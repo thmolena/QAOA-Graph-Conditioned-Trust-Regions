@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "specops-gctr"
+version = "3.0.0"
+description = "Graph-Conditioned Trust Regions for query-efficient QAOA parameter setting: exact-statevector QAOA pipeline with a graph-conditioned Gaussian surrogate that regenerates every figure, table, and CSV in the manuscript."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Molena Huynh", email = "molena.huynh@jmp.com" }]
+keywords = ["QAOA", "quantum-optimization", "trust-region", "uncertainty-quantification", "MaxCut", "reproducibility"]
+dependencies = ["numpy>=1.21", "scipy>=1.7", "networkx>=2.6", "matplotlib>=3.5", "pandas>=1.3", "torch>=1.12"]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+
+[project.scripts]
+gctr-reproduce = "specops_gctr.reproduce:main"
+
+[project.urls]
+Repository = "https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions"
+
+# Canonical sources live in code/ (see code/pyproject.toml). This root config
+# mirrors it so `pip install .` also works from the repository root.
+[tool.setuptools]
+package-dir = { "specops_gctr" = "code/specops_gctr" }
+packages = ["specops_gctr"]

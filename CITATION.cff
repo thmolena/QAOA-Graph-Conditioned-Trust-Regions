@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software or the accompanying manuscript, please cite it."
+title: "Graph-Conditioned Trust Regions for Query-Efficient QAOA"
+authors:
+  - family-names: "Huynh"
+    given-names: "Molena"
+    affiliation: "North Carolina State University"
+version: 3.0.0
+date-released: "2026-07-12"
+license: MIT
+repository-code: "https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions"
+preferred-citation:
+  type: article
+  title: "Query-Efficient Quantum Approximate Optimization via Graph-Conditioned Trust Regions"
+  authors:
+    - family-names: "Huynh"
+      given-names: "Molena"
+  year: 2026
+  identifiers:
+    - type: other
+      value: "arXiv:2604.24803"
+      description: "arXiv preprint"

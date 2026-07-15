@@ -1,0 +1,11 @@
+_backup_before_prep/
+.DS_Store
+*.egg-info/
+__pycache__/
+*.pyc
+.mplconfig/
+build/
+.pytest_cache/
+.venv/
+out/
+code/build/

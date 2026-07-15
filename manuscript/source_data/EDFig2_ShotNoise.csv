@@ -1,0 +1,7 @@
+shots,method,evaluations,evaluations_sd,expectation_ratio,expectation_ratio_sd
+128,Random,194.4,152.4,0.828,0.032
+128,Heuristic,13.9,8.7,0.853,0.028
+128,GCTR,18.5,18.2,0.854,0.026
+1024,Random,203.1,156.4,0.832,0.035
+1024,Heuristic,13.4,8.7,0.857,0.027
+1024,GCTR,18.0,17.1,0.856,0.026

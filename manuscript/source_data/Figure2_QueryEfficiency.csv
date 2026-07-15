@@ -1,0 +1,7 @@
+method,evaluations,evaluations_sd,expectation_ratio,expectation_ratio_sd,sampled_ratio,sampled_ratio_sd,runtime_ms,runtime_ms_sd,wilcoxon_p_vs_gctr
+Random,203.92,152.94,0.834,0.035,1.0,0.0,823.64,642.31,0.0
+Heuristic,12.33,6.45,0.857,0.027,1.0,0.0,57.47,28.4,0.000513
+k-NN,45.98,117.93,0.853,0.031,1.0,0.0,192.36,469.62,0.004947
+TQA,18.48,13.48,0.843,0.032,1.0,0.0,81.0,52.34,0.091136
+GNN point,179.4,125.53,0.801,0.057,0.99,0.02,717.7,495.41,0.0
+GCTR,15.27,8.1,0.856,0.026,1.0,0.0,68.83,34.17,

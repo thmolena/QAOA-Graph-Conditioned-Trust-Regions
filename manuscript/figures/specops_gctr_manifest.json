@@ -1,0 +1,53 @@
+{
+  "package": "specops-gctr",
+  "bib_key": "huynh2026gctr",
+  "mode": "full",
+  "source_data": "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/source_data",
+  "figures": [
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure1_ConceptualPipeline.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure1_ConceptualPipeline.png",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure2_QueryEfficiency.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure2_QueryEfficiency.png",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure3_CalibrationAndUncertainty.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure3_CalibrationAndUncertainty.png",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure4_Generalization.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure4_Generalization.png",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure5_Ablation.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure5_Ablation.png",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure6_QualityCostFrontier.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure6_QualityCostFrontier.png",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure7_UncertaintyBudgetPolicy.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure7_UncertaintyBudgetPolicy.png",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure9_LandscapeSlice.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure9_LandscapeSlice.png",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/ExtendedData/ED_Fig2_ShotNoiseRobustness.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/ExtendedData/ED_Fig2_ShotNoiseRobustness.png",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/ExtendedData/ED_Fig3_SeedStability.pdf",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/ExtendedData/ED_Fig3_SeedStability.png"
+  ],
+  "tables": [
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/tables/table_efficiency.tex",
+    "/Users/mohuyn/Library/CloudStorage/OneDrive-SAS/Documents/GitHub/QAOA-Graph-Conditioned-Trust-Regions/manuscript/tables/table_ablation.tex"
+  ],
+  "readouts": {
+    "evals::GCTR": 15.3,
+    "evals_sd::GCTR": 8.1,
+    "evals::Random": 203.9,
+    "evals::Heuristic": 12.3,
+    "evals::GNN point": 179.4,
+    "expratio::GCTR": 0.856,
+    "reduction_vs_random": 0.925,
+    "speedup_min": 9.64,
+    "speedup_max": 13.65,
+    "ece": 0.049,
+    "spearman": 0.673,
+    "spearman_p": 0.0,
+    "trsigma_spread": 0.45923,
+    "lofo_gctr": 39.0,
+    "lofo_point": 118.8,
+    "lofo_heuristic": 68.1,
+    "seeds_gctr": "16.4+-3.0",
+    "seeds_heuristic": "12.3+-0.0",
+    "seeds_spearman": "0.715+-0.040"
+  }
+}
