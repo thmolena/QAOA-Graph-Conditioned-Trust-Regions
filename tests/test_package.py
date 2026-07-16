@@ -452,7 +452,12 @@ def test_committed_headline_statistics_are_self_consistent():
         assert float(table.loc[method, "evaluations_sd"]) == pytest.approx(
             values.std(ddof=0), abs=0.005)
         if method != "GCTR":
-            stat, pvalue = wilcoxon(gctr, values)
+            # The recorded SciPy 1.17 release environment selects the normal
+            # approximation for these tied/zero-difference samples.  SciPy
+            # 1.13 (the newest release on Python 3.9) selects a different
+            # automatic path for some comparisons, so request the recorded
+            # method explicitly when replaying the committed statistics.
+            stat, pvalue = wilcoxon(gctr, values, method="approx")
             stored = results["queries"]["_wilcoxon"][method]
             assert stored["w"] == pytest.approx(stat)
             assert stored["p"] == pytest.approx(pvalue)
