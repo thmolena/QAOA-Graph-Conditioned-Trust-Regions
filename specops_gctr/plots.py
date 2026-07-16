@@ -418,10 +418,10 @@ def fig_repository_architecture(src: Path) -> plt.Figure:
                  fontweight="semibold")
 
     rows = [
-        (0.68, "Installable source\ncode/specops_gctr/",
+        (0.68, "Installable source\nspecops_gctr/",
          "Public API + CLIs\ngctr-optimize\ngctr-reproduce",
          "Wheel / editable install"),
-        (0.40, "Release tests\ncode/tests/",
+        (0.40, "Release tests\ntests/",
          "31 unit + artifact tests\nmath, accounting, hashes",
          "Validated package"),
         (0.12, "Committed evidence\nmanuscript/source_data/",

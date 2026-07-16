@@ -265,8 +265,8 @@
       <div class="section-heading">
         <h2>Reproducible Research Package</h2>
         <p>
-          The repository root and the <code>code/</code> directory install the
-          same <code>specops-gctr</code> distribution. The release contains the
+          The repository root is the single installable source for the
+          <code>specops-gctr</code> distribution. The release contains the
           exact-statevector objective, graph generator, trainable predictor,
           held-out error head, search policies, statistics, source data, figure
           and table generators, and a release test suite. Schema-2 validation checks
@@ -279,13 +279,13 @@
         </p>
       </div>
       <div class="bibtex-box install-box">
-        <pre><code>python -m pip install "specops-gctr @ git+https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions.git#subdirectory=code"
+        <pre><code>python -m pip install "specops-gctr @ git+https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions.git"
 gctr-optimize --family er --n 10 --budget 100 --json
 
 # Replot and tests require a repository checkout:
 gctr-reproduce --replot-only --source-data-dir manuscript/source_data
 gctr-reproduce --validate-only --manuscript-dir manuscript
-python -m pytest code/tests -q</code></pre>
+python -m pytest tests -q</code></pre>
       </div>
     </section>
 

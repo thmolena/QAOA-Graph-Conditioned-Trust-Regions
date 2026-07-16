@@ -177,7 +177,7 @@ def validate_manifest(manuscript_dir: Path, figures_dir: Path | None = None) -> 
 def _default_manuscript_dir() -> Path:
     """Locate the manuscript root (the directory holding main.tex) relative to
     the package. In a repository checkout the package lives at
-    ``<repo>/code/specops_gctr`` and the manuscript at ``<repo>/manuscript``;
+    ``<repo>/specops_gctr`` and the manuscript at ``<repo>/manuscript``;
     for a pip-installed package with no repository nearby, fall back to the
     current working directory (outputs land in ./source_data, ./figures,
     ./tables)."""

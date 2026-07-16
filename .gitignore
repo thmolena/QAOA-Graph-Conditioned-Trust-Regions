@@ -10,8 +10,6 @@ root-dist/
 .pytest_cache/
 .venv/
 out/
-code/build/
-code/dist/
 .coverage
 coverage.xml
 htmlcov/

@@ -41,9 +41,6 @@ Repository = "https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions"
 Issues = "https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions/issues"
 Paper = "https://arxiv.org/abs/2604.24803"
 
-# Canonical sources live in code/ (see code/pyproject.toml). This root config
-# mirrors it so `pip install .` also works from the repository root.
 [tool.setuptools]
-package-dir = { "specops_gctr" = "code/specops_gctr" }
 packages = ["specops_gctr"]
 include-package-data = false

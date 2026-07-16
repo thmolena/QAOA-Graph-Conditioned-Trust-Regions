@@ -124,7 +124,7 @@ The paper is organized as follows. Section~\ref{sec:related} positions the metho
 \section{Method}
 \label{sec:method}
 
-This section specifies the algorithm as implemented in the released package (module names in \texttt{typewriter} font refer to \texttt{code/specops\_gctr/}); Appendix~\ref{app:repro} maps every component to its implementation and test. The schema-2 evidence records the exact simulation-generator digest. Display-only table and plotting code is versioned separately in the portable manifest, so presentation changes cannot be mistaken for a new numerical experiment.
+This section specifies the algorithm as implemented in the released package (module names in \texttt{typewriter} font refer to the root \texttt{specops\_gctr/} package); Appendix~\ref{app:repro} maps every component to its implementation and test. The schema-2 evidence records the exact simulation-generator digest. Display-only table and plotting code is versioned separately in the portable manifest, so presentation changes cannot be mistaken for a new numerical experiment.
 
 \subsection{Problem setting, QAOA objective, and the stopping protocol}
 \label{subsec:protocol}
@@ -287,7 +287,7 @@ The primary metric is the capped benchmark cost in Eq.~\eqref{eq:cappedscore}, a
 \subsection{Reproducibility}
 \label{subsec:repro}
 
-The released package \texttt{specops-gctr} (\texttt{code/}) contains the simulator, graph features, trainable policy, optimizers, baselines, calibration diagnostics, plotting, tables and command-line drivers, together with a fitted-model interface and backend-neutral callback policy. The callback counts user evaluator calls, but authentication, compilation, mitigation, queueing, shot allocation and hardware uncertainty remain backend responsibilities; no hardware result is inferred. Graph-only prediction avoids the exponential statevector, yet uses a dense eigendecomposition and adjacency tensor. Complete fitting still requires exact-simulation \texttt{Instance} objects for calibration and offers no external calibration-error/objective-label callback, so it is not a large-scale training path. The \texttt{--replot-only} and \texttt{--validate-only} modes render and verify hashed schema-2 evidence. Both main-text tables are generated from CSVs and included verbatim.
+The released root package \texttt{specops-gctr} (\texttt{specops\_gctr/}) contains the simulator, graph features, trainable policy, optimizers, baselines, calibration diagnostics, plotting, tables and command-line drivers, together with a fitted-model interface and backend-neutral callback policy. The callback counts user evaluator calls, but authentication, compilation, mitigation, queueing, shot allocation and hardware uncertainty remain backend responsibilities; no hardware result is inferred. Graph-only prediction avoids the exponential statevector, yet uses a dense eigendecomposition and adjacency tensor. Complete fitting still requires exact-simulation \texttt{Instance} objects for calibration and offers no external calibration-error/objective-label callback, so it is not a large-scale training path. The \texttt{--replot-only} and \texttt{--validate-only} modes render and verify hashed schema-2 evidence. Both main-text tables are generated from CSVs and included verbatim.
 
 The canonical run records seed $20260424$, Python 3.13.12, NumPy 2.4.3, SciPy 1.17.1, NetworkX 3.6.1, PyTorch 2.11.0 with one thread, Matplotlib 3.10.8, pandas 3.0.2 and macOS/arm64 in \texttt{meta.json}. It records package 3.2.0 and the exact simulation-generator digest; a small source archive preserves those executed modules. The portable manifest separately fingerprints later display-only code and hashes every source and generated artifact. Floating-point details can vary across platforms, and runtime is machine-dependent.
 
@@ -621,8 +621,9 @@ dataset is used. A versioned archival DOI has not yet been assigned.
 
 \section*{Code availability}
 
-The complete implementation is included under \texttt{code/} as the
-installable MIT-licensed package \texttt{specops-gctr}: graph generation,
+The complete implementation is included at repository root under
+\texttt{specops\_gctr/} as the installable MIT-licensed package
+\texttt{specops-gctr}: graph generation,
 spectral features, exact and finite-shot QAOA objectives, target generation,
 the GIN predictor and calibration head, policy and baselines, diagnostics,
 figures, tables, public model and callback interfaces, command-line optimization
@@ -631,7 +632,7 @@ code but no pretrained checkpoint. \texttt{GCTRPolicyModel.fit} currently
 requires exact-simulation \texttt{Instance} objects and has no external
 calibration-error or objective-label callback; graph-only prediction uses dense
 linear algebra. These are explicit API limits, not implied hardware or
-large-scale capabilities. Unit and release tests ship under \texttt{code/tests/}.
+large-scale capabilities. Unit and release tests ship under \texttt{tests/}.
 
 \appendix
 
@@ -1345,7 +1346,7 @@ Figure~\ref{fig:theorymap} sketches how the predicted Gaussian feeds geometry an
 \subsection{Package layout and module contract}
 \label{app:layout}
 
-The artifact is a single installable Python package, \texttt{specops-gctr}, under \texttt{code/}:
+The artifact is a single installable Python package, \texttt{specops-gctr}, under the root \texttt{specops\_gctr/} directory:
 \begin{itemize}
 \item \texttt{graphs.py} --- instance generation for the four families, exact MaxCut by brute force, Laplacian spectral features with deterministic sign canonicalization;
 \item \texttt{qaoa.py} --- exact-statevector QAOA objective, finite-shot estimator, sampled best-bitstring ratio;
@@ -1360,6 +1361,7 @@ The artifact is a single installable Python package, \texttt{specops-gctr}, unde
 \item \texttt{reproduce.py} --- the \texttt{gctr-reproduce} console entry point;
 \item \texttt{cli.py} --- the tunable \texttt{gctr-optimize} single-instance command.
 \end{itemize}
+The root \texttt{run.py} dispatcher forwards reviewer arguments to the same two command implementations without introducing a second package layer.
 The mapping from equations to modules is part of the scientific claim: each mathematical component described in Sec.~\ref{sec:method} has a direct implementation site and a corresponding test. The implementation-level consistency conditions are few and checkable: every predicted mean and variance vector has length $2p$; the same $\Sigma$ is used for the retraction and the step preconditioning; the evaluation counter increments on every objective call, including seed evaluations; the reported ratio is the exact expectation of the returned angles; and the error calibrator is fit only on validation residuals.
 
 Figure~\ref{fig:repo} sketches the reviewer-facing architecture using the literal released paths. Installable source feeds the public API and commands; release tests verify mathematical and artifact contracts; and committed evidence feeds generated data figures, tables, the manuscript and its source archive. Generator source is archived separately from display-only code so numerical provenance survives later presentation changes.
@@ -1374,14 +1376,15 @@ Figure~\ref{fig:repo} sketches the reviewer-facing architecture using the litera
 \subsection{Test suite}
 \label{app:tests}
 
-The tests in \texttt{code/tests/test\_package.py} split into component tests of the mathematical contracts the manuscript relies on---the QAOA objective against an independent dense computation and the $\theta=0$ closed form, approximate unbiasedness of the finite-shot estimator, feasibility and idempotence of the trust-region retraction, exact query counting including seed evaluations, duplicate-seed suppression, the budget cap, the never-worse-than-best-seed guarantee, exactness of the reported value of returned parameters, monotonicity and clamping of the budget rule, discrimination of the coverage ECE on synthetic residuals, the Spearman interface, the TQA midpoint-ramp schedule, the heuristic's use of supplied angles, dataset determinism, agreement of the configuration defaults with this manuscript, the public API plus single-instance command, and callback-policy query accounting and invalid-geometry rejection---and smoke tests of the release path: entry-point callability, rebuilding every figure from the committed source data, regenerating both tables, manifest validation, aggregate-statistic consistency, and the \texttt{-{}-replot-only} command line.
+The tests in \texttt{tests/test\_package.py} split into component tests of the mathematical contracts the manuscript relies on---the QAOA objective against an independent dense computation and the $\theta=0$ closed form, approximate unbiasedness of the finite-shot estimator, feasibility and idempotence of the trust-region retraction, exact query counting including seed evaluations, duplicate-seed suppression, the budget cap, the never-worse-than-best-seed guarantee, exactness of the reported value of returned parameters, monotonicity and clamping of the budget rule, discrimination of the coverage ECE on synthetic residuals, the Spearman interface, the TQA midpoint-ramp schedule, the heuristic's use of supplied angles, dataset determinism, agreement of the configuration defaults with this manuscript, the public API plus single-instance command, and callback-policy query accounting and invalid-geometry rejection---and smoke tests of the release path: entry-point callability, rebuilding every figure from the committed source data, regenerating both tables, manifest validation, aggregate-statistic consistency, and the \texttt{-{}-replot-only} command line.
 
 \subsection{Reviewer commands}
 \label{app:commands}
 
 \begin{lstlisting}[caption={Complete reviewer workflow.},label={lst:commands}]
-pip install ./code
-cd code && pip install -e ".[test]" && pytest -q
+pip install .
+pip install -e ".[test]" && pytest -q
+python run.py reproduce --validate-only
 gctr-reproduce                 # full run
 gctr-reproduce --quick         # smoke run
 gctr-reproduce --replot-only   # re-render figures/tables

@@ -2,7 +2,7 @@
 
 [![Package CI](https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions/actions/workflows/ci.yml/badge.svg)](https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](code/pyproject.toml)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
 
 QAOA objective values are statistical queries: every optimizer evaluation costs
 repeated circuit preparation and measurement. This project learns a complete
@@ -27,7 +27,7 @@ median of 240 expensive training targets.
 
 - [Manuscript](manuscript/main.pdf) · [LaTeX source](manuscript/main.tex)
 - [Project page](https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/)
-- [Installable package](code/) · [Source data](manuscript/source_data/)
+- [Python package](specops_gctr/) · [Source data](manuscript/source_data/)
 - Preprint: [arXiv:2604.24803](https://arxiv.org/abs/2604.24803)
 
 > **Revision status.** The repository manuscript, package, and schema-2
@@ -44,7 +44,7 @@ median of 240 expensive training targets.
 | Gaussian angle uncertainty has marginal coverage diagnostics; a separate error score drives allocation | Angle-head ECE `0.101`; difficulty-score Spearman `rho = 0.671`, `p = 1.76e-7` | `Figure3_CalibrationAndUncertainty.csv`; `Figure7_BudgetPolicy.csv` | ECE and rank correlation measure different objects; neither proves calibrated stopping probabilities |
 | LOFO shift exposes mixed method ordering | GCTR `39/48`, cost `89.3`; heuristic `40/48`, `86.5`, `p = 0.832`; point `38/48`, `125.0`, `p = 0.00509`; two-seed/full-cap control `41/48`, `73.75`, `p = 0.0355` | `LOFO_InstanceLevel.csv`; `results.json` | Four fitted family clusters and a composite control make the paired tests exploratory, not causal evidence for allocation |
 | The ranking penalty is not supported by this run | Full ECE/rank correlation `0.101/0.671`; without ranking penalty `0.026/0.854` | `Figure5_Ablation.csv`; `results.json` | One component-removal run is diagnostic, not a causal estimate or a new confirmatory test |
-| Returned exact quality is protected by best-so-far seed selection when the budget admits the mandatory seeds | Monotone implementation and `test_seeded_policy_never_worse_than_best_seed` | `code/specops_gctr/optimization.py`; focused test | The guarantee is conditional on enough effective budget to evaluate the required seed set and compares with evaluated seed values, not a separately refined baseline |
+| Returned exact quality is protected by best-so-far seed selection when the budget admits the mandatory seeds | Monotone implementation and `test_seeded_policy_never_worse_than_best_seed` | `specops_gctr/optimization.py`; focused test | The guarantee is conditional on enough effective budget to evaluate the required seed set and compares with evaluated seed values, not a separately refined baseline |
 | Early truncation cannot improve shared-cap cost on a fixed trajectory | Pointwise target-hit/miss argument in the early-cap monotonicity proposition | manuscript Sec. V; `score_semantics` in `meta.json` | The two-seed/full-cap control also changes seeds, so its empirical difference cannot be assigned to the cap |
 | If a policy uses fewer fixed evaluation locations, a sufficient uniform-shot upper bound decreases | Concentration bounds plus finite-shot stress tests | manuscript Sec. V and Extended Data Fig. 2 | GCTR does not use fewer locations than the heuristic/control here; this is not an end-to-end hardware-cost identity |
 
@@ -69,27 +69,36 @@ attainment at every size.
 Install the canonical package from a checkout:
 
 ```bash
-python -m pip install ./code
+python -m pip install .
 ```
 
 Or install directly from the public Git repository:
 
 ```bash
 python -m pip install \
-  "specops-gctr @ git+https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions.git#subdirectory=code"
+  "specops-gctr @ git+https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions.git"
 ```
 
 For development and release checks:
 
 ```bash
-python -m pip install -e "./code[dev]"
-python -m pytest code/tests -q
+python -m pip install -e ".[dev]"
+python -m pytest tests -q
 ```
 
 The distribution name is `specops-gctr` and the import name is
 `specops_gctr`. Bare `pip install specops-gctr` will work only after version
 3.2.0 is uploaded to a Python package index; this repository does not claim
 that the index upload has already happened.
+
+The installed console commands remain the primary interface. From a checkout,
+the root dispatcher offers the same two entry points without path-specific
+shell wrappers:
+
+```bash
+python run.py optimize --help
+python run.py reproduce --validate-only
+```
 
 ## Fit and use the complete learned policy
 
@@ -253,11 +262,39 @@ PyTorch, BLAS, and platform builds. The recorded environment is stored in
 [`manuscript/source_data/meta.json`](manuscript/source_data/meta.json), and
 wall-clock columns are machine-dependent.
 
+## Distribution checks
+
+```bash
+python -m build .
+python -m twine check dist/*
+python -m pip install dist/*.whl
+gctr-optimize --family er --n 4 --budget 4 --json
+```
+
+The wheel contains the executable package and console commands; committed
+manuscript evidence stays in the repository and is supplied explicitly to
+replot or validation commands.
+
+## Module contract
+
+| Module | Responsibility |
+| --- | --- |
+| `qaoa` | Exact and finite-shot QAOA objectives |
+| `graphs` | Instances, exact MaxCut, spectral encodings |
+| `model`, `losses`, `estimator` | GIN Gaussian, training objectives, serializable high-level policy |
+| `calibration` | Reliability and uncertainty diagnostics |
+| `optimization`, `baselines` | Query-counted search, callback adapter, comparisons |
+| `pipeline` | Data, training, calibration, allocation, evaluations |
+| `plots`, `tables` | Source data to publication artifacts |
+| `cli`, `reproduce` | User command and full artifact command |
+
 ## Repository map
 
 ```text
-code/specops_gctr/       canonical package, estimator, and two console commands
-code/tests/              mathematical-contract, API, CLI, and reproduction tests
+specops_gctr/            canonical package, estimator, and two console commands
+tests/                    mathematical-contract, API, CLI, and reproduction tests
+run.py                    root dispatcher for optimize and reproduce commands
+pyproject.toml            single package and build definition
 manuscript/main.tex      article source
 manuscript/main.pdf      compiled article
 manuscript/source_data/  aggregate and per-instance CSV/JSON evidence
