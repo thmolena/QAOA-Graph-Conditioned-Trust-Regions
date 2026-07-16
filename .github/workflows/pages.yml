@@ -1,0 +1,45 @@
+name: Project page
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Stage public project page
+        run: |
+          mkdir -p _site/manuscript/figures
+          cp index.html style.css script.js favicon.svg _site/
+          cp manuscript/main.pdf _site/manuscript/
+          cp manuscript/figures/Figure1_ConceptualPipeline.png _site/manuscript/figures/
+          cp manuscript/figures/Figure2_QueryEfficiency.png _site/manuscript/figures/
+          cp manuscript/figures/Figure3_CalibrationAndUncertainty.png _site/manuscript/figures/
+          cp manuscript/figures/Figure4_Generalization.png _site/manuscript/figures/
+          cp manuscript/figures/Figure6_QualityCostFrontier.png _site/manuscript/figures/
+      - name: Check staged page assets
+        run: |
+          test -s _site/index.html
+          test -s _site/manuscript/main.pdf
+          test -s _site/manuscript/figures/Figure1_ConceptualPipeline.png
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

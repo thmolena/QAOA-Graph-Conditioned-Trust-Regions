@@ -39,6 +39,28 @@ class QueryCounter:
                                         rng=self.noise_rng)
 
 
+class CallableQueryCounter:
+    """Count calls to a user-supplied objective evaluator.
+
+    ``evaluator`` may execute a circuit, call a remote service, read a
+    surrogate, or evaluate any other scalar objective. The search policy sees
+    only the returned scalar and an exact call count.
+    """
+
+    def __init__(self, evaluator):
+        if not callable(evaluator):
+            raise TypeError("evaluator must be callable")
+        self.evaluator = evaluator
+        self.count = 0
+
+    def __call__(self, params) -> float:
+        self.count += 1
+        value = float(self.evaluator(np.asarray(params, dtype=float)))
+        if not np.isfinite(value):
+            raise ValueError("objective evaluator returned a non-finite value")
+        return value
+
+
 def _project_trust_region(x, center, L_inv=None, radius=None):
     """Retract x into the Mahalanobis ball of `radius` around `center`.
 
@@ -52,6 +74,13 @@ def _project_trust_region(x, center, L_inv=None, radius=None):
     """
     if radius is None or L_inv is None:
         return x
+    if not np.isfinite(radius) or radius <= 0:
+        raise ValueError("radius must be positive when a trust region is used")
+    x = np.asarray(x, dtype=float)
+    center = np.asarray(center, dtype=float)
+    L_inv = np.asarray(L_inv, dtype=float)
+    if center.shape != x.shape or L_inv.shape != (x.size, x.size):
+        raise ValueError("center and L_inv must match the parameter dimension")
     d = x - center
     m = L_inv @ d
     dist = np.linalg.norm(m)
@@ -75,28 +104,55 @@ def coordinate_search(objective, x0, budget, step0=0.3, center=None,
     reaches it; the query count is then the operational cost to reach that
     quality.
 
-    `candidates` (improvement B): an optional list of extra seed points. The
-    seed set {x0} U candidates is evaluated first (one honest query each, no
-    point evaluated twice); the best becomes the starting point and best-so-far,
-    so the search is never worse than the best cheap prior it is handed (e.g. the
-    concentration heuristic). With `recenter_on_best`, the Mahalanobis trust
-    region is re-centered on the winning seed and the seeds are evaluated
-    unprojected -- so when the heuristic seed wins, the subsequent search
-    explores its basin (keeping the learned shape/preconditioning) instead of
-    being dragged back toward a possibly-wrong GNN mean.
+    `candidates` is an optional list of extra seed points. Exact duplicate seed
+    vectors are removed before the seed set is evaluated, with one counted query
+    for each remaining seed. The best becomes the starting point and best-so-far,
+    so the search is never worse than the best evaluated prior it is handed (for
+    example, the concentration heuristic). With `recenter_on_best`, the
+    Mahalanobis trust region is re-centered on the winning seed and the seeds are
+    evaluated unprojected, so when the heuristic seed wins the subsequent search
+    explores its basin while retaining the learned shape and preconditioning.
     """
+    if int(budget) != budget or budget < 1:
+        raise ValueError("budget must be a positive integer")
+    budget = int(budget)
+    if not hasattr(objective, "count"):
+        raise TypeError("objective must expose a mutable count")
+    if not np.isfinite(step0) or step0 <= 0:
+        raise ValueError("step0 must be positive")
+    if target is not None and not np.isfinite(target):
+        raise ValueError("target must be finite when supplied")
     if rng is None:
         rng = np.random.default_rng(0)
     x = np.array(x0, dtype=float)
+    if x.ndim != 1 or x.size == 0 or not np.all(np.isfinite(x)):
+        raise ValueError("x0 must be a finite one-dimensional vector")
     dim = len(x)
     if step_scale is None:
         step_scale = np.ones(dim)
     else:
         step_scale = np.asarray(step_scale, dtype=float)
+        if (step_scale.shape != x.shape or not np.all(np.isfinite(step_scale))
+                or np.any(step_scale < 0) or not np.any(step_scale > 0)):
+            raise ValueError(
+                "step_scale must match x0 and contain finite nonnegative values")
+    if center is not None:
+        center = np.asarray(center, dtype=float)
+        if center.shape != x.shape or not np.all(np.isfinite(center)):
+            raise ValueError("center must be finite and have the same shape as x0")
+    if L_inv is not None:
+        L_inv = np.asarray(L_inv, dtype=float)
+        if L_inv.shape != (dim, dim) or not np.all(np.isfinite(L_inv)):
+            raise ValueError("L_inv must be a finite square matrix matching x0")
     # Assemble the seed set (x0 first, then any extra candidates) and evaluate
     # each exactly once, tracking the best. Seeds are projected into the trust
     # region unless we intend to re-center it on the winner.
-    seeds = [x] + [np.array(c, dtype=float) for c in (candidates or [])]
+    seeds = []
+    for seed in [x] + [np.asarray(c, dtype=float) for c in (candidates or [])]:
+        if seed.shape != x.shape or not np.all(np.isfinite(seed)):
+            raise ValueError("every candidate must be finite and match x0 shape")
+        if not any(np.array_equal(seed, prior) for prior in seeds):
+            seeds.append(seed.copy())
     project_seeds = center is not None and not recenter_on_best
     fbest = -np.inf
     xbest = seeds[0]
@@ -142,9 +198,12 @@ def run_policy(C, n, maxcut, init_params, budget, center=None, L_inv=None,
                recenter_on_best=False, shots=None):
     """Run coordinate search (optionally with restarts) and report metrics.
 
-    Returns dict with evaluations, ratio (sampled best-bitstring approx ratio),
-    the exact expectation `value` of the returned angles, and the best params
-    found. `restarts` random initializations are used for the random-restart
+    Returns both ``evaluations`` (the legacy raw-use key) and
+    ``evaluations_used``, plus ``reached_target``, sampled ratio, the exact
+    expectation ``value`` of the returned angles, and the best parameters.
+    A benchmark that gives one method an early cap must score a miss at the
+    shared cap outside this function; raw use alone is not a fair cost-to-target
+    score. ``restarts`` random initializations are used for the random-restart
     baseline; each restart shares the total budget. If `target` (an objective
     value) is given, search stops when reached and the evaluation count is the
     cost-to-target.
@@ -155,13 +214,18 @@ def run_policy(C, n, maxcut, init_params, budget, center=None, L_inv=None,
     angles, recomputed once outside the query count, so quality is measured
     without estimator noise.
     """
+    if int(budget) != budget or budget < 1:
+        raise ValueError("budget must be a positive integer")
+    if int(restarts) != restarts or restarts < 1:
+        raise ValueError("restarts must be a positive integer")
+    budget, restarts = int(budget), int(restarts)
     if rng is None:
         rng = np.random.default_rng(0)
     counter = QueryCounter(C, n, maxcut, shots=shots,
                            noise_rng=np.random.default_rng(sample_seed + 1))
     best_params = np.array(init_params, dtype=float)
     best_val = -np.inf
-    per = max(4, budget // restarts)
+    per = max(1, budget // restarts)
     for r in range(restarts):
         if r == 0:
             x0 = np.array(init_params, dtype=float)
@@ -190,7 +254,50 @@ def run_policy(C, n, maxcut, init_params, budget, center=None, L_inv=None,
     value_exact = qaoa_expectation(C, np.asarray(best_params, dtype=float), n)
     return {
         "evaluations": counter.count,
+        "evaluations_used": counter.count,
+        "reached_target": (None if target is None
+                           else bool(best_val >= target)),
         "ratio": ratio,
         "value": value_exact,
         "params": best_params,
+    }
+
+
+def optimize_callback(evaluator, init_params, budget, center=None, L_inv=None,
+                      radius=None, target=None, step_scale=None, step0=0.3,
+                      candidates=None, recenter_on_best=False,
+                      exact_evaluator=None):
+    """Optimize an arbitrary scalar evaluator with counted pattern search.
+
+    ``evaluator`` is the operational, possibly noisy objective and is called at
+    most ``budget`` times. If ``exact_evaluator`` is supplied, it is called once
+    on the returned parameters to provide an uncounted diagnostic in ``value``;
+    the best operational value remains available as ``observed_value``.
+    """
+    if int(budget) != budget or budget < 1:
+        raise ValueError("budget must be a positive integer")
+    x0 = np.asarray(init_params, dtype=float)
+    if x0.ndim != 1 or x0.size == 0 or not np.all(np.isfinite(x0)):
+        raise ValueError("init_params must be a finite one-dimensional vector")
+    counter = CallableQueryCounter(evaluator)
+    params, observed, _ = coordinate_search(
+        counter, x0, int(budget), step0=step0, center=center, L_inv=L_inv,
+        radius=radius, target=target, step_scale=step_scale,
+        candidates=candidates, recenter_on_best=recenter_on_best,
+    )
+    value = observed
+    if exact_evaluator is not None:
+        if not callable(exact_evaluator):
+            raise TypeError("exact_evaluator must be callable")
+        value = float(exact_evaluator(np.asarray(params, dtype=float)))
+        if not np.isfinite(value):
+            raise ValueError("exact_evaluator returned a non-finite value")
+    return {
+        "evaluations": counter.count,
+        "evaluations_used": counter.count,
+        "reached_target": (None if target is None
+                           else bool(observed >= target)),
+        "observed_value": float(observed),
+        "value": float(value),
+        "params": np.asarray(params, dtype=float),
     }

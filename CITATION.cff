@@ -5,8 +5,7 @@ authors:
   - family-names: "Huynh"
     given-names: "Molena"
     affiliation: "North Carolina State University"
-version: 3.0.0
-date-released: "2026-07-12"
+version: 3.2.0
 license: MIT
 repository-code: "https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions"
 preferred-citation:

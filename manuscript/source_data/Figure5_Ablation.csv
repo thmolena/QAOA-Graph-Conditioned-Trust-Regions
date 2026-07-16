@@ -1,9 +1,9 @@
-variant,evaluations,evaluations_sd,ece,spearman,spearman_p
-Full method,15.27,8.1,0.049,0.673,0.0
-No trust region,14.83,7.75,0.049,0.673,0.0
-No heuristic seed,82.9,51.26,0.049,0.673,0.0
-No adaptive budget,14.33,7.91,0.049,0.673,0.0
-No error calibrator,18.98,34.48,0.049,-0.71,0.0
-No Wasserstein loss,17.54,16.46,0.055,0.785,0.0
-No ranking penalty,14.77,7.07,0.089,0.737,0.0
-No spectral encodings,15.33,8.49,0.081,0.665,0.0
+variant,evaluations,evaluations_sd,successes,n_test,ece,spearman,spearman_p
+Full method,15.0,7.82,48,48,0.101,0.671,1.7572245e-07
+No trust region,22.88,55.55,47,48,0.101,0.671,1.7572245e-07
+No heuristic seed,249.44,178.8,20,48,0.101,0.671,1.7572245e-07
+Two-seed/full-cap control,14.31,7.93,48,48,0.101,0.671,1.7572245e-07
+No error calibrator,22.29,55.6,47,48,0.101,-0.638,1.0803717e-06
+No Wasserstein loss,15.58,9.58,48,48,0.069,0.751,7.9173571e-10
+No ranking penalty,17.29,17.24,48,48,0.026,0.854,1.2034144e-14
+No spectral encodings,15.33,8.49,48,48,0.081,0.665,2.5575847e-07

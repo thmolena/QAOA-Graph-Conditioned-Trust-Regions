@@ -1,6 +1,7 @@
 """LaTeX table builders derived only from the committed source-data CSVs."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import List
 
@@ -25,7 +26,17 @@ def _fmt_p(p) -> str:
     p = float(p)
     if p < 1e-4:
         return r"$<10^{-4}$"
+    if p < 1e-3:
+        return r"$<0.001$"
     return f"${p:.3f}$"
+
+
+def _cost_heading(src: Path) -> str:
+    meta = json.loads((src / "meta.json").read_text())
+    if meta.get("score_semantics") == \
+            "recorded_objective_calls_until_target_convergence_or_cap":
+        return "Recorded objective calls"
+    return "Capped cost to target"
 
 
 def efficiency_table(src: Path) -> str:
@@ -36,9 +47,9 @@ def efficiency_table(src: Path) -> str:
     """
     df = pd.read_csv(src / "Figure2_QueryEfficiency.csv").set_index("method")
     lines = [
-        _HDR + r"\begin{tabular}{lcccc}",
+        _HDR + r"\begin{tabular}{lccccc}",
         r"\toprule",
-        r"Method & Evaluations to target & $F_G(\theta)/C_{\max}$ & "
+        rf"Method & {_cost_heading(src)} & Success & $F_G(\theta)/C_{{\max}}$ & "
         r"Runtime (ms) & $p$ (vs.\ GCTR) \\",
         r"\midrule",
     ]
@@ -47,10 +58,11 @@ def efficiency_table(src: Path) -> str:
             continue
         r = df.loc[key]
         evals = f"${r['evaluations']:.0f}\\pm{r['evaluations_sd']:.0f}$"
+        success = f"${int(r['successes'])}/{int(r['n_test'])}$"
         exp = f"${r['expectation_ratio']:.3f}\\pm{r['expectation_ratio_sd']:.3f}$"
         rt = f"${r['runtime_ms']:.0f}\\pm{r['runtime_ms_sd']:.0f}$"
         pv = _fmt_p(r.get("wilcoxon_p_vs_gctr", ""))
-        lines.append(f"{disp} & {evals} & {exp} & {rt} & {pv} \\\\")
+        lines.append(f"{disp} & {evals} & {success} & {exp} & {rt} & {pv} \\\\")
     lines += [r"\bottomrule", r"\end{tabular}", ""]
     return "\n".join(lines)
 
@@ -61,19 +73,21 @@ def ablation_table(src: Path) -> str:
     df = pd.read_csv(src / "Figure5_Ablation.csv")
     f2 = pd.read_csv(src / "Figure2_QueryEfficiency.csv").set_index("method")
     lines = [
-        _HDR + r"\begin{tabular}{lccc}",
+        _HDR + r"\begin{tabular}{lcccc}",
         r"\toprule",
-        r"Variant & Evaluations to target & ECE & Spearman $\rho$ \\",
+        rf"Variant & {_cost_heading(src)} & Success & ECE & Spearman $\rho$ \\",
         r"\midrule",
     ]
     for _, r in df.iterrows():
         evals = f"${r['evaluations']:.0f}\\pm{r['evaluations_sd']:.0f}$"
-        lines.append(f"{r['variant']} & {evals} & {r['ece']:.3f} & "
+        success = f"${int(r['successes'])}/{int(r['n_test'])}$"
+        lines.append(f"{r['variant']} & {evals} & {success} & {r['ece']:.3f} & "
                      f"{r['spearman']:.3f} \\\\")
     if "GNN point" in f2.index:
         g = f2.loc["GNN point"]
         lines.append(f"Point prediction only & ${g['evaluations']:.0f}"
-                     f"\\pm{g['evaluations_sd']:.0f}$ & -- & -- \\\\")
+                     f"\\pm{g['evaluations_sd']:.0f}$ & "
+                     f"${int(g['successes'])}/{int(g['n_test'])}$ & -- & -- \\\\")
     lines += [r"\bottomrule", r"\end{tabular}", ""]
     return "\n".join(lines)
 

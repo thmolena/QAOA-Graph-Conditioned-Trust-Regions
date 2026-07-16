@@ -4,10 +4,10 @@ The network maps a graph to a diagonal Gaussian N(mu(G), Sigma(G)) over the 2p
 QAOA angles. This is a probabilistic surrogate for the expensive quantum
 optimization loop: mu initializes local search and Sigma both preconditions the
 step sizes and defines a Mahalanobis trust region. A separate post-hoc
-ErrorCalibrator head, fit on held-out (validation) residuals, predicts the
-realized warm-start error; that calibrated uncertainty is what allocates the
-per-instance seed count and evaluation budget (see pipeline.budget_rule), so
-the uncertainty is operational, not decorative.
+    ErrorCalibrator head, fit on held-out (validation) residuals, predicts the
+    realized warm-start error; that validation-fit difficulty score allocates
+    the per-instance seed count and evaluation budget (see pipeline.budget_rule).
+    It is a point prediction used for ranking, not a calibrated probability law.
 """
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ class GraphConditionedGaussian(nn.Module):
     def embed(self, x, adj, mask):
         """Return the pooled (mean||max) graph embedding [B, 2*hidden_dim].
 
-        Exposed so a post-hoc uncertainty calibrator can be fit on the same
+        Exposed so a post-hoc error-score head can be fit on the same
         representation the mean/geometry heads use, without recomputing the
         message passing.
         """
@@ -77,12 +77,12 @@ class GraphConditionedGaussian(nn.Module):
 
 
 class ErrorCalibrator(nn.Module):
-    """Post-hoc heteroscedastic error calibrator (improvement A).
+    """Post-hoc linear predictor of log realized warm-start error.
 
     A small linear map from the frozen graph embedding to the *predicted log
     realized error* of the GNN warm start. It is fit on the residuals of a
     held-out validation split (graphs the GNN never trained on), so the
-    reported uncertainty tracks the error a practitioner actually incurs --
+    resulting difficulty score can track the error a practitioner incurs --
     unlike tr(Sigma), which the likelihood-driven losses can flatten across
     instances. Kept deliberately linear because only a few dozen labelled
     graphs are available; an MLP/NLL head overfits.

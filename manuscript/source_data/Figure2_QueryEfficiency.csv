@@ -1,7 +1,7 @@
-method,evaluations,evaluations_sd,expectation_ratio,expectation_ratio_sd,sampled_ratio,sampled_ratio_sd,runtime_ms,runtime_ms_sd,wilcoxon_p_vs_gctr
-Random,203.92,152.94,0.834,0.035,1.0,0.0,823.64,642.31,0.0
-Heuristic,12.33,6.45,0.857,0.027,1.0,0.0,57.47,28.4,0.000513
-k-NN,45.98,117.93,0.853,0.031,1.0,0.0,192.36,469.62,0.004947
-TQA,18.48,13.48,0.843,0.032,1.0,0.0,81.0,52.34,0.091136
-GNN point,179.4,125.53,0.801,0.057,0.99,0.02,717.7,495.41,0.0
-GCTR,15.27,8.1,0.856,0.026,1.0,0.0,68.83,34.17,
+method,evaluations,evaluations_sd,evaluations_used,evaluations_used_sd,successes,n_test,expectation_ratio,expectation_ratio_sd,sampled_ratio,sampled_ratio_sd,runtime_ms,runtime_ms_sd,wilcoxon_p_vs_gctr
+Random,203.92,152.94,203.92,152.94,37,48,0.834,0.035,1.0,0.0,431.74,321.85,0.0
+Heuristic,12.33,6.45,12.33,6.45,48,48,0.857,0.027,1.0,0.0,30.55,13.74,0.000265
+k-NN,52.94,131.93,48.31,121.24,42,48,0.852,0.032,1.0,0.0,106.94,253.71,0.004926
+TQA,18.48,13.48,18.48,13.48,48,48,0.843,0.032,1.0,0.0,43.61,28.1,0.068282
+GNN point,264.42,164.02,190.79,128.73,20,48,0.793,0.068,0.984,0.029,406.47,267.73,0.0
+GCTR,15.0,7.82,15.0,7.82,48,48,0.858,0.026,1.0,0.0,36.64,17.43,

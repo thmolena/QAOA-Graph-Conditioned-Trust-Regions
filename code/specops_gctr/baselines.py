@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from .optimization import run_policy, _project_trust_region
+from .optimization import optimize_callback, run_policy, _project_trust_region
 
 # Documented fallback for standalone use of the concentration heuristic. The
 # pipeline never uses these values: it passes the coordinate-wise median of the
@@ -84,12 +84,52 @@ def gnn_point(inst, budget, mu, rng=None, sample_seed=0, target=None,
                       sample_seed=sample_seed, target=target, shots=shots)
 
 
+def _gctr_geometry(mu, sigma_diag, radius_scale, heuristic_angles,
+                   use_heuristic_seed, n_gaussian_seeds, sample_seed,
+                   use_trust_region):
+    """Validate a Gaussian policy and construct its search geometry/seeds."""
+    mu = np.asarray(mu, dtype=float)
+    sigma_diag = np.asarray(sigma_diag, dtype=float)
+    if mu.ndim != 1 or mu.size == 0 or not np.all(np.isfinite(mu)):
+        raise ValueError("mu must be a finite one-dimensional vector")
+    if sigma_diag.shape != mu.shape or not np.all(np.isfinite(sigma_diag)):
+        raise ValueError("sigma_diag must be finite and have the same shape as mu")
+    if np.any(sigma_diag <= 0):
+        raise ValueError("sigma_diag entries must be positive")
+    if radius_scale <= 0:
+        raise ValueError("radius_scale must be positive")
+    if int(n_gaussian_seeds) != n_gaussian_seeds or n_gaussian_seeds < 0:
+        raise ValueError("n_gaussian_seeds must be a nonnegative integer")
+    if heuristic_angles is not None:
+        heuristic_angles = np.asarray(heuristic_angles, dtype=float)
+        if (heuristic_angles.shape != mu.shape or
+                not np.all(np.isfinite(heuristic_angles))):
+            raise ValueError(
+                "heuristic_angles must be finite and have the same shape as mu")
+
+    sigma_diag = np.maximum(sigma_diag, 1e-6)
+    std = np.sqrt(sigma_diag)
+    L_inv = np.diag(1.0 / std)
+    step_scale = std / std.mean()
+    radius = radius_scale if use_trust_region else None
+    candidates = []
+    if use_heuristic_seed and heuristic_angles is not None:
+        candidates.append(heuristic_angles.copy())
+    if n_gaussian_seeds > 0:
+        seed_rng = np.random.default_rng(sample_seed + 7)
+        for _ in range(int(n_gaussian_seeds)):
+            draw = mu + std * seed_rng.standard_normal(mu.shape)
+            draw = _project_trust_region(draw, mu, L_inv, radius)
+            candidates.append(draw)
+    return mu, L_inv, radius, step_scale, candidates
+
+
 def gctr_policy(inst, budget, mu, sigma_diag, radius_scale=2.0, rng=None,
                 sample_seed=0, target=None, heuristic_angles=None,
                 use_heuristic_seed=True, n_gaussian_seeds=0, budget_cap=None,
-                use_trust_region=True, shots=None):
+                use_trust_region=True, shots=None, step0=0.3):
     """Full policy: mean-init + covariance-preconditioned Mahalanobis trust
-    region + uncertainty-allocated seeds and budget.
+    region plus score-allocated seeds and budget.
 
     The predicted covariance does two jobs at once. (i) It preconditions the
     coordinate steps: per-coordinate step sizes are proportional to the
@@ -105,12 +145,12 @@ def gctr_policy(inst, budget, mu, sigma_diag, radius_scale=2.0, rng=None,
     (`heuristic_angles`; one honest counted query), and from `n_gaussian_seeds`
     draws of the predicted Gaussian retracted into the trust region (one
     counted query each). Best-so-far starts at the best seed and the trust
-    region re-centers on it, so the policy pays at most one extra query
-    relative to the heuristic while the learned prior shortcuts exactly the
-    instances on which the fixed heuristic wanders.
+    region re-centers on it. The returned value is therefore no worse than
+    every seed evaluated within the effective budget; this is a quality
+    guarantee, not a query-cost guarantee.
 
     Budget allocation: `n_gaussian_seeds` and `budget_cap` are set per instance
-    from the calibrated predicted uncertainty (see pipeline.budget_rule) --
+    from the validation-fit difficulty score (see pipeline.budget_rule) --
     confident instances get a lean seed set and a tight evaluation cap,
     uncertain instances get more exploration. `budget_cap` never exceeds
     `budget`, the cap shared by every baseline.
@@ -119,23 +159,13 @@ def gctr_policy(inst, budget, mu, sigma_diag, radius_scale=2.0, rng=None,
     `use_trust_region=False` removes the Mahalanobis constraint (keeping seeds,
     preconditioning and budget) to isolate the trust region's contribution.
     """
-    sigma_diag = np.maximum(np.asarray(sigma_diag, dtype=float), 1e-6)
-    std = np.sqrt(sigma_diag)
-    L_inv = np.diag(1.0 / std)
-    # step_scale in raw angle units, normalized so the mean step matches step0
-    step_scale = std / std.mean()
-    mu = np.asarray(mu, dtype=float)
-    radius = radius_scale if use_trust_region else None
-
-    candidates = []
-    if use_heuristic_seed and heuristic_angles is not None:
-        candidates.append(np.array(heuristic_angles, dtype=float))
-    if n_gaussian_seeds > 0:
-        seed_rng = np.random.default_rng(sample_seed + 7)
-        for _ in range(int(n_gaussian_seeds)):
-            draw = mu + std * seed_rng.standard_normal(mu.shape)
-            draw = _project_trust_region(draw, mu, L_inv, radius)
-            candidates.append(draw)
+    mu, L_inv, radius, step_scale, candidates = _gctr_geometry(
+        mu, sigma_diag, radius_scale, heuristic_angles, use_heuristic_seed,
+        n_gaussian_seeds, sample_seed, use_trust_region)
+    if int(budget) != budget or budget < 1:
+        raise ValueError("budget must be a positive integer")
+    if budget_cap is not None and (int(budget_cap) != budget_cap or budget_cap < 1):
+        raise ValueError("budget_cap must be a positive integer when supplied")
 
     eff_budget = min(budget, budget_cap) if budget_cap else budget
     return run_policy(inst.C, inst.n, inst.maxcut, mu, eff_budget,
@@ -144,6 +174,40 @@ def gctr_policy(inst, budget, mu, sigma_diag, radius_scale=2.0, rng=None,
                       radius=radius, restarts=1,
                       rng=rng or np.random.default_rng(0),
                       sample_seed=sample_seed, target=target,
-                      step_scale=step_scale,
+                      step_scale=step_scale, step0=step0,
                       candidates=candidates or None,
                       recenter_on_best=bool(candidates), shots=shots)
+
+
+def gctr_callback_policy(evaluator, budget, mu, sigma_diag, radius_scale=2.0,
+                         sample_seed=0, target=None, heuristic_angles=None,
+                         use_heuristic_seed=True, n_gaussian_seeds=0,
+                         budget_cap=None, use_trust_region=True,
+                         exact_evaluator=None, step0=0.3):
+    """Run GCTR against an arbitrary scalar objective callback.
+
+    Each call to ``evaluator(parameters)`` is one counted objective query. The
+    package makes no assumption about how that scalar is obtained; users remain
+    responsible for shot allocation, mitigation, authentication, queueing, and
+    backend-specific uncertainty.
+    """
+    mu, L_inv, radius, step_scale, candidates = _gctr_geometry(
+        mu, sigma_diag, radius_scale, heuristic_angles, use_heuristic_seed,
+        n_gaussian_seeds, sample_seed, use_trust_region)
+    if int(budget) != budget or budget < 1:
+        raise ValueError("budget must be a positive integer")
+    if budget_cap is not None and (int(budget_cap) != budget_cap or budget_cap < 1):
+        raise ValueError("budget_cap must be a positive integer when supplied")
+    eff_budget = min(int(budget), int(budget_cap)) if budget_cap else int(budget)
+    return optimize_callback(
+        evaluator, mu, eff_budget,
+        center=mu if use_trust_region else None,
+        L_inv=L_inv if use_trust_region else None,
+        radius=radius,
+        target=target,
+        step_scale=step_scale,
+        step0=step0,
+        candidates=candidates or None,
+        recenter_on_best=bool(candidates),
+        exact_evaluator=exact_evaluator,
+    )

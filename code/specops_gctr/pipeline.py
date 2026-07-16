@@ -1,4 +1,4 @@
-"""End-to-end REAL pipeline: data -> targets -> train GNN -> evaluate.
+"""End-to-end pipeline: data -> targets -> train GNN -> evaluate.
 
 This is the driver behind the `gctr-reproduce` console entrypoint. It runs a
 genuine QAOA statevector simulation, trains a torch GNN that predicts a
@@ -6,7 +6,7 @@ graph-conditioned Gaussian over angles, fits a held-out error calibrator, and
 measures query efficiency (with paired Wilcoxon tests), calibration,
 cross-size generalization, leave-one-family-out transfer, the component
 ablation, seed stability and shot-noise robustness. Everything is
-deterministic given the seed and a fixed environment; nothing is hand-typed.
+deterministic given the seed and a fixed environment.
 """
 from __future__ import annotations
 
@@ -83,22 +83,25 @@ def sigmoid(z):
 
 
 def budget_rule(cfg: Config, u, u_med, u_iqr):
-    """Uncertainty -> per-instance search allocation.
+    """Validation-fit difficulty score -> per-instance search allocation.
 
-    The calibrated predicted uncertainty u is robustly standardized with the
+    The validation-fit predicted difficulty ``u`` is robustly standardized with the
     validation median and interquartile range, z = (u - med)/IQR. The rule is
     monotone and capped:
 
-      K(z) = clip(floor(1 + 4*sigmoid(z)), 1, 5)   total initial seed points
+      K(z) = clip(floor(1 + 4*sigmoid(z)), 1, 4)   nominal initial seed count
       T(z) = clip(floor(T_base*(0.5 + max(z,0))), T_min, budget)
 
-    with T_base = budget/2. Low-uncertainty instances get a lean seed set and a
-    tight evaluation cap; high-uncertainty instances get up to five seeds and
+    with T_base = budget/2. Low-score instances get a lean seed set and a
+    tight evaluation cap; high-score instances get up to four nominal seeds and
     the full shared cap. The GNN mean and the concentration seed are the first
     two seed points, so n_gaussian_seeds = max(0, K - 2).
     """
     z = (float(u) - float(u_med)) / max(float(u_iqr), 1e-9)
-    K = int(np.clip(np.floor(1 + 4 * sigmoid(z)), 1, 5))
+    # For every finite z, floor(1 + 4*sigmoid(z)) is in {1, 2, 3, 4}.
+    # The explicit upper clamp documents the attainable range rather than an
+    # unreachable limiting value at z=+infinity.
+    K = int(np.clip(np.floor(1 + 4 * sigmoid(z)), 1, 4))
     t_base = cfg.budget // 2
     T = int(np.clip(np.floor(t_base * (0.5 + max(z, 0.0))),
                     cfg.budget_cap_min, cfg.budget))
@@ -140,10 +143,19 @@ def prepare(cfg: Config, verbose=True):
 
 
 def train_model(cfg: Config, data, use_spectral=None, verbose=True):
+    """Train without permanently changing the caller's torch thread policy."""
+    previous_threads = torch.get_num_threads()
+    torch.set_num_threads(1)
+    try:
+        return _train_model_impl(cfg, data, use_spectral, verbose)
+    finally:
+        torch.set_num_threads(previous_threads)
+
+
+def _train_model_impl(cfg: Config, data, use_spectral=None, verbose=True):
     if use_spectral is None:
         use_spectral = cfg.use_spectral
     torch.manual_seed(cfg.seed)
-    torch.set_num_threads(1)  # cross-machine numerical stability
     np.random.seed(cfg.seed)
     k = cfg.spectral_k
     fdim = graph_feature_dim(k)
@@ -168,9 +180,9 @@ def train_model(cfg: Config, data, use_spectral=None, verbose=True):
         loss.backward(); opt.step()
         if verbose and (ep + 1) % 40 == 0:
             print(f"[train] epoch {ep+1}/{cfg.epochs} loss {loss.item():.3f}")
-    # fit the post-hoc heteroscedastic error calibrator on HELD-OUT residuals
+    # fit the post-hoc error head on HELD-OUT residuals
     # (the realized objective error of the GNN warm start on the validation
-    # split, which the GNN never trained on) so the reported uncertainty
+    # split, which the GNN never trained on) so the reported difficulty score
     # tracks the error a fresh instance actually incurs.
     _attach_error_calibrator(model, cfg, data, verbose=verbose)
     return model, feats, adjs
@@ -202,7 +214,9 @@ def _attach_error_calibrator(model, cfg, data, verbose=False):
         logvar_val = model.logvar_head(pooled).clamp(-8.0, 2.0).numpy()
     r_val = _realized_obj_error(val, mu_val)
     emb_mean = pooled.mean(dim=0, keepdim=True)
-    emb_std = pooled.std(dim=0, keepdim=True) + 1e-6
+    # Population scaling remains finite even for reduced development fixtures;
+    # the high-level estimator still requires at least two calibration graphs.
+    emb_std = pooled.std(dim=0, keepdim=True, unbiased=False) + 1e-6
     pooled_n = (pooled - emb_mean) / emb_std
     target = torch.tensor(np.log(r_val + 1e-4), dtype=torch.float32)
 
@@ -281,6 +295,20 @@ def run_gctr(cfg: Config, inst, mu_i, var_i, alloc, conc, ss, target,
     return B.gctr_policy(inst, cfg.budget, mu_i, var_i, **kw)
 
 
+def _capped_score(result, shared_cap):
+    """Fair cost-to-target score under a shared cap.
+
+    Per-instance early caps reduce raw usage, but a target miss is scored at the
+    same shared cap as every baseline. This prevents an early-stopped failure
+    from appearing artificially query-efficient.
+    """
+    reached = result.get("reached_target")
+    if reached is None:
+        raise ValueError("cost-to-target scoring requires an explicit target")
+    used = int(result.get("evaluations_used", result["evaluations"]))
+    return used if reached else int(shared_cap)
+
+
 def evaluate_queries(cfg: Config, data, model, verbose=True):
     """Run every baseline + GCTR on the test set; report per-method stats.
 
@@ -300,7 +328,8 @@ def evaluate_queries(cfg: Config, data, model, verbose=True):
     conc = concentration_angles(tr_ang)
     allocs = gctr_allocation(cfg, model, test)
 
-    rows = {m: {"evals": [], "ratio": [], "expratio": [], "ms": []}
+    rows = {m: {"evals": [], "evals_used": [], "reached": [],
+                "ratio": [], "expratio": [], "ms": []}
             for m in METHOD_ORDER}
     for i, inst in enumerate(test):
         target = cfg.target_frac * data["te_val"][i]
@@ -325,7 +354,9 @@ def evaluate_queries(cfg: Config, data, model, verbose=True):
         gc = timed(run_gctr, cfg, inst, mu[i], var[i], allocs[i], conc, ss,
                    target)
         for name, res in zip(METHOD_ORDER, [r, h, kn, tq, gp, gc]):
-            rows[name]["evals"].append(res["evaluations"])
+            rows[name]["evals"].append(_capped_score(res, cfg.budget))
+            rows[name]["evals_used"].append(res["evaluations_used"])
+            rows[name]["reached"].append(bool(res["reached_target"]))
             rows[name]["ratio"].append(res["ratio"])
             rows[name]["expratio"].append(
                 res["value"] / inst.maxcut if inst.maxcut > 0 else 0.0)
@@ -333,13 +364,22 @@ def evaluate_queries(cfg: Config, data, model, verbose=True):
     summary = {}
     for name, d in rows.items():
         ev = np.array(d["evals"]); ra = np.array(d["ratio"])
+        used = np.array(d["evals_used"]); reached = np.array(d["reached"])
         er = np.array(d["expratio"]); ms = np.array(d["ms"])
         summary[name] = dict(evals_mean=float(ev.mean()), evals_sd=float(ev.std()),
+                             evaluations_used_mean=float(used.mean()),
+                             evaluations_used_sd=float(used.std()),
+                             successes=int(reached.sum()),
+                             success_rate=float(reached.mean()),
                              ratio_mean=float(ra.mean()), ratio_sd=float(ra.std()),
                              expratio_mean=float(er.mean()),
                              expratio_sd=float(er.std()),
                              ms_mean=float(ms.mean()), ms_sd=float(ms.std()),
-                             evals=[int(x) for x in d["evals"]])
+                             evals=[int(x) for x in d["evals"]],
+                             evaluations_used=[int(x) for x in d["evals_used"]],
+                             reached_target=[bool(x) for x in d["reached"]],
+                             expectation_ratios=[float(x) for x in d["expratio"]],
+                             sampled_ratios=[float(x) for x in d["ratio"]])
         if verbose:
             print(f"[queries] {name:10s} evals={ev.mean():6.1f}+-{ev.std():4.1f} "
                   f"expratio={er.mean():.3f} sampled={ra.mean():.3f} "
@@ -364,17 +404,23 @@ def evaluate_queries(cfg: Config, data, model, verbose=True):
         z=[a["z"] for a in allocs], K=[a["K"] for a in allocs],
         T=[a["T"] for a in allocs],
         n_gaussian_seeds=[a["n_gaussian_seeds"] for a in allocs])
+    summary["_instances"] = [
+        dict(index=i, family=inst.family, graph_seed=int(inst.seed),
+             n=int(inst.n), maxcut=int(inst.maxcut),
+             target=float(cfg.target_frac * data["te_val"][i]))
+        for i, inst in enumerate(test)
+    ]
     return summary, mu, var
 
 
 def evaluate_calibration(cfg: Config, data, model, verbose=True,
                          use_calibrator=True):
-    """ECE + Spearman on the test set (real bin counts).
+    """ECE + Spearman on the test set with explicit bin counts.
 
     ECE is the coverage expected calibration error of the Gaussian heads (mean
     |empirical - nominal| coverage over ten levels). The headline Spearman rho
-    correlates the *calibrated* predicted uncertainty (the error-calibrator
-    head, fit on held-out validation residuals) with the realized objective
+    correlates the validation-fit difficulty score (the error-calibrator head,
+    fit on held-out validation residuals) with the realized objective
     error of the GNN warm start on the test set, and is reported WITH its
     p-value and sample size. For transparency we also report the legacy
     quantity: the rank correlation of tr(Sigma) with the offline instance
@@ -432,6 +478,7 @@ def evaluate_generalization(cfg: Config, data, model, verbose=True):
         mu, var, feats = predict(model, ds, cfg.spectral_k)
         allocs = gctr_allocation(cfg, model, ds)
         r_ev, h_ev, p_ev, g_ev = [], [], [], []
+        r_ok, h_ok, p_ok, g_ok = [], [], [], []
         for i, inst in enumerate(ds):
             target = cfg.target_frac * vals[i]
             ss = cfg.seed + n + i
@@ -443,13 +490,23 @@ def evaluate_generalization(cfg: Config, data, model, verbose=True):
             gp = B.gnn_point(inst, cfg.budget, mu[i], sample_seed=ss,
                              target=target)
             gc = run_gctr(cfg, inst, mu[i], var[i], allocs[i], conc, ss, target)
-            r_ev.append(r["evaluations"]); h_ev.append(h["evaluations"])
-            p_ev.append(gp["evaluations"]); g_ev.append(gc["evaluations"])
+            r_ev.append(_capped_score(r, cfg.budget))
+            h_ev.append(_capped_score(h, cfg.budget))
+            p_ev.append(_capped_score(gp, cfg.budget))
+            g_ev.append(_capped_score(gc, cfg.budget))
+            r_ok.append(bool(r["reached_target"]))
+            h_ok.append(bool(h["reached_target"]))
+            p_ok.append(bool(gp["reached_target"]))
+            g_ok.append(bool(gc["reached_target"]))
         speedup = float(np.mean(r_ev) / max(1e-9, np.mean(g_ev)))
         out[n] = dict(random_evals=float(np.mean(r_ev)),
                       heuristic_evals=float(np.mean(h_ev)),
                       point_evals=float(np.mean(p_ev)),
-                      gctr_evals=float(np.mean(g_ev)), speedup=speedup)
+                      gctr_evals=float(np.mean(g_ev)), speedup=speedup,
+                      random_successes=int(sum(r_ok)),
+                      heuristic_successes=int(sum(h_ok)),
+                      point_successes=int(sum(p_ok)),
+                      gctr_successes=int(sum(g_ok)), n_test=len(ds))
         if verbose:
             print(f"[general] n={n:2d} speedup={speedup:.2f}x "
                   f"(rand {np.mean(r_ev):.1f} / heur {np.mean(h_ev):.1f} / "
@@ -466,14 +523,16 @@ def evaluate_lofo(cfg: Config, data, verbose=True):
     training set, and the full GCTR policy (plus the point baseline and the
     concentration heuristic, for reference) is evaluated on the held-out
     family's test instances under the same cost-to-target protocol. Two policy
-    ablations run in the same setting so the trust region's and the adaptive
-    budget's contributions under family shift are measured, not asserted:
-    GCTR without the Mahalanobis constraint, and GCTR with the allocation
-    frozen at its default (no uncertainty-dependent seeds or cap).
+    controls run in the same setting: GCTR without the Mahalanobis constraint,
+    and a joint two-seed/full-cap allocation control.  The latter changes both
+    Gaussian seeding and the early evaluation cap, so it diagnoses the composite
+    allocation layer and does not isolate either lever causally.
     """
     per_fam = {}
+    raw_rows = []
     all_gc, all_gp, all_h, all_nt, all_fb = [], [], [], [], []
-    fixed_alloc = dict(z=0.0, K=2, T=None, n_gaussian_seeds=0)
+    all_gc_ok, all_gp_ok, all_h_ok, all_nt_ok, all_fb_ok = [], [], [], [], []
+    control_alloc = dict(z=0.0, K=2, T=None, n_gaussian_seeds=0)
     for fam in FAMILIES:
         tr_idx = [i for i, inst in enumerate(data["train"]) if inst.family != fam]
         va_idx = [i for i, inst in enumerate(data["val"]) if inst.family != fam]
@@ -492,6 +551,7 @@ def evaluate_lofo(cfg: Config, data, verbose=True):
         mu, var, _ = predict(model, te_insts, cfg.spectral_k)
         allocs = gctr_allocation(cfg, model, te_insts)
         gc_ev, gp_ev, h_ev, nt_ev, fb_ev = [], [], [], [], []
+        gc_ok, gp_ok, h_ok, nt_ok, fb_ok = [], [], [], [], []
         for j, inst in enumerate(te_insts):
             target = cfg.target_frac * data["te_val"][te_idx[j]]
             ss = cfg.seed + 777 + te_idx[j]
@@ -502,23 +562,67 @@ def evaluate_lofo(cfg: Config, data, verbose=True):
                                  target=target)
             nt = run_gctr(cfg, inst, mu[j], var[j], allocs[j], conc, ss,
                           target, use_trust_region=False)
-            fb = run_gctr(cfg, inst, mu[j], var[j], fixed_alloc, conc, ss,
+            fb = run_gctr(cfg, inst, mu[j], var[j], control_alloc, conc, ss,
                           target, budget_cap=None)
-            gc_ev.append(gc["evaluations"]); gp_ev.append(gp["evaluations"])
-            h_ev.append(h["evaluations"]); nt_ev.append(nt["evaluations"])
-            fb_ev.append(fb["evaluations"])
+            gc_ev.append(_capped_score(gc, cfg.budget))
+            gp_ev.append(_capped_score(gp, cfg.budget))
+            h_ev.append(_capped_score(h, cfg.budget))
+            nt_ev.append(_capped_score(nt, cfg.budget))
+            fb_ev.append(_capped_score(fb, cfg.budget))
+            gc_ok.append(bool(gc["reached_target"]))
+            gp_ok.append(bool(gp["reached_target"]))
+            h_ok.append(bool(h["reached_target"]))
+            nt_ok.append(bool(nt["reached_target"]))
+            fb_ok.append(bool(fb["reached_target"]))
+            raw_rows.append({
+                "held_out_family": fam,
+                "graph_seed": int(inst.seed),
+                "target": float(target),
+                "GCTR": {
+                    "capped_score": _capped_score(gc, cfg.budget),
+                    "evaluations_used": int(gc["evaluations_used"]),
+                    "reached_target": bool(gc["reached_target"]),
+                },
+                "GNN point": {
+                    "capped_score": _capped_score(gp, cfg.budget),
+                    "evaluations_used": int(gp["evaluations_used"]),
+                    "reached_target": bool(gp["reached_target"]),
+                },
+                "Heuristic": {
+                    "capped_score": _capped_score(h, cfg.budget),
+                    "evaluations_used": int(h["evaluations_used"]),
+                    "reached_target": bool(h["reached_target"]),
+                },
+                "GCTR no trust region": {
+                    "capped_score": _capped_score(nt, cfg.budget),
+                    "evaluations_used": int(nt["evaluations_used"]),
+                    "reached_target": bool(nt["reached_target"]),
+                },
+                "GCTR two-seed/full-cap": {
+                    "capped_score": _capped_score(fb, cfg.budget),
+                    "evaluations_used": int(fb["evaluations_used"]),
+                    "reached_target": bool(fb["reached_target"]),
+                },
+            })
         per_fam[fam] = dict(gctr_evals=float(np.mean(gc_ev)),
                             point_evals=float(np.mean(gp_ev)),
                             heuristic_evals=float(np.mean(h_ev)),
                             gctr_no_tr_evals=float(np.mean(nt_ev)),
-                            gctr_fixed_budget_evals=float(np.mean(fb_ev)),
+                            gctr_two_seed_full_cap_evals=float(np.mean(fb_ev)),
+                            gctr_successes=int(sum(gc_ok)),
+                            point_successes=int(sum(gp_ok)),
+                            heuristic_successes=int(sum(h_ok)),
+                            gctr_no_tr_successes=int(sum(nt_ok)),
+                            gctr_two_seed_full_cap_successes=int(sum(fb_ok)),
                             n_test=len(te_insts))
         all_gc += gc_ev; all_gp += gp_ev; all_h += h_ev
         all_nt += nt_ev; all_fb += fb_ev
+        all_gc_ok += gc_ok; all_gp_ok += gp_ok; all_h_ok += h_ok
+        all_nt_ok += nt_ok; all_fb_ok += fb_ok
         if verbose:
             print(f"[lofo] held-out {fam:3s}: gctr={np.mean(gc_ev):6.1f} "
                   f"point={np.mean(gp_ev):6.1f} heur={np.mean(h_ev):6.1f} "
-                  f"noTR={np.mean(nt_ev):6.1f} fixedB={np.mean(fb_ev):6.1f} "
+                  f"noTR={np.mean(nt_ev):6.1f} twoSeedFullCap={np.mean(fb_ev):6.1f} "
                   f"(n={len(te_insts)})")
     pooled = dict(gctr_evals_mean=float(np.mean(all_gc)),
                   gctr_evals_sd=float(np.std(all_gc)),
@@ -528,8 +632,14 @@ def evaluate_lofo(cfg: Config, data, verbose=True):
                   heuristic_evals_sd=float(np.std(all_h)),
                   gctr_no_tr_evals_mean=float(np.mean(all_nt)),
                   gctr_no_tr_evals_sd=float(np.std(all_nt)),
-                  gctr_fixed_budget_evals_mean=float(np.mean(all_fb)),
-                  gctr_fixed_budget_evals_sd=float(np.std(all_fb)))
+                  gctr_two_seed_full_cap_evals_mean=float(np.mean(all_fb)),
+                  gctr_two_seed_full_cap_evals_sd=float(np.std(all_fb)),
+                  gctr_successes=int(sum(all_gc_ok)),
+                  point_successes=int(sum(all_gp_ok)),
+                  heuristic_successes=int(sum(all_h_ok)),
+                  gctr_no_tr_successes=int(sum(all_nt_ok)),
+                  gctr_two_seed_full_cap_successes=int(sum(all_fb_ok)),
+                  n_test=len(all_gc))
     if verbose:
         print(f"[lofo] pooled: gctr={pooled['gctr_evals_mean']:.1f}"
               f"+-{pooled['gctr_evals_sd']:.1f} "
@@ -537,8 +647,22 @@ def evaluate_lofo(cfg: Config, data, verbose=True):
               f"+-{pooled['point_evals_sd']:.1f} "
               f"heur={pooled['heuristic_evals_mean']:.1f} "
               f"noTR={pooled['gctr_no_tr_evals_mean']:.1f} "
-              f"fixedB={pooled['gctr_fixed_budget_evals_mean']:.1f}")
-    return dict(per_family=per_fam, pooled=pooled)
+              f"twoSeedFullCap={pooled['gctr_two_seed_full_cap_evals_mean']:.1f}")
+    paired = {}
+    gctr_scores = np.asarray(
+        [row["GCTR"]["capped_score"] for row in raw_rows], dtype=float)
+    for method in ("Heuristic", "GNN point", "GCTR no trust region",
+                   "GCTR two-seed/full-cap"):
+        comparator = np.asarray(
+            [row[method]["capped_score"] for row in raw_rows], dtype=float)
+        try:
+            statistic, pvalue = wilcoxon(gctr_scores, comparator)
+        except ValueError:
+            statistic, pvalue = 0.0, 1.0
+        paired[method] = dict(w=float(statistic), p=float(pvalue),
+                              n=int(len(raw_rows)))
+    return dict(per_family=per_fam, pooled=pooled, rows=raw_rows,
+                wilcoxon=paired)
 
 
 def evaluate_ablation(cfg: Config, data, verbose=True):
@@ -558,13 +682,13 @@ def evaluate_ablation(cfg: Config, data, verbose=True):
     mu, var, _ = predict(model, test, cfg.spectral_k)
     allocs = gctr_allocation(cfg, model, test)
     allocs_trsig = gctr_allocation(cfg, model, test, use_calibrator=False)
-    fixed_alloc = dict(z=0.0, K=2, T=None, n_gaussian_seeds=0)
+    control_alloc = dict(z=0.0, K=2, T=None, n_gaussian_seeds=0)
 
     policy_variants = ["Full method", "No trust region", "No heuristic seed",
-                       "No adaptive budget", "No error calibrator"]
+                       "Two-seed/full-cap control", "No error calibrator"]
 
     def run_variant(name):
-        evs = []
+        evs, successes = [], []
         for i, inst in enumerate(test):
             target = cfg.target_frac * data["te_val"][i]
             ss = cfg.seed + i
@@ -574,8 +698,8 @@ def evaluate_ablation(cfg: Config, data, verbose=True):
             elif name == "No heuristic seed":
                 res = run_gctr(cfg, inst, mu[i], var[i], allocs[i], conc, ss,
                                target, use_heuristic_seed=False)
-            elif name == "No adaptive budget":
-                res = run_gctr(cfg, inst, mu[i], var[i], fixed_alloc, conc, ss,
+            elif name == "Two-seed/full-cap control":
+                res = run_gctr(cfg, inst, mu[i], var[i], control_alloc, conc, ss,
                                target, budget_cap=None)
             elif name == "No error calibrator":
                 res = run_gctr(cfg, inst, mu[i], var[i], allocs_trsig[i], conc,
@@ -583,17 +707,19 @@ def evaluate_ablation(cfg: Config, data, verbose=True):
             else:  # Full method
                 res = run_gctr(cfg, inst, mu[i], var[i], allocs[i], conc, ss,
                                target)
-            evs.append(res["evaluations"])
-        return evs
+            evs.append(_capped_score(res, cfg.budget))
+            successes.append(bool(res["reached_target"]))
+        return evs, successes
 
     results = {}
     for name in policy_variants:
-        evs = run_variant(name)
+        evs, successes = run_variant(name)
         calib = evaluate_calibration(
             cfg, data, model, verbose=False,
             use_calibrator=(name != "No error calibrator"))
         results[name] = dict(evals_mean=float(np.mean(evs)),
                              evals_sd=float(np.std(evs)),
+                             successes=int(sum(successes)), n_test=len(evs),
                              ece=calib["ece"], spearman=calib["spearman"],
                              spearman_p=calib["spearman_p"])
         if verbose:
@@ -616,16 +742,18 @@ def evaluate_ablation(cfg: Config, data, verbose=True):
         m2, _, _ = train_model(c, data, use_spectral=use_spec, verbose=False)
         mu2, var2, _ = predict(m2, test, cfg.spectral_k)
         allocs2 = gctr_allocation(cfg, m2, test)
-        evs = []
+        evs, successes = [], []
         for i, inst in enumerate(test):
             target = cfg.target_frac * data["te_val"][i]
             ss = cfg.seed + i
             res = run_gctr(cfg, inst, mu2[i], var2[i], allocs2[i], conc, ss,
                            target)
-            evs.append(res["evaluations"])
+            evs.append(_capped_score(res, cfg.budget))
+            successes.append(bool(res["reached_target"]))
         calib = evaluate_calibration(cfg, data, m2, verbose=False)
         results[name] = dict(evals_mean=float(np.mean(evs)),
                              evals_sd=float(np.std(evs)),
+                             successes=int(sum(successes)), n_test=len(evs),
                              ece=calib["ece"], spearman=calib["spearman"],
                              spearman_p=calib["spearman_p"])
         if verbose:
@@ -699,7 +827,7 @@ def evaluate_shot_noise(cfg: Config, data, model, verbose=True):
     allocs = gctr_allocation(cfg, model, test)
     out = {}
     for shots in cfg.shot_levels:
-        rows = {m: {"evals": [], "expratio": []}
+        rows = {m: {"evals": [], "expratio": [], "reached": []}
                 for m in ["Random", "Heuristic", "GCTR"]}
         for i, inst in enumerate(test):
             target = cfg.target_frac * data["te_val"][i]
@@ -712,12 +840,14 @@ def evaluate_shot_noise(cfg: Config, data, model, verbose=True):
             gc = run_gctr(cfg, inst, mu[i], var[i], allocs[i], conc, ss,
                           target, shots=shots)
             for name, res in zip(["Random", "Heuristic", "GCTR"], [r, h, gc]):
-                rows[name]["evals"].append(res["evaluations"])
+                rows[name]["evals"].append(_capped_score(res, cfg.budget))
+                rows[name]["reached"].append(bool(res["reached_target"]))
                 rows[name]["expratio"].append(
                     res["value"] / inst.maxcut if inst.maxcut > 0 else 0.0)
         out[int(shots)] = {
             m: dict(evals_mean=float(np.mean(d["evals"])),
                     evals_sd=float(np.std(d["evals"])),
+                    successes=int(sum(d["reached"])), n_test=len(test),
                     expratio_mean=float(np.mean(d["expratio"])),
                     expratio_sd=float(np.std(d["expratio"])))
             for m, d in rows.items()}
@@ -733,7 +863,7 @@ def evaluate_shot_noise(cfg: Config, data, model, verbose=True):
 
 
 def landscape_slice(cfg: Config, data, model, grid: int = 41, verbose=True):
-    """Compute a REAL 2D landscape slice for one test instance.
+    """Compute a 2D landscape slice for one test instance.
 
     Fixes (gamma_2, beta_2) at the predicted mean and sweeps (gamma_1, beta_1)
     over a grid, evaluating the exact QAOA expectation ratio <C>/C_max at every

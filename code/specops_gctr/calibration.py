@@ -1,4 +1,4 @@
-"""Calibration diagnostics with real bin counts.
+"""Calibration diagnostics with explicit bin counts.
 
 Certification of a probabilistic surrogate is estimation plus hypothesis
 testing: we report the expected calibration error (ECE) of Gaussian coverage,

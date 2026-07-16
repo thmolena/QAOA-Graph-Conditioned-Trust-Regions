@@ -1,0 +1,241 @@
+held_out_family,graph_seed,target,method,capped_score,evaluations_used,reached_target
+er,9000,25.642870845,GCTR,21,21,True
+er,9000,25.642870845,GNN point,23,23,True
+er,9000,25.642870845,Heuristic,18,18,True
+er,9000,25.642870845,GCTR no trust region,21,21,True
+er,9000,25.642870845,GCTR two-seed/full-cap,19,19,True
+er,9001,25.7775855443,GCTR,8,8,True
+er,9001,25.7775855443,GNN point,31,31,True
+er,9001,25.7775855443,Heuristic,7,7,True
+er,9001,25.7775855443,GCTR no trust region,8,8,True
+er,9001,25.7775855443,GCTR two-seed/full-cap,8,8,True
+er,9002,29.6741261999,GCTR,10,10,True
+er,9002,29.6741261999,GNN point,400,305,False
+er,9002,29.6741261999,Heuristic,18,18,True
+er,9002,29.6741261999,GCTR no trust region,10,10,True
+er,9002,29.6741261999,GCTR two-seed/full-cap,8,8,True
+er,9003,25.7816111893,GCTR,4,4,True
+er,9003,25.7816111893,GNN point,16,16,True
+er,9003,25.7816111893,Heuristic,3,3,True
+er,9003,25.7816111893,GCTR no trust region,4,4,True
+er,9003,25.7816111893,GCTR two-seed/full-cap,4,4,True
+er,9004,24.8152990182,GCTR,5,5,True
+er,9004,24.8152990182,GNN point,76,76,True
+er,9004,24.8152990182,Heuristic,7,7,True
+er,9004,24.8152990182,GCTR no trust region,5,5,True
+er,9004,24.8152990182,GCTR two-seed/full-cap,4,4,True
+er,9005,28.0881990958,GCTR,6,6,True
+er,9005,28.0881990958,GNN point,17,17,True
+er,9005,28.0881990958,Heuristic,3,3,True
+er,9005,28.0881990958,GCTR no trust region,6,6,True
+er,9005,28.0881990958,GCTR two-seed/full-cap,4,4,True
+er,9006,26.5429191566,GCTR,10,10,True
+er,9006,26.5429191566,GNN point,39,39,True
+er,9006,26.5429191566,Heuristic,18,18,True
+er,9006,26.5429191566,GCTR no trust region,10,10,True
+er,9006,26.5429191566,GCTR two-seed/full-cap,8,8,True
+er,9007,28.5403542964,GCTR,10,10,True
+er,9007,28.5403542964,GNN point,121,121,True
+er,9007,28.5403542964,Heuristic,7,7,True
+er,9007,28.5403542964,GCTR no trust region,10,10,True
+er,9007,28.5403542964,GCTR two-seed/full-cap,8,8,True
+er,9008,29.5345587221,GCTR,67,67,True
+er,9008,29.5345587221,GNN point,400,257,False
+er,9008,29.5345587221,Heuristic,7,7,True
+er,9008,29.5345587221,GCTR no trust region,67,67,True
+er,9008,29.5345587221,GCTR two-seed/full-cap,8,8,True
+er,9009,28.5426579812,GCTR,29,29,True
+er,9009,28.5426579812,GNN point,400,209,False
+er,9009,28.5426579812,Heuristic,21,21,True
+er,9009,28.5426579812,GCTR no trust region,29,29,True
+er,9009,28.5426579812,GCTR two-seed/full-cap,27,27,True
+er,9010,25.2770554364,GCTR,19,19,True
+er,9010,25.2770554364,GNN point,143,143,True
+er,9010,25.2770554364,Heuristic,18,18,True
+er,9010,25.2770554364,GCTR no trust region,19,19,True
+er,9010,25.2770554364,GCTR two-seed/full-cap,19,19,True
+er,9011,27.6078649518,GCTR,6,6,True
+er,9011,27.6078649518,GNN point,9,9,True
+er,9011,27.6078649518,Heuristic,3,3,True
+er,9011,27.6078649518,GCTR no trust region,6,6,True
+er,9011,27.6078649518,GCTR two-seed/full-cap,4,4,True
+rr,9012,15.1010537383,GCTR,17,17,True
+rr,9012,15.1010537383,GNN point,47,47,True
+rr,9012,15.1010537383,Heuristic,27,27,True
+rr,9012,15.1010537383,GCTR no trust region,17,17,True
+rr,9012,15.1010537383,GCTR two-seed/full-cap,15,15,True
+rr,9013,15.397113366,GCTR,2,2,True
+rr,9013,15.397113366,GNN point,21,21,True
+rr,9013,15.397113366,Heuristic,1,1,True
+rr,9013,15.397113366,GCTR no trust region,2,2,True
+rr,9013,15.397113366,GCTR two-seed/full-cap,2,2,True
+rr,9014,14.8545260635,GCTR,17,17,True
+rr,9014,14.8545260635,GNN point,63,63,True
+rr,9014,14.8545260635,Heuristic,10,10,True
+rr,9014,14.8545260635,GCTR no trust region,17,17,True
+rr,9014,14.8545260635,GCTR two-seed/full-cap,15,15,True
+rr,9015,14.8489115829,GCTR,30,30,True
+rr,9015,14.8489115829,GNN point,81,81,True
+rr,9015,14.8489115829,Heuristic,27,27,True
+rr,9015,14.8489115829,GCTR no trust region,30,30,True
+rr,9015,14.8489115829,GCTR two-seed/full-cap,28,28,True
+rr,9016,15.2814688713,GCTR,2,2,True
+rr,9016,15.2814688713,GNN point,400,209,False
+rr,9016,15.2814688713,Heuristic,1,1,True
+rr,9016,15.2814688713,GCTR no trust region,2,2,True
+rr,9016,15.2814688713,GCTR two-seed/full-cap,2,2,True
+rr,9017,15.0923280826,GCTR,16,16,True
+rr,9017,15.0923280826,GNN point,47,47,True
+rr,9017,15.0923280826,Heuristic,10,10,True
+rr,9017,15.0923280826,GCTR no trust region,16,16,True
+rr,9017,15.0923280826,GCTR two-seed/full-cap,15,15,True
+rr,9018,15.3286445768,GCTR,17,17,True
+rr,9018,15.3286445768,GNN point,400,209,False
+rr,9018,15.3286445768,Heuristic,14,14,True
+rr,9018,15.3286445768,GCTR no trust region,17,17,True
+rr,9018,15.3286445768,GCTR two-seed/full-cap,15,15,True
+rr,9019,15.1201649728,GCTR,2,2,True
+rr,9019,15.1201649728,GNN point,21,21,True
+rr,9019,15.1201649728,Heuristic,1,1,True
+rr,9019,15.1201649728,GCTR no trust region,2,2,True
+rr,9019,15.1201649728,GCTR two-seed/full-cap,2,2,True
+rr,9020,15.0824212172,GCTR,2,2,True
+rr,9020,15.0824212172,GNN point,259,259,True
+rr,9020,15.0824212172,Heuristic,1,1,True
+rr,9020,15.0824212172,GCTR no trust region,2,2,True
+rr,9020,15.0824212172,GCTR two-seed/full-cap,2,2,True
+rr,9021,15.3810127309,GCTR,2,2,True
+rr,9021,15.3810127309,GNN point,165,165,True
+rr,9021,15.3810127309,Heuristic,1,1,True
+rr,9021,15.3810127309,GCTR no trust region,2,2,True
+rr,9021,15.3810127309,GCTR two-seed/full-cap,2,2,True
+rr,9022,15.3490560054,GCTR,2,2,True
+rr,9022,15.3490560054,GNN point,400,217,False
+rr,9022,15.3490560054,Heuristic,1,1,True
+rr,9022,15.3490560054,GCTR no trust region,2,2,True
+rr,9022,15.3490560054,GCTR two-seed/full-cap,2,2,True
+rr,9023,14.9398973441,GCTR,29,29,True
+rr,9023,14.9398973441,GNN point,43,43,True
+rr,9023,14.9398973441,Heuristic,10,10,True
+rr,9023,14.9398973441,GCTR no trust region,29,29,True
+rr,9023,14.9398973441,GCTR two-seed/full-cap,28,28,True
+ba,9024,16.0984769805,GCTR,400,128,False
+ba,9024,16.0984769805,GNN point,95,95,True
+ba,9024,16.0984769805,Heuristic,400,337,False
+ba,9024,16.0984769805,GCTR no trust region,400,128,False
+ba,9024,16.0984769805,GCTR two-seed/full-cap,400,400,False
+ba,9025,16.2087628789,GCTR,400,100,False
+ba,9025,16.2087628789,GNN point,400,400,False
+ba,9025,16.2087628789,Heuristic,400,209,False
+ba,9025,16.2087628789,GCTR no trust region,400,100,False
+ba,9025,16.2087628789,GCTR two-seed/full-cap,400,186,False
+ba,9026,16.0230520613,GCTR,22,22,True
+ba,9026,16.0230520613,GNN point,27,27,True
+ba,9026,16.0230520613,Heuristic,103,103,True
+ba,9026,16.0230520613,GCTR no trust region,22,22,True
+ba,9026,16.0230520613,GCTR two-seed/full-cap,22,22,True
+ba,9027,16.2141277691,GCTR,42,42,True
+ba,9027,16.2141277691,GNN point,37,37,True
+ba,9027,16.2141277691,Heuristic,45,45,True
+ba,9027,16.2141277691,GCTR no trust region,42,42,True
+ba,9027,16.2141277691,GCTR two-seed/full-cap,42,42,True
+ba,9028,16.8614533771,GCTR,42,42,True
+ba,9028,16.8614533771,GNN point,42,42,True
+ba,9028,16.8614533771,Heuristic,48,48,True
+ba,9028,16.8614533771,GCTR no trust region,42,42,True
+ba,9028,16.8614533771,GCTR two-seed/full-cap,42,42,True
+ba,9029,15.2148694752,GCTR,18,18,True
+ba,9029,15.2148694752,GNN point,19,19,True
+ba,9029,15.2148694752,Heuristic,22,22,True
+ba,9029,15.2148694752,GCTR no trust region,18,18,True
+ba,9029,15.2148694752,GCTR two-seed/full-cap,20,20,True
+ba,9030,15.0033657372,GCTR,400,100,False
+ba,9030,15.0033657372,GNN point,52,52,True
+ba,9030,15.0033657372,Heuristic,36,36,True
+ba,9030,15.0033657372,GCTR no trust region,47,47,True
+ba,9030,15.0033657372,GCTR two-seed/full-cap,400,400,False
+ba,9031,15.4138066685,GCTR,12,12,True
+ba,9031,15.4138066685,GNN point,11,11,True
+ba,9031,15.4138066685,Heuristic,52,52,True
+ba,9031,15.4138066685,GCTR no trust region,12,12,True
+ba,9031,15.4138066685,GCTR two-seed/full-cap,12,12,True
+ba,9032,14.9751157934,GCTR,400,155,False
+ba,9032,14.9751157934,GNN point,60,60,True
+ba,9032,14.9751157934,Heuristic,52,52,True
+ba,9032,14.9751157934,GCTR no trust region,400,155,False
+ba,9032,14.9751157934,GCTR two-seed/full-cap,400,400,False
+ba,9033,16.2024313574,GCTR,400,103,False
+ba,9033,16.2024313574,GNN point,400,400,False
+ba,9033,16.2024313574,Heuristic,400,201,False
+ba,9033,16.2024313574,GCTR no trust region,400,103,False
+ba,9033,16.2024313574,GCTR two-seed/full-cap,24,24,True
+ba,9034,14.9892247856,GCTR,19,19,True
+ba,9034,14.9892247856,GNN point,35,35,True
+ba,9034,14.9892247856,Heuristic,31,31,True
+ba,9034,14.9892247856,GCTR no trust region,19,19,True
+ba,9034,14.9892247856,GCTR two-seed/full-cap,18,18,True
+ba,9035,15.0376281844,GCTR,14,14,True
+ba,9035,15.0376281844,GNN point,27,27,True
+ba,9035,15.0376281844,Heuristic,52,52,True
+ba,9035,15.0376281844,GCTR no trust region,14,14,True
+ba,9035,15.0376281844,GCTR two-seed/full-cap,28,28,True
+ws,9036,18.8296518269,GCTR,400,150,False
+ws,9036,18.8296518269,GNN point,400,400,False
+ws,9036,18.8296518269,Heuristic,400,385,False
+ws,9036,18.8296518269,GCTR no trust region,400,150,False
+ws,9036,18.8296518269,GCTR two-seed/full-cap,400,178,False
+ws,9037,18.4422170102,GCTR,33,33,True
+ws,9037,18.4422170102,GNN point,23,23,True
+ws,9037,18.4422170102,Heuristic,31,31,True
+ws,9037,18.4422170102,GCTR no trust region,33,33,True
+ws,9037,18.4422170102,GCTR two-seed/full-cap,73,73,True
+ws,9038,18.8606663605,GCTR,34,34,True
+ws,9038,18.8606663605,GNN point,32,32,True
+ws,9038,18.8606663605,Heuristic,31,31,True
+ws,9038,18.8606663605,GCTR no trust region,36,36,True
+ws,9038,18.8606663605,GCTR two-seed/full-cap,33,33,True
+ws,9039,18.146189209,GCTR,21,21,True
+ws,9039,18.146189209,GNN point,400,400,False
+ws,9039,18.146189209,Heuristic,400,313,False
+ws,9039,18.146189209,GCTR no trust region,400,130,False
+ws,9039,18.146189209,GCTR two-seed/full-cap,400,178,False
+ws,9040,18.4639845439,GCTR,19,19,True
+ws,9040,18.4639845439,GNN point,27,27,True
+ws,9040,18.4639845439,Heuristic,400,337,False
+ws,9040,18.4639845439,GCTR no trust region,19,19,True
+ws,9040,18.4639845439,GCTR two-seed/full-cap,18,18,True
+ws,9041,19.109993612,GCTR,400,121,False
+ws,9041,19.109993612,GNN point,32,32,True
+ws,9041,19.109993612,Heuristic,31,31,True
+ws,9041,19.109993612,GCTR no trust region,34,34,True
+ws,9041,19.109993612,GCTR two-seed/full-cap,33,33,True
+ws,9042,17.3336192212,GCTR,10,10,True
+ws,9042,17.3336192212,GNN point,27,27,True
+ws,9042,17.3336192212,Heuristic,36,36,True
+ws,9042,17.3336192212,GCTR no trust region,10,10,True
+ws,9042,17.3336192212,GCTR two-seed/full-cap,36,36,True
+ws,9043,17.3845723951,GCTR,39,39,True
+ws,9043,17.3845723951,GNN point,25,25,True
+ws,9043,17.3845723951,Heuristic,44,44,True
+ws,9043,17.3845723951,GCTR no trust region,33,33,True
+ws,9043,17.3845723951,GCTR two-seed/full-cap,32,32,True
+ws,9044,18.0404912987,GCTR,12,12,True
+ws,9044,18.0404912987,GNN point,107,107,True
+ws,9044,18.0404912987,Heuristic,71,71,True
+ws,9044,18.0404912987,GCTR no trust region,12,12,True
+ws,9044,18.0404912987,GCTR two-seed/full-cap,12,12,True
+ws,9045,18.3959998402,GCTR,400,183,False
+ws,9045,18.3959998402,GNN point,17,17,True
+ws,9045,18.3959998402,Heuristic,400,305,False
+ws,9045,18.3959998402,GCTR no trust region,400,183,False
+ws,9045,18.3959998402,GCTR two-seed/full-cap,28,28,True
+ws,9046,18.9702324439,GCTR,400,179,False
+ws,9046,18.9702324439,GNN point,64,64,True
+ws,9046,18.9702324439,Heuristic,31,31,True
+ws,9046,18.9702324439,GCTR no trust region,400,179,False
+ws,9046,18.9702324439,GCTR two-seed/full-cap,400,400,False
+ws,9047,18.2420221335,GCTR,18,18,True
+ws,9047,18.2420221335,GNN point,17,17,True
+ws,9047,18.2420221335,Heuristic,400,233,False
+ws,9047,18.2420221335,GCTR no trust region,18,18,True
+ws,9047,18.2420221335,GCTR two-seed/full-cap,18,18,True

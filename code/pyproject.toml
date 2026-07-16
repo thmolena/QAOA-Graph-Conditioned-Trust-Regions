@@ -1,26 +1,46 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "specops-gctr"
-version = "3.0.0"
-description = "Graph-Conditioned Trust Regions for query-efficient QAOA parameter setting: a real, end-to-end, exact-statevector QAOA pipeline with a graph-conditioned Gaussian surrogate that regenerates every data figure, table, and CSV in the manuscript."
+version = "3.2.0"
+description = "Trainable graph-conditioned trust-region policies for query-efficient QAOA"
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Molena Huynh", email = "molena.huynh@jmp.com" }]
-keywords = ["QAOA", "quantum-optimization", "trust-region", "uncertainty-quantification", "MaxCut", "reproducibility"]
-dependencies = ["numpy>=1.21", "scipy>=1.7", "networkx>=2.6", "matplotlib>=3.5", "pandas>=1.3", "torch>=1.12"]
+keywords = ["QAOA", "quantum computing", "quantum machine learning", "variational quantum algorithms", "MaxCut", "trust region", "graph neural network", "uncertainty quantification", "reproducibility"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = ["numpy>=1.21,<3", "scipy>=1.7,<2", "networkx>=2.6,<4", "matplotlib>=3.5,<4", "pandas>=1.3,<4", "torch>=1.12,<3"]
 
 [project.optional-dependencies]
 test = ["pytest>=7.0"]
+dev = ["build>=1.0", "pytest>=7.0", "twine>=5.0"]
 
 [project.scripts]
 gctr-reproduce = "specops_gctr.reproduce:main"
+gctr-optimize = "specops_gctr.cli:main"
 
 [project.urls]
+Homepage = "https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/"
 Repository = "https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions"
+Issues = "https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions/issues"
+Paper = "https://arxiv.org/abs/2604.24803"
 
 [tool.setuptools]
 packages = ["specops_gctr"]
+include-package-data = false
