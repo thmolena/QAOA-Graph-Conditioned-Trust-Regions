@@ -16,7 +16,7 @@
   <meta property="og:image" content="https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure1_ConceptualPipeline.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Graph-Conditioned Trust Regions for QAOA" />
-  <meta name="twitter:description" content="Working revision, schema-2 evidence ledger, installable code, and source data for query-budgeted QAOA search." />
+  <meta name="twitter:description" content="Schema-2 evidence, installable code, and source data for query-budgeted QAOA search." />
   <meta name="twitter:image" content="https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure1_ConceptualPipeline.png" />
   <meta name="citation_title" content="Query-Efficient Quantum Approximate Optimization via Graph-Conditioned Trust Regions" />
   <meta name="citation_author" content="Molena Huynh" />
@@ -46,28 +46,23 @@
   </nav>
   <header class="hero">
     <section class="hero-content fade-in">
-      <h1>Query-Efficient Quantum Approximate Optimization via Graph-Conditioned Trust Regions</h1>
+      <h1><span class="nowrap">Query&#8209;Efficient</span> Quantum Approximate Optimization via <span class="nowrap">Graph&#8209;Conditioned</span> Trust Regions</h1>
       <p class="authors">Molena Huynh</p>
-      <p class="venue">Working repository revision · 2026</p>
+      <p class="venue">Preprint · 2026</p>
       <p class="summary">
         Every objective evaluation in a variational quantum algorithm is purchased
-        with repeated circuit executions. Graph-Conditioned Trust Regions turn a
+        with repeated circuit executions. Graph&#8209;Conditioned Trust Regions turn a
         learned Gaussian over QAOA angles into a complete search policy: a warm
-        start, a step geometry, a feasible region, and a validation-fit per-instance
+        start, a step geometry, a feasible region, and a validation&#8209;fit per&#8209;instance
         budget, all fixed before the first query. When the effective budget can
         evaluate both mandatory seeds, the policy includes the strongest
-        online-cheap prior as a counted seed and, under exact evaluation,
-        best-so-far selection protects its value. That prior is derived from supervised training targets;
+        online&#8209;cheap prior as a counted seed and, under exact evaluation,
+        best&#8209;so&#8209;far selection protects its value. That prior is derived from supervised training targets;
         it is not free of offline label cost.
       </p>
-      <p class="revision-note" id="revision-status">
-        The repository manuscript, package, and schema-2 numerical artifacts are
-        newer than arXiv v1. The local PDF is the working revision until the
-        updated preprint is uploaded.
-      </p>
       <div class="button-row">
-        <a class="button primary" href="manuscript/main.pdf">Paper</a>
-        <a class="button" href="https://arxiv.org/abs/2604.24803" aria-describedby="revision-status">arXiv v1</a>
+        <a class="button primary" href="manuscript/main.pdf">Read the paper</a>
+        <a class="button" href="https://arxiv.org/abs/2604.24803">arXiv</a>
         <a class="button" href="https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions" target="_blank" rel="noopener noreferrer">Code</a>
         <a class="button" href="#bibtex">BibTeX</a>
       </div>
@@ -78,15 +73,15 @@
     <section class="section teaser fade-in">
       <div class="teaser-panel">
         <div class="teaser-copy">
-          <h2>QAOA Optimization as a Query-Limited Problem</h2>
+          <h2>QAOA Optimization as a <span class="nowrap">Query&#8209;Limited</span> Problem</h2>
           <p>
-            Depth-\(p\) QAOA prepares \(|\gamma,\beta\rangle\) from a cost
+            Depth&#8209;\(p\) QAOA prepares \(|\gamma,\beta\rangle\) from a cost
             Hamiltonian \(C\) and mixer \(B\), and a classical loop maximizes
             \[
               F_G(\theta)=\langle\theta|C|\theta\rangle,
               \qquad \theta\in\mathbb{R}^{2p}.
             \]
-            On hardware, this objective is estimated from Born-rule samples rather
+            On hardware, this objective is estimated from Born&#8209;rule samples rather
             than read out directly, so every optimizer query costs repeated state
             preparation, execution, and measurement.
           </p>
@@ -95,10 +90,10 @@
           <p>
             Every method is scored against the same offline 98% reference target.
             Reaching the target costs the number of objective evaluations used; a
-            miss costs the common 400-call benchmark cap. Raw work and an explicit
+            miss costs the common 400&#8209;call benchmark cap. Raw work and an explicit
             attainment flag are retained alongside that capped score, so an early
             stop cannot make a failed run appear cheap. On a fixed trajectory,
-            truncation can only tie or worsen this shared-cap score. The reference
+            truncation can only tie or worsen this shared&#8209;cap score. The reference
             is privileged evaluation information, not a deployable stopping oracle,
             and its construction is excluded from online counts.
           </p>
@@ -108,7 +103,7 @@
 
     <section class="section fade-in" id="method">
       <div class="section-heading">
-        <h2>A Graph-Conditioned Gaussian as a Search Policy</h2>
+        <h2>A <span class="nowrap">Graph&#8209;Conditioned</span> Gaussian as a Search Policy</h2>
       </div>
       <div class="text-block">
         <p>
@@ -126,9 +121,9 @@
           Every proposal is retracted onto this region in whitened coordinates.
         </p>
         <p>
-          The seed set contains the predicted mean, the parameter-concentration
-          angles, and score-allocated Gaussian draws. Each evaluated seed costs one
-          query, the region re-centers on the best seed, and best-so-far selection
+          The seed set contains the predicted mean, the parameter&#8209;concentration
+          angles, and score&#8209;allocated Gaussian draws. Each evaluated seed costs one
+          query, the region re&#8209;centers on the best seed, and best&#8209;so&#8209;far selection
           preserves the best evaluated exact value. Comparison with both mandatory
           seeds requires enough effective budget to evaluate them. This distinguishes
           a learned search policy from a learned point initializer.
@@ -138,16 +133,16 @@
 
     <section class="section fade-in" id="allocation">
       <div class="section-heading">
-        <h2>A Held-Out Difficulty Score Prices Each Instance</h2>
+        <h2>A <span class="nowrap">Held&#8209;Out</span> Difficulty Score Prices Each Instance</h2>
       </div>
       <div class="text-block">
         <p>
           The covariance sizes the search geometry. A separate linear calibrator
-          is fit on held-out validation residuals, never on test outcomes, and
+          is fit on held&#8209;out validation residuals, never on test outcomes, and
           produces the difficulty score used for allocation. On the 48 test graphs,
-          that score has Spearman \(\rho=0.671\) with realized warm-start error
+          that score has Spearman \(\rho=0.671\) with realized warm&#8209;start error
           (\(p=1.76\times10^{-7}\)). Separately, the Gaussian angle head has
-          marginal per-coordinate coverage ECE 0.101 over 192 residuals and
+          marginal per&#8209;coordinate coverage ECE 0.101 over 192 residuals and
           observed coverage 0.901 at nominal 0.95; ECE does not calibrate the
           difficulty score. Removing the ranking penalty improves ECE to 0.026
           and score correlation to 0.854 in the released ablation, so that loss
@@ -157,7 +152,7 @@
           Validation statistics standardize the score and map it monotonically to
           a seed count and evaluation cap before the first query. The mandatory
           mean and concentration seeds are protected only when the effective budget
-          can evaluate them. The released two-seed/full-cap control changes both
+          can evaluate them. The released two&#8209;seed/full&#8209;cap control changes both
           Gaussian seeding and the cap, so it cannot identify either component's
           causal contribution.
         </p>
@@ -166,14 +161,14 @@
 
     <section class="section fade-in" id="results">
       <div class="section-heading">
-        <h2>Benchmarking Graph-Conditioned Trust Regions</h2>
+        <h2>Benchmarking <span class="nowrap">Graph&#8209;Conditioned</span> Trust Regions</h2>
         <p>
           The released run studies unweighted MaxCut at \(n=14\), depth \(p=2\),
-          with 240/80/48 train/validation/test graphs from four random-graph
-          families. Schema-2 source data retain capped cost, raw evaluations,
-          attainment, primary and leave-one-family-out instance rows, an
-          implementation fingerprint, and artifact hashes. The exact-statevector
-          evidence stops at \(n=16\); no device result or larger-scale claim is made.
+          with 240/80/48 train/validation/test graphs from four random&#8209;graph
+          families. Schema&#8209;2 source data retain capped cost, raw evaluations,
+          attainment, primary and leave&#8209;one&#8209;family&#8209;out instance rows, an
+          implementation fingerprint, and artifact hashes. The exact&#8209;statevector
+          evidence stops at \(n=16\); no device result or larger&#8209;scale claim is made.
           Because this revision inspected the test results while correcting the
           protocol and claims, confirmation requires a new prospectively untouched
           audit set.
@@ -183,11 +178,11 @@
       <div class="result-stack">
         <article class="result-block">
           <div class="result-copy">
-            <h3>In-Distribution Cost and Attainment</h3>
+            <h3><span class="nowrap">In&#8209;Distribution</span> Cost and Attainment</h3>
             <p>
               GCTR reaches \(48/48\) targets at capped cost \(15.0\pm7.8\) calls
               and mean exact expectation ratio 0.858. The supervised concentration
-              heuristic is online-cheaper, also reaches \(48/48\), and records
+              heuristic is online&#8209;cheaper, also reaches \(48/48\), and records
               \(12.33\pm6.45\)
               (paired \(p=2.6488\times10^{-4}\)). TQA reaches \(48/48\) at
               \(18.48\pm13.48\), with no established cost difference from GCTR
@@ -208,26 +203,26 @@
             <h3>Angle Coverage and Difficulty Ranking</h3>
             <p>
               The Gaussian heads attain coverage ECE 0.101 over 192 standardized
-              residuals. The validation-fit difficulty score ranks realized
-              warm-start error with \(\rho=0.671\) (\(p=1.76\times10^{-7}\),
+              residuals. The validation&#8209;fit difficulty score ranks realized
+              warm&#8209;start error with \(\rho=0.671\) (\(p=1.76\times10^{-7}\),
               \(n=48\)). Coverage calibration and difficulty ranking are distinct
               diagnostics; neither is a calibrated probability of target attainment.
             </p>
           </div>
           <figure class="result-figure">
             <img src="manuscript/figures/Figure3_CalibrationAndUncertainty.png" alt="Marginal angle reliability curve and separate difficulty-score rank association" width="1458" height="1457" loading="lazy" decoding="async" />
-            <figcaption>Marginal Gaussian angle coverage and a separate held-out score's association with realized warm-start error.</figcaption>
+            <figcaption>Marginal Gaussian angle coverage and a separate held&#8209;out score's association with realized warm&#8209;start error.</figcaption>
           </figure>
         </article>
 
         <article class="result-block">
           <div class="result-copy">
-            <h3>Leave-One-Family-Out Shift</h3>
+            <h3><span class="nowrap">Leave&#8209;One&#8209;Family&#8209;Out</span> Shift</h3>
             <p>
               Pooled across four held-out graph families, GCTR reaches \(39/48\)
               targets at capped cost 89.3. The heuristic reaches \(40/48\) at
               86.5 (\(p=0.832\) versus GCTR), while the point initializer reaches
-              \(38/48\) at 125.0 (\(p=0.00509\)). The two-seed/full-cap control
+              \(38/48\) at 125.0 (\(p=0.00509\)). The two&#8209;seed/full&#8209;cap control
               reaches \(41/48\) at 73.75 (\(p=0.0355\)). These exploratory paired
               tests share four fitted family clusters, and the composite control
               does not isolate learned allocation from its coupled policy changes.
@@ -241,7 +236,7 @@
 
         <article class="result-block">
           <div class="result-copy">
-            <h3>Cross-Size Transfer Through 16 Qubits</h3>
+            <h3><span class="nowrap">Cross&#8209;Size</span> Transfer Through 16 Qubits</h3>
             <p>
               A model trained at \(n=14\) has an 8.47--13.95\(\times\) lower mean
               capped cost than random restarts for \(n=8,10,12,14,16\). GCTR costs
@@ -249,7 +244,7 @@
               12.1, 12.5, and 10.5, with identical attainment at every size. Thus
               the heuristic is cheaper at four of five sizes; GCTR is slightly
               cheaper only at \(n=10\). The random/GCTR ratio is arithmetic benchmark
-              cost, not wall-clock or hardware speedup, and the exact-statevector
+              cost, not wall&#8209;clock or hardware speedup, and the exact&#8209;statevector
               boundary prevents extrapolation beyond \(n=16\).
             </p>
           </div>
@@ -267,13 +262,13 @@
         <p>
           The repository root is the single installable source for the
           <code>specops-gctr</code> distribution. The release contains the
-          exact-statevector objective, graph generator, trainable predictor,
-          held-out error head, search policies, statistics, source data, figure
-          and table generators, and a release test suite. Schema-2 validation checks
+          exact&#8209;statevector objective, graph generator, trainable predictor,
+          held&#8209;out error head, search policies, statistics, source data, figure
+          and table generators, and a release test suite. Schema&#8209;2 validation checks
           the implementation fingerprint and artifact hashes. The package does not ship a pretrained
-          checkpoint. Fitting currently requires exact-simulation calibration
-          instances and graph-only prediction still uses dense linear algebra.
-          A backend-neutral callback API applies the
+          checkpoint. Fitting currently requires exact&#8209;simulation calibration
+          instances and graph&#8209;only prediction still uses dense linear algebra.
+          A backend&#8209;neutral callback API applies the
           same counted policy to QPU runtimes, emulators, or external scalar
           objectives without treating that integration path as hardware evidence.
         </p>
@@ -309,7 +304,7 @@ python -m pytest tests -q</code></pre>
   </main>
 
   <footer class="footer">
-    <p>Graph-Conditioned Trust Regions · <a href="https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions">GitHub</a></p>
+    <p>Graph&#8209;Conditioned Trust Regions · <a href="https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions">GitHub</a></p>
   </footer>
   <script src="script.js?v=20260716"></script>
 </body>
