@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "specops-gctr"
 version = "3.2.0"
-description = "Trainable graph-conditioned trust-region policies for query-efficient QAOA"
+description = "Fixed-budget QAOA optimizer portfolios, structural routing, and selective-risk auditing"
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Molena Huynh", email = "molena.huynh@jmp.com" }]
-keywords = ["QAOA", "quantum computing", "quantum machine learning", "variational quantum algorithms", "MaxCut", "trust region", "graph neural network", "uncertainty quantification", "reproducibility"]
+keywords = ["QAOA", "quantum computing", "variational quantum algorithms", "MaxCut", "algorithm selection", "optimizer portfolio", "selective prediction", "risk control", "reproducibility"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Science/Research",
@@ -34,6 +34,8 @@ dev = ["build>=1.0", "pytest>=7.0", "twine>=5.0"]
 [project.scripts]
 gctr-reproduce = "specops_gctr.reproduce:main"
 gctr-optimize = "specops_gctr.cli:main"
+gctr-portfolio = "specops_gctr.portfolio_experiment:main"
+gctr-risk-audit = "specops_gctr.risk_control:main"
 
 [project.urls]
 Homepage = "https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/"

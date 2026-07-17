@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "experiment_name": "target-free-portfolio-heterogeneous-confirmatory-v1",
+  "protocol_sha256": "58692d57df9cb489ab22fa0cc672924d5b3888d107aee0a88b856c726ac5dcf1",
+  "implementation_sha256": "42aa34816315126b4519d92da86a24120443cdee6a654cf92c932c7b91ce9f3d",
+  "config_sha256": "a0e66aa4c41f7868dd0a4ae1ca1223de7a1d92caebf7857062f033261f56d558",
+  "decision_sha256": "962f63d71dc20efa5896a949a2d4869bb1c691395b65ecb1d079302e4805bbe6",
+  "environment": {
+    "python": "3.13.12",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "numpy": "2.4.3",
+    "scipy": "1.17.1",
+    "networkx": "3.6.1",
+    "torch": "2.11.0"
+  },
+  "files": {
+    "angle_labels.json": "797cf594cf2353c1ba49f51d5ab5adccd9612070d48230161246fb597a0fc61d",
+    "legacy_model_state.pt": "5d54e34aac9862f7bbea77cd5734c8c292d750a319a6b8a66214538e02c7a4ee",
+    "non_audit_traces.jsonl": "04849ed4b33e855be45ec1fcbe48ff3eb1e9c06084d4025bcd9135cabdfa19d8",
+    "frozen_decision.json": "a0ad295b70b1f7de80ee8bc736a813cc661f8ea0cee907916f91a8529a077696",
+    "traces.jsonl": "0c537faf56b1ec84341404948ecf60843bd0366046ede506c6a3083e4cc4d445",
+    "summary.json": "7453cba1779ae5a87eca471157468c6c6fdd13bf756cf043df57d6114e336e28"
+  }
+}

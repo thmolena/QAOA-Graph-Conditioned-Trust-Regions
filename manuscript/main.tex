@@ -1,1500 +1,836 @@
-
 \documentclass[aps,twocolumn,superscriptaddress,nofootinbib,longbibliography,floatfix]{revtex4-2}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{amsmath,amssymb,amsfonts}
-\usepackage{amsthm}
 \usepackage{bm}
-\usepackage{hyperref}
 \usepackage{microtype}
-\setlength{\emergencystretch}{3em}
-\usepackage{array}
-\usepackage{listings}
 \usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+\setlength{\emergencystretch}{3em}
 \hypersetup{
   colorlinks=true,
   linkcolor=black,
   citecolor=black,
   urlcolor=blue,
-  pdftitle={Query-Efficient Quantum Approximate Optimization via Graph-Conditioned Trust Regions},
+  pdftitle={Reliability auditing for structural routing of QAOA optimizers},
   pdfauthor={Molena Huynh},
-  pdfsubject={Query-budgeted optimization policies for QAOA},
-  pdfkeywords={QAOA, variational quantum algorithms, graph neural networks, trust regions, calibration}
+  pdfsubject={Target-free fixed-budget optimizer selection with residual-order-statistic abstention},
+  pdfkeywords={QAOA, algorithm selection, conformal prediction, graph learning, reproducibility}
 }
-\newcommand{\qaoa}{QAOA}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,frame=single,
+  columns=fullflexible,keepspaces=true}
+\newcommand{\QAOA}{QAOA}
+\newcommand{\AURC}{\mathrm{AURC}}
+\newcommand{\Prob}{\mathbb{P}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\R}{\mathbb{R}}
-\newcommand{\tr}{\operatorname{tr}}
-\newcommand{\diag}{\operatorname{diag}}
-\newcommand{\argmax}{\operatorname*{arg\,max}}
-\newcommand{\Var}{\operatorname{Var}}
-\newcommand{\Cov}{\operatorname{Cov}}
-\newcommand{\clip}{\operatorname{clip}}
-\newtheorem{theorem}{Theorem}
-\newtheorem{proposition}{Proposition}
-\newtheorem{corollary}{Corollary}
-\newtheorem{lemma}{Lemma}
-\theoremstyle{definition}
-\newtheorem{assumption}{Assumption}
-\newtheorem{observation}{Observation}
-\newcommand{\Prob}{\mathbb{P}}
-\newcommand{\opnorm}[1]{\lVert #1 \rVert_{\mathrm{op}}}
-\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,frame=single,columns=fullflexible,keepspaces=true}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\code}[1]{\texttt{#1}}
+\input{tables/portfolio_numbers.tex}
 
 \begin{document}
 
-\title{Query-Efficient Quantum Approximate Optimization via Graph-Conditioned Trust Regions}
+\title{Reliability auditing for structural routing of QAOA optimizers}
 \author{Molena Huynh}
 \email{molena.huynh@jmp.com}
 \affiliation{North Carolina State University, Raleigh, North Carolina 27695, USA}
-\date{July 16, 2026}
+\date{July 2026}
 
 \begin{abstract}
-Each variational-quantum objective evaluation requires repeated circuit
-executions. We evaluate a graph-conditioned QAOA policy whose predicted
-Gaussian supplies initialization, preconditioning and a Mahalanobis region,
-while a validation-fit score allocates seeds and an early cap. Under a shared
-$400$-call miss penalty, GCTR records $15.0\pm7.8$ capped calls and $48/48$
-target hits on held-out $n=14$, $p=2$ MaxCut simulations, versus
-$203.9\pm152.9$ and $37/48$ for random restarts. The fixed concentration prior
-is cheaper ($12.3\pm6.4$, $48/48$), and a two-seed/full-cap control has a lower
-mean ($14.3\pm7.9$, $48/48$). Under leave-one-family-out shift, GCTR records
-$89.3\pm149.8$ and $39/48$, versus $86.5\pm141.6$ and $40/48$ for the prior.
-Removing the ranking penalty improves marginal coverage ECE from $0.101$ to
-$0.026$ and score correlation from $0.671$ to $0.854$. Thus the release
-provides falsifiable diagnostics and software, not evidence of an allocation,
-hardware, asymptotic or global-convergence advantage. Reference targets are
-privileged simulation quantities whose offline cost is excluded.
+Learned routing among classical optimizers can underperform a fixed schedule.
+We audit depth-2 MaxCut QAOA as a target-free portfolio: nine arms share a
+32-call ceiling, a structural ridge model predicts anytime regret, and an
+order-statistic rule abstains to a family control. After development on 64
+graphs, one internally locked audit gave mean AURC $\ConfirmGatedAURC$ versus
+$\ConfirmFamilyAURC$ on 160 new instances
+($\Delta=\ConfirmDelta$). Twelve routes were accepted and four were harmful.
+Coverage was 141/160, below the frozen 0.90 gate. Under an iid-binomial
+sensitivity model this miss is compatible with nominal variation
+($P=0.249$), but the 95\% upper risk bounds do not certify coverage-failure or
+conditional-harm control. Fixed quotas and sequential non-isomorphism
+filtering also preclude pooled exchangeability. The reliability gate therefore
+fails. This exact-simulator audit provides neither hardware nor scaling
+evidence.
 \end{abstract}
 
 \maketitle
 
-\noindent\textbf{Revision note.} This repository manuscript, schema-2 evidence
-and software are newer than arXiv v1 of arXiv:2604.24803. The repository and
-the current arXiv record should not be treated as synchronized until a revised
-preprint is uploaded.
+\noindent\textbf{Revision status.} This manuscript supersedes the scientific
+claims and target-based evaluation of the first repository release and
+arXiv:2604.24803v1. The optimizer-portfolio evidence reported here uses new
+protocols, new seeds, a target-free metric and a separate internally locked
+confirmatory audit. The earlier target-hitting results are discussed only as
+motivation and are not combined with the new evidence.
 
-\section{Introduction}
-\label{sec:intro}
+Variational quantum algorithms combine a parameterized quantum circuit with a
+classical outer-loop optimizer. Each objective evaluation can require repeated
+circuit preparation and measurement, so optimization strategy multiplies the
+cost of an already expensive experimental loop
+\cite{cerezo2021variational,bharti2022noisy}. The quantum approximate
+optimization algorithm (QAOA) makes this interaction especially visible:
+parameters that work well on one graph can transfer to related graphs, while
+optimizer rankings can change with graph structure, circuit depth, noise and
+hyperparameters \cite{farhi2014qaoa,zhou2020qaoa,bonet2023performance}.
 
-A variational quantum algorithm never reads its objective; it estimates it.
-Each query prepares, executes and measures a parameterized circuit repeatedly,
-returning a finite-variance statistic of Born-rule
-samples~\cite{cerezo2021variational,bharti2022noisy}, so the classical outer
-loop optimizes through a stochastic oracle whose every call is paid for in
-shots and wall-clock time on near-term devices~\cite{preskill2018nisq}.  For a
-fixed ansatz, the count of objective evaluations is a major multiplier of
-hardware cost alongside circuit depth, shot count, compilation and queueing.
-This paper treats that count as the quantity to engineer. Estimation error,
-uncertainty and sample complexity enter the design of the optimizer itself,
-rather than appearing only in its post hoc analysis.
+Parameter concentration, schedule interpolation, warm starts and graph neural
+networks exploit shared structure to initialize QAOA
+\cite{brandao2018fixed,akshay2021concentration,egger2021warm,jain2022gnn,
+jiang2025qseer}. Learned optimizers go further by predicting trajectories or
+search policies \cite{khairy2020learning,nguyen2026meta}. These approaches can
+reduce search effort, but they create a second statistical problem: deciding
+when a learned recommendation is safer than a strong, cheap control. Model
+selection on the same benchmark used to advertise performance is vulnerable
+to selection bias \cite{rice1976selection,cawley2010overfitting}. Average gains
+also conceal selective harm; a router can improve a mean by helping one graph
+family while degrading another. Instance-level algorithm selection has already
+been posed for choosing between quantum and classical MaxCut solvers
+\cite{moussa2020quantum}, while portfolio-learning theory shows that enlarging
+the portfolio can increase opportunity and overfitting simultaneously
+\cite{balcan2021generalization}. Our narrower problem routes among classical
+outer-loop strategies for one quantum objective and audits the resulting
+selective risk.
 
-QAOA~\cite{farhi2014quantum,hadfield2019quantum,farhi2016quantum} is the canonical instance of this query bottleneck. At fixed depth the parameter space is low dimensional, yet the objective landscape is graph dependent~\cite{brandao2018fixed,guerreschi2019qaoa,willsch2020benchmarking}, so derivative-free optimizers burn many evaluations rediscovering structure that is largely shared across related instances. Transfer and warm-start methods attack this redundancy by proposing parameters, schedules or circuit initializations~\cite{egger2021warm,zhou2020qaoa,akshay2021reachability,lotshaw2022empirical,galda2021transferability,shaydulin2023transfer,jain2022gnn}, and they save evaluations. But these initial conditions fix neither the geometry of the search that follows nor the evaluation budget an instance deserves. A graph that sits in a sharp, narrow basin and one that sits in a broad, forgiving basin receive the same treatment, and the optimizer pays for the difference in queries.
+An earlier version of this project predicted a graph-conditioned Gaussian over
+QAOA angles and used it as an initializer, preconditioner, trust region and
+budget policy \cite{huynh2026gctr}. Its favorable comparison to random restart
+did not survive stronger controls: fixed concentration and simple schedule
+initializations were cheaper, and the stopping metric depended on an offline
+reference target unavailable in deployment. That negative result changes the
+question. Instead of asking whether one learned angle policy dominates, we ask
+whether graph structure can route among a deliberately heterogeneous
+\emph{portfolio} while preserving a measurable reliability criterion.
 
-We test this idea by promoting the learned object from a point estimate to a full search policy. Given a graph, a graph isomorphism network with Laplacian spectral encodings predicts a Gaussian over the QAOA angles: the mean initializes the local optimizer and the covariance preconditions its per-coordinate steps and defines a Mahalanobis trust region. A separate error head, fit on held-out validation residuals, sets an instance-dependent seed count and evaluation cap. The entire optimization trajectory is thereby conditioned on graph structure before the first circuit evaluation. Whether those additions improve a strong fixed-angle prior is an empirical question, and the controls below answer it negatively in the tested regimes.
+We make four contributions. First, every arm receives an identical, target-free
+32-query budget and is scored by an anytime normalized-regret curve rather than
+by time to a privileged target. Second, a low-capacity ridge model maps 16
+relabeling-invariant graph summaries to per-arm utility; the strongest arm for
+each development family remains the deployable fallback. Third, a one-sided
+residual order statistic, motivated by the split-conformal construction, turns
+routing into selective prediction: the model abstains unless its estimated
+selected-minus-fallback regret plus that statistic is negative
+\cite{angelopoulos2021gentle,romano2019cqr}. Fourth, the graph
+protocol, implementation, non-audit traces and decision are content-hashed
+before audit evaluation, and an output lock rejects a second run in the same
+evidence directory.
 
-An online-cheap and strong competitor frames every claim in this paper: the parameter-concentration heuristic, which reuses one fixed angle vector (the coordinate-wise median of the supervised training targets) for every instance~\cite{brandao2018fixed,akshay2021reachability,shaydulin2023transfer}. Its inference cost is low, but its training labels are expensive. The policy \emph{absorbs} this vector as a counted seed and retains the best value seen. Once both unconditional seeds have been evaluated under exact objectives, the returned value cannot fall below the prior's angle vector; the separately refined heuristic remains a stronger cost baseline. The corrected evidence is therefore diagnostic: GCTR is much cheaper than random restarts and a weak learned point initializer, but it is more expensive than the fixed prior and the two-seed/full-cap control in distribution, and it is not best under family shift. Removing the hard boundary is worse in distribution but has a lower pooled mean under shift, while the learned early cap has no possible advantage under shared-cap miss scoring along an otherwise identical trajectory.
-
-Concretely, we contribute the following; every number is traceable to hashed schema-2 source artifacts and per-instance rows (Sec.~\ref{subsec:repro}).
-\begin{enumerate}
-\item \emph{An executable graph-conditioned policy.} A learned Gaussian becomes an initialization, step preconditioner and Mahalanobis region, with a held-out score controlling seeds and an early cap. On $48$ held-out instances, GCTR reaches the reference on all $48$ with $15.0\pm7.8$ capped calls, while random restarts reach $37/48$ with $203.9\pm152.9$ ($p=2.9\times10^{-9}$). The point head alone reaches $20/48$ with $264.4\pm164.0$ ($p=2.3\times10^{-9}$). These comparisons establish a combined-policy safeguard, not a learned-geometry effect.
-\item \emph{Controls that falsify the stronger claim.} The fixed prior reaches $48/48$ with $12.3\pm6.4$ calls, and the paired difference favors the prior over GCTR ($p=2.6\times10^{-4}$); the two-seed/full-cap control reaches $48/48$ with $14.3\pm7.9$. Pooled leave-one-family-out results likewise favor neither the full policy over the prior ($p=0.832$) nor over removing the hard boundary ($p=0.686$), while the paired comparison favors the simpler control over GCTR ($p=0.0355$). The current data do not support an allocation advantage.
-\item \emph{Separated uncertainty diagnostics and negative loss evidence.} The Gaussian angle head has marginal coverage ECE $0.101$ over $192$ residuals. A distinct validation-fit score ranks warm-start error at Spearman $\rho=0.671$ ($p=1.8\times10^{-7}$, $n=48$). Removing the ranking penalty improves ECE to $0.026$ and $\rho$ to $0.854$, so that penalty is not empirically supported by this run.
-\item \emph{Falsifiable theory and a reproducible artifact.} Conditional local bounds state exactly what the trust region can retain; finite-sample results connect objective estimates to shot cost; and an explicit monotonicity proposition shows why early truncation cannot improve shared-cap cost on a fixed trajectory (Sec.~\ref{sec:theory}). The package records generator and display-code hashes, primary and LOFO instance rows, target attainment, and one-command validation. The public API and offline-label costs are bounded explicitly rather than represented as large-scale hardware evidence.
-\end{enumerate}
-
-For review, the corresponding claim--evidence ledger is maintained in the
-repository README: it links each quantitative statement to its committed data,
-reproduction path and boundary without consuming a main-text display item.
-
-The paper is organized as follows. Section~\ref{sec:related} positions the method against learned initialization, surrogate-based optimizers and adaptive resource allocation. Section~\ref{sec:method} specifies the implemented algorithm exactly---data, model, losses, calibrator, search policy, budget rule, baselines, protocol and statistics. Section~\ref{sec:results} presents the empirical evidence. Section~\ref{sec:theory} states local guarantees and statistical foundations, with proofs in the appendices. Section~\ref{sec:discussion} discusses scope and limitations. The appendices collect the mathematical material, extended results (budget-policy realization, landscape slice, seed stability, shot noise) and reproducibility details.
-
-\section{Related work}
-\label{sec:related}
-
-\emph{Learned initialization and parameter transfer for QAOA.} Angle- and schedule-level methods include concentration and fixed-angle transfer~\cite{brandao2018fixed,akshay2021reachability,lotshaw2022empirical,galda2021transferability}, weighted transfer~\cite{shaydulin2023transfer}, iteration-free neural prediction~\cite{amosy2022iterationfree}, and graph representation learning~\cite{liang2024graphlearning,falla2024transferability}. QSeer predicts initial parameters across circuit depths and weighted MaxCut~\cite{jiang2025qseer}; Neural QAOA$^2$ jointly predicts graph partitions and initial parameters~\cite{zheng2026neuralqaoa2}. Both remain point-initialization systems, whereas this work predicts covariance, search geometry and budget. A distinct line initializes the state and mixer from a relaxation~\cite{egger2021warm} or GNN-predicted node probabilities~\cite{jain2022gnn}; classical symmetry analysis identifies equivalent parameter regions~\cite{shaydulin2023parameter}. Learned optimizers~\cite{khairy2020learning,verdon2019learning} shape trajectories online. Diffusion models generate graph-conditioned parameter distributions~\cite{meng2024diffusion}; here the distribution is wired into a counted local-search policy, although the full-versus-point gap also contains the fixed-prior seed and does not isolate covariance alone.
-
-\emph{Surrogate-based and trust-region optimizers.} Bayesian optimization and local surrogate models are established for variational algorithms~\cite{frazier2018tutorial,snoek2012practical,shahriari2016taking,srinivas2010gaussian,tibaldi2022bayesian,sung2020models}; DARBO adapts a Gaussian-process trust region for QAOA~\cite{cheng2024darbo}. A recent hyperparameter-free RBF surrogate learns online from the current device, including 127-qubit hardware experiments~\cite{oleary2025online}. These methods consume current-instance observations to update the surrogate or region; ours is amortized across graphs and fixed before the first query. The approaches are composable. We hold the inner pattern search fixed because optimizer choice materially affects variational performance~\cite{bonet2023performance}.
-
-\emph{Adaptive resource allocation.} Shot-frugal optimizers allocate measurement shots within a run, per iteration or per term~\cite{kubler2020adaptive,gu2021adaptive}, and end-to-end protocols minimize total shots for QAOA~\cite{hao2024endtoend}. Our budget rule allocates a different resource at a different granularity: objective evaluations \emph{across instances}, from a validation-fit instance-level difficulty score available before the run starts. The two allocations are complementary; Appendix~\ref{app:extresults} measures finite-shot behavior.
-
-\emph{Positioning against the concentration prior.} Parameter concentration~\cite{brandao2018fixed,akshay2021reachability} makes a fixed angle vector a strong baseline at low depth, and our measurements confirm it ($12.3\pm6.4$ capped calls, $48/48$ hits, aggregate ratio $0.857$). GCTR evaluates that vector as a seed and records $15.0\pm7.8$ calls with the same hit count and ratio $0.858$; the paired difference favors the heuristic ($p=2.6\times10^{-4}$). The appropriate value is diagnostic and infrastructural---a seed-level floor, held-out score, intervention controls, and auditable package---not superiority over the prior.
-
-\section{Method}
-\label{sec:method}
-
-This section specifies the algorithm as implemented in the released package (module names in \texttt{typewriter} font refer to the root \texttt{specops\_gctr/} package); Appendix~\ref{app:repro} maps every component to its implementation and test. The schema-2 evidence records the exact simulation-generator digest. Display-only table and plotting code is versioned separately in the portable manifest, so presentation changes cannot be mistaken for a new numerical experiment.
-
-\subsection{Problem setting, QAOA objective, and the stopping protocol}
-\label{subsec:protocol}
-
-For an unweighted graph $G=(V,E)$ with $n=|V|$ vertices, MaxCut~\cite{goemans1995improved,dunning2017jump,lucas2014ising} seeks $z\in\{+1,-1\}^{n}$ maximizing
-\begin{equation}
-C(z)=\sum_{(i,j)\in E}\frac{1-z_i z_j}{2}.
-\end{equation}
-Depth-$p$ QAOA prepares
-\begin{equation}
-|\gamma,\beta\rangle=e^{-i\beta_p B}e^{-i\gamma_p C}\cdots e^{-i\beta_1 B}e^{-i\gamma_1 C}|+\rangle^{\otimes n},
-\end{equation}
-where $C=\sum_{(i,j)\in E}(I-Z_iZ_j)/2$ and $B=\sum_i X_i$, and the expected objective is $F_G(\theta)=\langle\theta|C|\theta\rangle$ with $\theta=(\gamma_1,\beta_1,\ldots,\gamma_p,\beta_p)\in\R^{2p}$. All experiments use $p=2$ and evaluate $F_G$ on an exact statevector simulator (\texttt{qaoa.py}); a finite-shot variant replaces each evaluation by the mean cut value of $S$ Born-rule samples (Appendix~\ref{app:extresults}).
-
-\emph{Stopping protocol and retained fields.} Each instance $i$ carries a privileged reference value $V_i$, the best local optimum found by the offline target generator below. An optimizer stops when its best evaluated objective reaches $0.98\,V_i$, when pattern search meets its numerical convergence threshold, or when it exhausts its operational cap. Baselines receive $B=400$ calls; GCTR may receive a smaller preassigned cap $T(G)\le B$. A counter increments on every objective call, including seed evaluations (\texttt{optimization.QueryCounter}; unit-tested). For fair comparison, the reported capped score is
-\begin{equation}
-Y_i^{(m)}=\begin{cases}U_i^{(m)},&\text{if method $m$ reaches }0.98V_i,\\ B,&\text{otherwise},\end{cases}
-\label{eq:cappedscore}
-\end{equation}
-where $U_i^{(m)}$ is raw use. Schema 2 retains $U_i^{(m)}$, attainment, $Y_i^{(m)}$, and returned expectation and sampled ratios for every primary instance--method pair. The metric is a simulation benchmark with privileged stopping information; it is not deployable unless an external reference comparable to $V_i$ is available.
-
-\emph{Quality metrics.} Solution quality is the exact expectation ratio $F_G(\theta_{\rm ret})/C_{\max}$ of the returned angles, recomputed once outside the query count. We also record the sampled best-bitstring ratio $C(z_{\rm best})/C_{\max}$ from $512$ Born-rule samples. It saturates near $1.0$ at these sizes and is disclosed but not used as the discriminating quality metric. Primary per-instance qualities are released; LOFO and other auxiliary files retain the fields listed in Appendix~\ref{app:repro}.
-
-\subsection{Instance families and target generation}
-\label{subsec:data}
-
-Four random-graph families are used: Erd\H{o}s--R\'enyi $G(n,0.5)$~\cite{erdos1959random}, random regular graphs with degree $3$ ($4$ for odd $n$)~\cite{brandao2018fixed}, Barab\'asi--Albert graphs with attachment parameter $2$~\cite{barabasi1999emergence}, and Watts--Strogatz graphs with degree $4$ and rewiring probability $0.3$~\cite{watts1998collective}. At the training size $n=14$ the splits are $240$ training instances ($60$ per family, generation seeds starting at $100$), $80$ validation instances ($20$ per family, seeds from $5000$) and $48$ test instances ($12$ per family, seeds from $9000$); all splits are disjoint by construction (\texttt{graphs.py}). Exact MaxCut values are computed by brute force.
-
-Target angles $\theta^\star_i$ are produced offline by the same deterministic pattern search used elsewhere: the best of eight local searches, each capped at $60$ exact objective calls (\texttt{targets.py}). These are local optima, not certified global optima; they define training labels, reference values $V_i$, and the proxy $e_i=1-F_G(\theta_i^\star)/C_{\max}$. The configured upper bounds are $240\times8\times60=115{,}200$ calls for training targets, $80\times8\times60=38{,}400$ for validation targets, and $48\times8\times60=23{,}040$ for test references: at most $176{,}640$ calls for target/reference construction. Actual target-search counts are not persisted and may be lower after convergence. This is not total offline cost: fitting the validation error head evaluates $80$ predicted means, while exact MaxCut brute force and graph-feature preprocessing add further work. All are excluded from the online metric, and training costs are unequal across methods: random restarts and TQA do not require learned labels. Moreover, the current pipeline generates validation target arrays that its model and calibrator do not consume; eliminating that step and recording every offline counter are necessary protocol fixes. The test references also make the stopping rule privileged.
-
-\subsection{Spectral features and the graph-conditioned Gaussian}
-\label{subsec:model}
-
-Node features concatenate the normalized degree $d_v/n$ with the $k=6$ eigenvectors after the first in ascending combinatorial-Laplacian order, zero-padded when fewer exist~\cite{fiedler1973algebraic}. For the connected released graphs these are nonconstant modes; on a disconnected public-API input, dropping only the first vector can retain another zero mode. Each selected eigenvector is canonicalized \emph{deterministically}: the entry of largest magnitude is made positive (\texttt{graphs.laplacian\_spectral\_features}). This resolves sign flips for simple, separated eigenvalues in the tested numerical pipeline; it does not resolve rotations within repeated or nearly repeated eigenspaces. No random sign augmentation is used. Appendix~\ref{app:math} states the resulting invariance boundary explicitly.
-
-A three-layer graph isomorphism network~\cite{xu2019gin} with hidden width $48$ (layer normalization inside each update MLP) produces node embeddings; the graph representation $g(G)$ concatenates mean and max pooling. Two small heads (one hidden layer each) map $g(G)$ to
-\begin{equation}
-\mu(G)\in\R^{2p},\qquad
-\log\sigma^2(G)={\rm clamp}\bigl(a(G),-8,2\bigr)\in\R^{2p},
-\end{equation}
-defining the diagonal Gaussian $p(\theta|G)=\mathcal{N}(\mu(G),\Sigma(G))$ with $\Sigma(G)=\diag(\sigma^2(G))$ (\texttt{model.py}). The diagonal covariance is an intentional simplification that keeps the trust region cheap to construct and retract onto; structured covariances are future work (Appendix~\ref{app:math}).
-
-\subsection{Training objective (single phase)}
-\label{subsec:training}
-
-Training is a \emph{single} phase: $120$ full-batch epochs of Adam~\cite{kingma2015adam} with learning rate $5\times10^{-3}$ on the $240$ training graphs (\texttt{pipeline.train\_model}; PyTorch seeded, single-threaded for cross-machine stability). The loss combines three terms implemented in \texttt{losses.py}:
-\begin{equation}
-\begin{aligned}
-\mathcal{L}&=\mathcal{L}_{\rm NLL}
-+\lambda_W\mathcal{L}_{W_2}+\lambda_C\mathcal{L}_{\rm rank},\\
-\lambda_W&=0.3,\qquad \lambda_C=0.2 .
-\end{aligned}
-\end{equation}
-The first is the heteroscedastic diagonal-Gaussian negative log-likelihood of the target angles~\cite{lakshminarayanan2017simple},
-\begin{equation}
-\mathcal{L}_{\rm NLL}=\frac{1}{2N}\sum_{i=1}^{N}\sum_{j=1}^{2p}
-\left[\log\sigma_{ij}^2+\frac{(\theta_{ij}^\star-\mu_{ij})^2}{\sigma_{ij}^2}\right].
-\end{equation}
-The second is a squared 2-Wasserstein pull~\cite{villani2009optimal} of each predicted Gaussian toward a \emph{difficulty-scaled reference}: the Dirac-like Gaussian centered at the instance's target angles with isotropic reference spread $\sigma_{{\rm ref},i}^2 = 0.02+0.5\,e_i$,
-\begin{equation}
-\begin{aligned}
-\mathcal{L}_{W_2}=\frac{1}{N}\sum_{i=1}^{N}\Bigl[&\|\mu_i-\theta_i^\star\|_2^2\\
-&+\sum_{j=1}^{2p}(\sigma_{ij}-\sigma_{{\rm ref},i})^2\Bigr],
-\end{aligned}
-\end{equation}
-using the closed form of $W_2^2$ between diagonal Gaussians (Appendix~\ref{app:math}). Hard instances are pulled toward larger spreads, easy instances toward tighter ones. The third is a pairwise \emph{ranking penalty} that aligns the total predicted variance $u_i=\tr\Sigma_i$ with the instance difficulty: for every ordered pair with $e_i>e_j$,
-\begin{equation}
-\begin{aligned}
-\mathcal{L}_{\rm rank}
-&=\frac{1}{|\mathcal{P}|}\sum_{(i,j)\in\mathcal{P}}
-\max\bigl(0,0.05-(u_i-u_j)\bigr),\\
-\mathcal{P}&=\{(i,j):e_i>e_j\}.
-\end{aligned}
-\end{equation}
-There is no two-phase schedule, no pairwise-weighted Wasserstein coupling between instances, and no embedding-level contrastive loss; the three displayed terms are the entire objective.
-
-\subsection{Held-out error head for allocation}
-\label{subsec:calibrator}
-
-The covariance head does two jobs that must not be conflated: it sizes the trust region, and one might hope to read it as ``how uncertain is the warm start.'' Empirically the second reading fails: on the test set, $\tr\Sigma(G)$ is \emph{anti}-correlated with the realized warm-start error ($\rho=-0.638$, $p=1.1\times10^{-6}$) and weakly anti-correlated with the offline difficulty proxy ($\rho=-0.292$, $p=0.0437$; Sec.~\ref{subsec:calibresults}). A sign-corrected trace could rank instances, but choosing the sign post hoc would peek at test outcomes. We therefore decouple the difficulty signal from the geometry with a head whose sign and scale are fixed on held-out validation data alone.
-
-After training, the message-passing backbone is frozen and a \emph{linear} calibrator head (\texttt{model.ErrorCalibrator}) is fit on the \emph{held-out validation split}---graphs the network never trained on. For each validation graph, the realized warm-start error is
-\begin{equation}
-r_i \;=\; 1-\frac{F_G(\mu(G_i))}{C_{\max}(G_i)} ,
-\end{equation}
-the exact objective error of the predicted mean. The head regresses $\log(r_i+10^{-4})$ on the standardized pooled embedding (Adam, learning rate $10^{-2}$, weight decay $10^{-2}$, $500$ steps, seeded), and its point prediction is $\widehat e(G)=\exp(\widehat{\log r}(G))$. A linear head is deliberate with $80$ validation graphs. Because it is fit on validation residuals and evaluated on the disjoint test split, no test information leaks into it. The validation split also supplies the median and interquartile range of $\widehat e$ used by the budget rule. This score is assessed as an error ranking; it is not itself a calibrated predictive distribution, and its Spearman correlation must not be conflated with the Gaussian angle head's coverage ECE.
-
-\subsection{Trust-region search policy}
-\label{subsec:policy}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.98\linewidth]{figures/Figure1_ConceptualPipeline.pdf}
-\caption{Graph-conditioned search policy, drawn from a held-out test instance (Erd\H{o}s--R\'enyi, generation seed $9000$, $n=14$) and its predicted Gaussian. The mean initializes pattern search, the covariance preconditions steps and defines a Mahalanobis region, and the validation-fit error score sets the seed count and evaluation cap.}
-\label{fig:pipeline}
-\end{figure}
-
-\emph{Inner optimizer (all methods).} The only optimizer used anywhere in this paper is a deterministic derivative-free coordinate \emph{pattern search} (\texttt{optimization.coordinate\_search}): starting from step size $0.3$, it sweeps the $2p$ coordinates, trying $\pm$ steps; any improving move is accepted immediately; after a full sweep without improvement the step halves; the search stops when the step falls below $10^{-3}$, the budget is exhausted, or the target is reached. It is deterministic given its inputs.
-
-\emph{Preconditioning.} For the learned policy, the predicted standard deviations set per-coordinate step multipliers ${\rm scale}_j=\sigma_j/\overline{\sigma}$ (normalized so the mean multiplier is one): confident directions take small exploitative steps, uncertain directions take larger exploratory ones. The learned geometry, not a fixed step, drives the trajectory.
-
-\emph{Trust region and retraction.} The feasible set is the Mahalanobis ball of radius $r=2$ in whitened standard-deviation units,
-\begin{equation}
-\mathcal{T}(G)=\bigl\{\theta:\ \|\Sigma(G)^{-1/2}(\theta-c)\|_2\le r\bigr\},\qquad r=2,
-\end{equation}
-initially centered at $c=\mu(G)$. Every proposed point is retracted onto $\mathcal{T}$ by pulling it radially toward the center until the Mahalanobis norm equals $r$:
-\begin{equation}
-\Pi_{\mathcal{T}}(\theta')=c+\min\!\left(1,\frac{r}{\|\Sigma^{-1/2}(\theta'-c)\|_2}\right)(\theta'-c).
-\label{eq:retraction}
-\end{equation}
-This is the Euclidean projection in whitened coordinates and a \emph{feasibility retraction}---not the Euclidean nearest feasible point in raw angle coordinates; it always returns a feasible point and leaves feasible points unchanged (Proposition~\ref{prop:retraction}). If the target angles were distributed as $\mathcal N(\mu,\Sigma)$, the ball $r=2$ (squared radius $r^2=4$) would have nominal coverage $\Prob\{\chi^2_4\le 4\}\approx0.594$; this $\chi^2$ reading is an \emph{interpretation} of the fixed radius, not part of the implementation.
-
-\emph{Seeding and re-centering (never worse than the best evaluated seed).} The search is seeded from a set of candidate points: (i) the predicted mean $\mu(G)$; (ii) the concentration-heuristic angles $\theta_{\rm conc}$ (the coordinate-wise median of the training target angles); and (iii) $\max(0,K-2)$ draws from $\mathcal N(\mu,\Sigma)$ retracted into the trust region, where $K$ comes from the budget rule below. Exact duplicate seed vectors are removed before evaluation, and every remaining seed costs one counted query; later search proposals are counted even if a projected location has been visited before. Candidates are considered in that order, so the effective budget must be at least two for the concentration vector to be evaluated (all shipped allocations satisfy this). The best evaluated seed initializes the best-so-far value \emph{and the trust region re-centers on it} (the Mahalanobis metric $\Sigma^{-1}$ and the step preconditioning are retained; seeds are evaluated unprojected when re-centering is enabled). When the heuristic seed wins, the subsequent search explores its basin with the learned ellipsoid shape instead of being dragged back toward a possibly wrong mean. Because best-so-far selection is monotone, the returned quality under exact evaluation is never worse than any seed that fits in the effective budget---in particular never worse than the concentration angle vector when that budget is at least two---at the cost of the counted seed evaluations (\texttt{baselines.gctr\_policy}; the guarantee is unit-tested). Two qualifications make this precise. The guarantee concerns the prior's \emph{angle vector}: the standalone heuristic baseline refines beyond that vector, so its final polished quality can end marginally ahead of the policy's, within one standard deviation (Table~\ref{tab:efficiency}). And under finite shots the same selection operates on noisy estimates, so the guarantee holds for the estimates the optimizer sees rather than for the exact expectations (Appendix~\ref{app:extresults}).
-
-\subsection{Score-based budget allocation}
-\label{subsec:budget}
-
-The validation-fit difficulty score $u=\widehat e(G)$ is standardized with the validation median and interquartile range, $z=(u-{\rm med})/{\rm IQR}$, and mapped to a per-instance allocation by a monotone, capped rule (\texttt{pipeline.budget\_rule}; monotonicity and caps are unit-tested):
-\begin{align}
-K(z)&=\clip\bigl(\lfloor 1+4\,\varsigma(z)\rfloor,\,1,\,4\bigr), \\
-T(z)&=\clip\bigl(\lfloor \tfrac{B}{2}\,(0.5+\max(z,0))\rfloor,\,40,\,B\bigr),
-\end{align}
-with $\varsigma$ the logistic sigmoid and $B=400$ the shared cap. $K$ is the nominal seed count: the mean and the concentration seed are evaluated unconditionally and $\max(0,K-2)$ Gaussian draws are added, so the realized seed count is $\max(K,2)$. $T$ is the instance's evaluation cap, which never exceeds the cap shared by every baseline. For every finite $z$, $K\in\{1,2,3,4\}$; high-score instances therefore receive at most four seeds and the full cap. The implementation is exactly:
-
-\begin{lstlisting}[caption={The budget rule as implemented in \texttt{pipeline.budget\_rule}.},label={lst:budget}]
-z = (float(u) - float(u_med)) / max(float(u_iqr), 1e-9)
-K = int(np.clip(np.floor(1 + 4 * sigmoid(z)), 1, 4))
-t_base = cfg.budget // 2
-T = int(np.clip(np.floor(t_base * (0.5 + max(z, 0.0))),
-                cfg.budget_cap_min, cfg.budget))
-return dict(z=float(z), K=K, T=T,
-            n_gaussian_seeds=max(0, K - 2))
-\end{lstlisting}
-
-The realized allocations on the test set are shown in Appendix~\ref{app:extresults} (Fig.~\ref{fig:budget}). Equation~\eqref{eq:cappedscore} changes the interpretation of $T$: for a fixed ordered trajectory and seed set, early truncation cannot improve capped score. A hit before $T$ has the same score with or without truncation; a miss at $T$ scores $B$, while continuing to $B$ can only find a later hit or tie at $B$. Thus $T$ can reduce raw work only by accepting a quality/success tradeoff; it cannot explain a fair capped-cost gain. Proposition~\ref{prop:capmonotonicity} formalizes this negative result.
-
-\subsection{Baselines}
-\label{subsec:baselines}
-
-All baselines use the identical pattern search, the same target/convergence stopping logic and the identical $400$-evaluation cap; they differ only in the information available before the first query. The learned policy additionally uses the graph-conditioned early cap in Sec.~\ref{subsec:budget}. The optimizer choice is held fixed because it materially affects variational performance~\cite{bonet2023performance}.
-\begin{itemize}
-\item \emph{Random restarts}: $10$ restarts from uniform draws ($\gamma\in[0,\pi)$, $\beta\in[0,\pi/2)$), the budget split evenly across restarts. No learned information.
-\item \emph{Concentration heuristic}: pattern search from the fixed vector $\theta_{\rm conc}$, the coordinate-wise \emph{median} of the $240$ training target angle vectors~\cite{brandao2018fixed,akshay2021reachability,shaydulin2023transfer}. This is the strongest online-cheap prior (after supervised target construction) and also supplies the seed for the learned policy.
-\item \emph{$k$-NN transfer} ($k=1$): pattern search from the target angles of the single training graph nearest in mean spectral-feature space (plain nearest-neighbour transfer)~\cite{bengio2021machine}.
-\item \emph{TQA}: Trotterized-quantum-annealing initialization~\cite{sack2021quantum}, the midpoint linear ramp $\gamma_i=\frac{i-1/2}{p}\,\Delta t$, $\beta_i=\bigl(1-\frac{i-1/2}{p}\bigr)\Delta t$ with $\Delta t=0.75$; for $p=2$ this is $(\gamma_1,\beta_1,\gamma_2,\beta_2)=(0.1875,0.5625,0.5625,0.1875)$ (unit-tested).
-\item \emph{GNN point}: pattern search from the predicted mean $\mu(G)$ alone---the same trained network, stripped of covariance, additional seeds, trust region and budget rule. Its gap to the full policy measures the \emph{joint} contribution of those additions; it does not isolate covariance alone.
-\end{itemize}
-
-\subsection{Metrics and statistical protocol}
-\label{subsec:stats}
-
-The primary metric is the capped benchmark cost in Eq.~\eqref{eq:cappedscore}, always reported with target successes out of $48$ and exact returned expectation quality. Means and descriptive standard deviations use the population convention (denominator $N$). A miss receives $400$ regardless of early convergence or a method-specific cap; raw use is reported separately. The cross-seed study retrains and reruns on the same graphs under four algorithm seeds and therefore measures seed sensitivity, not independent dataset replication.
-
-\emph{Paired tests.} Method comparisons use two-sided paired Wilcoxon signed-rank tests~\cite{wilcoxon1945individual} on the $48$ paired capped scores. We report raw two-sided $p$-values from \texttt{scipy.stats.wilcoxon} with its version-recorded default method. Holm's step-down adjustment over the five planned primary comparisons retains the four raw $p<0.005$ results at familywise $0.05$ and leaves TQA nonsignificant; direction is always stated, including that the concentration result favors the heuristic. These tests are conditional on one training seed and one fixed graph sample. LOFO rows share four fitted family-exclusion models, so their per-instance tests are exploratory and clustered rather than independent replications.
-
-\emph{Calibration.} The coverage expected calibration error (ECE)~\cite{guo2017calibration} of the Gaussian heads is computed from per-dimension standardized residuals $z_{ij}=(\theta^\star_{ij}-\mu_{ij})/\sigma_{ij}$ pooled over the $48$ test instances and $2p=4$ dimensions ($N=192$): for ten nominal two-sided coverage levels $c_k$ (bin centers $0.05,\ldots,0.95$), the observed coverage is the fraction of $|z|$ below the Gaussian quantile $\Phi^{-1}(0.5+c_k/2)$, and ${\rm ECE}=\frac{1}{10}\sum_k|{\rm obs}_k-c_k|$ (\texttt{calibration.py}). The full reliability curve with counts is committed as source data.
-
-\emph{Error-score association.} Spearman rank correlation~\cite{spearman1904proof} between the validation-fit score $\widehat e(G)$ and realized warm-start error on the test set is reported with its $p$-value and sample size ($n=48$). This is a ranking diagnostic, not a coverage-calibration measure. For transparency we also report the rank correlation of $\tr\Sigma(G)$ with the offline difficulty proxy.
-
-\subsection{Reproducibility}
-\label{subsec:repro}
-
-The released root package \texttt{specops-gctr} (\texttt{specops\_gctr/}) contains the simulator, graph features, trainable policy, optimizers, baselines, calibration diagnostics, plotting, tables and command-line drivers, together with a fitted-model interface and backend-neutral callback policy. The callback counts user evaluator calls, but authentication, compilation, mitigation, queueing, shot allocation and hardware uncertainty remain backend responsibilities; no hardware result is inferred. Graph-only prediction avoids the exponential statevector, yet uses a dense eigendecomposition and adjacency tensor. Complete fitting still requires exact-simulation \texttt{Instance} objects for calibration and offers no external calibration-error/objective-label callback, so it is not a large-scale training path. The \texttt{--replot-only} and \texttt{--validate-only} modes render and verify hashed schema-2 evidence. Both main-text tables are generated from CSVs and included verbatim.
-
-The canonical run records seed $20260424$, Python 3.13.12, NumPy 2.4.3, SciPy 1.17.1, NetworkX 3.6.1, PyTorch 2.11.0 with one thread, Matplotlib 3.10.8, pandas 3.0.2 and macOS/arm64 in \texttt{meta.json}. It records package 3.2.0 and the exact simulation-generator digest; a small source archive preserves those executed modules. The portable manifest separately fingerprints later display-only code and hashes every source and generated artifact. Floating-point details can vary across platforms, and runtime is machine-dependent.
+The confirmatory conclusion is deliberately negative. A development study
+passed all frozen criteria, but the one-shot 160-graph audit did not. The
+prespecified 4,000-resample stratified bootstrap returned two negative
+percentile endpoints, but the upper endpoint is boundary-sensitive under
+reasonable alternative inference. Descriptive coverage also missed its
+threshold and four accepted routes were harmful. This distinction between the
+output of one locked resampling analysis and a failed reliability decision is
+the central result.
 
 \section{Results}
-\label{sec:results}
 
-All numbers in this section come from the committed schema-2 run (\texttt{manuscript/source\_data/results.json}, \texttt{meta.json}): $n=14$, $p=2$, $240/80/48$ train/validation/test instances, $98\%$ reference target, shared score cap $400$, and seed $20260424$. Primary and LOFO capped scores, raw use and attainment are independently recomputable from released instance rows.
+\subsection{A target-free portfolio replaces privileged stopping}
 
-\subsection{Capped cost to the privileged reference at the training size}
-\label{subsec:queries}
+For an unweighted graph $G=(V,E)$, depth-$p$ QAOA prepares
+\begin{equation}
+ |\bm\gamma,\bm\beta\rangle =
+ \prod_{j=p}^{1} e^{-i\beta_j B}e^{-i\gamma_j C}|+\rangle^{\otimes |V|},
+\end{equation}
+where $C=\sum_{(u,v)\in E}(I-Z_uZ_v)/2$, $B=\sum_v X_v$, and the exact
+objective is $F_G(\bm\theta)=\langle C\rangle_{\bm\theta}$
+\cite{farhi2014qaoa,hadfield2019alternating}. We use $p=2$ and evaluate
+$F_G$ exactly. An optimizer never receives a target value, exact MaxCut value
+or target-based stopping event. It receives a counter that permits exactly
+$B=32$ objective calls.
 
-Table~\ref{tab:efficiency} and Fig.~\ref{fig:queries} give the primary comparison. Random restarts record $203.9\pm152.9$ capped calls, $37/48$ hits and exact returned ratio $0.834\pm0.035$. The learned point baseline records $264.4\pm164.0$, $20/48$ and $0.793\pm0.068$: the mean alone is weak. GCTR records $15.0\pm7.8$, $48/48$ and $0.858\pm0.026$. Paired tests give $p=2.9\times10^{-9}$ versus random and $2.3\times10^{-9}$ versus the point baseline. The combined policy therefore safeguards a weak learned initializer, but because it includes the fixed heuristic seed this gap cannot identify learned covariance, geometry or allocation.
+At frozen checkpoints
+\begin{equation}
+ \mathcal T=\{1,2,4,8,16,32\},
+\end{equation}
+the runner records the best value observed so far. With exact MaxCut value
+$C_{\max}(G)$ used only after optimization, arm $m$ has checkpoint regret
+\begin{equation}
+ r_{im}(t)=1-\frac{\max_{s\le t}F_{G_i}(\bm\theta_{ims})}{C_{\max}(G_i)}
+\end{equation}
+and primary utility
+\begin{equation}
+ u_{im}=\AURC_{im}=\frac{1}{|\mathcal T|}
+ \sum_{t\in\mathcal T} r_{im}(t).
+ \label{eq:aurc}
+\end{equation}
+Lower AURC is better. Equal checkpoint weights emphasize useful values early
+without inventing a deployment target. Exact MaxCut is still a privileged
+small-instance analysis quantity; removing it from optimizer control does not
+make the metric hardware-native.
 
-$1$-NN records $52.9\pm131.9$ with $42/48$ hits ($p=4.9\times10^{-3}$ versus GCTR). TQA records $18.5\pm13.5$ with $48/48$ and is not distinguishable from GCTR ($p=0.0683$). The adversarial comparison is the concentration heuristic: $12.3\pm6.4$, $48/48$, ratio $0.857\pm0.027$, with a paired difference favoring the heuristic ($p=2.6\times10^{-4}$). The $92.6\%$ arithmetic reduction from random to GCTR is a capped simulation-benchmark ratio, not an end-to-end speedup; it excludes the offline references and physical shots.
+The portfolio contains nine fixed arms: a training-set concentration vector;
+four midpoint linear schedules with scale $d_t\in\{0.25,0.50,0.75,1.00\}$;
+one-nearest-neighbor angle transfer; four-start random multistart; SPSA; and the
+legacy graph-conditioned Gaussian trust-region policy. The fixed schedules are
+included as separate arms because schedule choice can be competitive without
+instance-level learning \cite{zhou2020qaoa,montanez2025ramp}. Every arm uses
+the full budget, and all seed evaluations are counted.
 
-The GNN forward pass is a one-time classical computation. Wall-clock runtimes in Table~\ref{tab:efficiency} are included descriptively but are machine-dependent; the inferential comparison uses counted objective calls rather than timing.
-
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=0.82\linewidth]{figures/Figure2_QueryEfficiency.pdf}
-\caption{Capped cost to the privileged $98\%$ reference on $48$ held-out instances. A miss is scored at $400$; bars show mean and one population SD. Successes are random $37/48$, heuristic $48/48$, $1$-NN $42/48$, TQA $48/48$, point $20/48$ and GCTR $48/48$. GCTR is much lower than random and point, but the fixed heuristic is lower than GCTR.}
-\label{fig:queries}
-\end{figure}
+\includegraphics[width=0.98\textwidth]{figures/Figure1_PortfolioProtocol.pdf}
+\caption{\textbf{Internally locked experiment and resource ledger.} The graph list,
+configuration and implementation are hashed before evaluation. Development
+data fit both the invariant ridge selector and a family-specific fallback;
+calibration data set one upper residual order statistic. The decision is
+written before the 160-graph audit is evaluated. All arms receive the same
+target-free 32-query ceiling. The confirmatory reliability gate fails because
+descriptive empirical coverage is below its prespecified threshold.}
+\label{fig:protocol}
+\end{figure*}
+
+\subsection{Structural routing abstains to a strong family fallback}
+
+For each graph we compute a 16-dimensional relabelling-invariant vector
+$x(G)$: size, edge count per vertex, density, seven degree summaries, mean
+clustering, transitivity, triangles per vertex, and three normalized
+Laplacian eigenvalue summaries. A multi-output ridge regression fitted only on
+development graphs predicts every arm's AURC,
+\begin{equation}
+ \widehat{\bm u}(x)=\bm a+W\widetilde x, \qquad \lambda_{\rm ridge}=1,
+\end{equation}
+where $\widetilde x$ uses development means and scales. The proposed arm is
+$s(x)=\argmin_m\widehat u_m(x)$.
+
+A family label is available for these synthetic generators. For family $f$,
+the fallback is the arm with lowest mean development AURC,
+\begin{equation}
+ b(f)=\argmin_m\frac{1}{N_f}\sum_{i:f_i=f}u_{im}.
+ \label{eq:fallback}
+\end{equation}
+This is intentionally stronger than falling back to a single global arm. In
+the heterogeneous study, Erd\H{o}s--R\'enyi and Watts--Strogatz graphs fall
+back to the $d_t=0.50$ schedule; random-regular and Barab\'asi--Albert graphs
+fall back to $d_t=0.75$.
+
+On calibration graph $i$, define the selected-minus-fallback residual
+\begin{equation}
+ R_i = [u_{i,s(x_i)}-u_{i,b(f_i)}]
+       -[\widehat u_{s(x_i)}(x_i)-\widehat u_{b(f_i)}(x_i)].
+ \label{eq:residual}
+\end{equation}
+With $n_{\rm cal}=48$ and $\alpha=0.10$, we use the one-sided split-conformal
+rank rule to choose the
+$\lceil(n_{\rm cal}+1)(1-\alpha)\rceil=45$th ordered residual,
+$q=0.0358185$. For a new graph,
+\begin{equation}
+ U(x)=\widehat u_{s(x)}(x)-\widehat u_{b(f)}(x)+q.
+\end{equation}
+The deployed arm is $s(x)$ only when $s(x)\ne b(f)$ and $U(x)<0$; otherwise it
+is $b(f)$. If calibration residuals and a future residual were exchangeable,
+the standard split-conformal theorem would provide marginal one-sided coverage
+$\Prob\{u_s-u_b\le U\}\ge 1-\alpha$, up to its finite-sample rank convention
+\cite{angelopoulos2021gentle}. That premise is not exactly satisfied here:
+calibration and audit sets have fixed family-by-size quotas, and protocol
+construction sequentially rejects graphs isomorphic to any previously accepted
+graph across earlier splits. Thus $q$ is a conformal-motivated order-statistic
+threshold, not a finite-sample coverage certificate for the realized audit;
+its empirical coverage is descriptive. Algebraically, the joint event
+``accepted and truly worse than fallback'' is still contained in the observed
+event $u_s-u_b>U$, but no nominal probability bound follows for this protocol.
+
+\subsection{Development selected a heterogeneous protocol}
+
+We used development evidence only to decide whether a fresh confirmation was
+warranted. A first regular-grid study on 48 audit graphs improved the global
+baseline but not the development-selected family control: mean gated-minus-
+family AURC was $+0.000936$ with interval
+$[-0.002094,0.004013]$. It accepted 13 graphs, harmed nine and achieved
+coverage $0.7708$. This protocol failed and was not promoted.
+
+A second development protocol varied generator parameters continuously or
+discretely within broad ranges. On 64 new audit graphs its mean difference was
+$\DevDelta$ with stratified 95\% interval
+[$\DevCILow$, $\DevCIHigh$]. It accepted $\DevAccepted$ graphs, harmed
+$\DevHarms$, and achieved descriptive coverage $\DevCoverage$. It passed every frozen
+follow-up criterion. This result was used as model-selection evidence only: it
+fixed the nine arms, features, ridge penalty, family fallbacks, residual-rank
+rule, checkpoints, bootstrap procedure and gate. No development
+number is treated as confirmatory.
+
+We then created a configuration identical in all training, development and
+calibration seeds and all method hyperparameters, changing only the study label
+to confirmatory, the audit count from 8 to 20 graphs per family-size stratum,
+and the audit seed range. The resulting 160 graphs were generated from a new
+range and evaluated once (Fig.~\ref{fig:progression}).
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/Figure3_DevelopmentToConfirmation.pdf}
+\caption{\textbf{Development-to-confirmation progression.} \textbf{a}, Mean
+gated-minus-family-fallback AURC and stratified 95\% bootstrap intervals.
+\textbf{b}, Descriptive empirical one-sided coverage; the dashed line is the prespecified
+0.90 requirement. \textbf{c}, fractions accepted and jointly harmed. The
+heterogeneous development result triggered confirmation; the confirmatory
+coverage result failed the locked gate.}
+\label{fig:progression}
+\end{figure*}
+
+\subsection{The confirmatory mean improves, but the reliability gate fails}
+
+On the 160 confirmatory graphs, the strongest global arm was the
+$d_t=0.75$ schedule with mean AURC $\ConfirmGlobalAURC$. The family fallback
+improved this to $\ConfirmFamilyAURC$. The abstaining deployment achieved
+$\ConfirmGatedAURC$; the per-instance portfolio oracle, which is unavailable
+at deployment, achieved $\ConfirmOracleAURC$. Thus the portfolio contained
+opportunity, but most of it could not be selected safely.
+
+The primary paired difference between gated deployment and family fallback was
+$\ConfirmDelta$. A bootstrap that resampled within each family-by-size stratum
+4,000 times gave percentile endpoints
+[$\ConfirmCILow$, $\ConfirmCIHigh$]. Both endpoints from that prespecified run
+are negative, with the upper endpoint close to zero. Reasonable alternative
+resampling seeds and interval constructions do not uniformly retain a negative
+upper endpoint. We therefore report the exact locked-bootstrap output, not a
+claim of robust statistical significance or a conformal guarantee. The effect
+is not operationally broad: only
+$\ConfirmAccepted/\ConfirmN$ graphs ($\ConfirmAcceptedRate$) were routed away
+from fallback.
+
+Four accepted routes were harmful, a joint rate of $\ConfirmJointHarmRate$ and
+a conditional rate of $\ConfirmConditionalHarmRate$ among acceptances. All
+four harms occurred in the Barab\'asi--Albert family, where the gated policy
+worsened mean AURC by $\ConfirmBAdelta$. Random-regular graphs supplied most
+of the improvement ($\ConfirmRRdelta$; five acceptances and no harms).
+Watts--Strogatz improved by $\ConfirmWSdelta$ with one acceptance, and
+Erd\H{o}s--R\'enyi always used its fallback.
+
+Most importantly, descriptive empirical coverage was $\ConfirmCoverage$ (141 of 160),
+below the prespecified $\ConfirmNominal$ requirement. The observed joint harm
+rate remained below $\alpha$, but the mechanical decision required every
+criterion. It therefore returned
+\code{confirmatory\_followup\_ready=false} and
+\code{nmi\_claim\_ready=false}. We do not alter that rule after observing the
+audit.
 
 \begin{table*}[t]
+\caption{\textbf{Confirmatory results by graph family.} Fallback and gated
+columns are mean AURC. $\Delta$ is gated minus family fallback; negative is
+better. A harm is an accepted route with positive realized $\Delta$.}
+\label{tab:confirmatory}
 \centering
-\caption{Capped cost, target success, exact returned expectation ratio and wall-clock runtime at $p=2$, $n=14$ (mean $\pm$ population SD where applicable). A target miss scores $400$; raw use is released separately. $p$-values are raw two-sided paired Wilcoxon tests versus GCTR. The significant concentration result favors the \emph{heuristic}; runtime is machine-dependent. The table is generated from the released CSV and included verbatim.}
-\label{tab:efficiency}
-\input{tables/table_efficiency}
+\input{tables/table_confirmatory_results.tex}
 \end{table*}
 
-\subsection{The fixed prior remains stronger}
-\label{subsec:prior}
-
-The heuristic is the strongest primary baseline. It and GCTR both reach $48/48$, while the heuristic uses $2.7$ fewer capped calls on average and has indistinguishable aggregate quality. The two-seed/full-cap control also reaches $48/48$ and records $14.3\pm7.9$, slightly below GCTR. This control keeps the mean and heuristic seeds and the trust region, removes score-allocated Gaussian draws, and removes early truncation. Because it changes two levers, it does not isolate either; because early truncation cannot improve the fair score on a fixed trajectory, its favorable value supplies no evidence for cap allocation. Across four algorithm seeds GCTR records $17.6\pm4.2$ versus the deterministic heuristic's $12.3\pm0.0$, at ratio $0.855\pm0.003$ versus $0.857$. The seed-floor guarantee remains correct once both seeds are evaluated, but it is not an efficiency result against the refined prior.
-
-\subsection{Angle coverage and a held-out difficulty score}
-\label{subsec:calibresults}
-
-Two diagnostics measure different objects (Fig.~\ref{fig:calibration}). Over $192$ per-dimension residuals, the Gaussian head has ECE $0.101$ and undercovers at every nominal level (observed $0.901$ at nominal $0.95$); this is marginal, not joint, coverage. The raw covariance trace anti-correlates with realized warm-start error ($\rho=-0.638$, $p=1.1\times10^{-6}$) and with the offline proxy ($\rho=-0.292$, $p=0.0437$). The separate validation-fit head has the intended sign, $\rho=0.671$ ($p=1.8\times10^{-7}$, $n=48$), and $0.767\pm0.085$ across algorithm seeds. Yet removing the ranking penalty improves the same held-out diagnostics to ECE $0.026$ and $\rho=0.854$. The current run therefore supports separation of geometry and difficulty signals, but not the chosen ranking penalty or a calibrated Gaussian claim.
-
-\begin{figure}[t]
+\begin{table*}[t]
+\caption{\textbf{Prespecified confirmatory gate.} Every row had to pass. The
+locked bootstrap endpoints are negative and the joint harm rate is below
+$\alpha$, but descriptive empirical coverage fails its requirement.}
+\label{tab:gate}
 \centering
-\includegraphics[width=0.72\linewidth]{figures/Figure3_CalibrationAndUncertainty.pdf}
-\caption{Held-out diagnostics. The Gaussian angle head has marginal coverage ECE $0.101$ over $192$ standardized residuals and systematically undercovers. Separately, a validation-fit error score ranks realized warm-start error at $\rho=0.671$ ($p=1.8\times10^{-7}$, $n=48$); the raw covariance trace has the wrong sign ($\rho=-0.638$).}
-\label{fig:calibration}
-\end{figure}
+\input{tables/table_confirmatory_gate.tex}
+\end{table*}
 
-\subsection{Cross-size transfer}
-\label{subsec:crosssize}
+\subsection{Point coverage, marginal harm and selective harm differ}
 
-A single model trained at $n=14$ was evaluated on fresh $48$-instance sets at $n=8,10,12,14,16$ (Appendix Fig.~\ref{fig:transfer}). GCTR records $11.6$, $20.1$, $13.4$, $15.4$ and $15.2$ capped calls with successes $48$, $47$, $48$, $48$, $48$. The heuristic records $10.9$, $21.8$, $12.1$, $12.5$, $10.5$ with the same success counts at every size. Thus GCTR is lower only at $n=10$ and the heuristic is lower at four sizes. Arithmetic random/GCTR mean ratios are $13.47$, $8.47$, $13.95$, $12.82$ and $10.40$, but these exclude offline references and are not hardware speedups. No cross-size feature ablation was run, so transfer cannot be attributed to spectral coordinates.
+The frozen gate compares a point estimate with 0.90. A point miss does not by
+itself show that nominal coverage is false. Under an explicitly hypothetical
+iid Bernoulli model with success probability 0.90, the lower-tail probability
+of observing at most 141 covered graphs in 160 trials is 0.249. The realized
+coverage is therefore statistically compatible with 0.90 under that model,
+even though it fails the frozen mechanical rule.
 
-\subsection{Leave-one-family-out transfer exposes failure modes}
-\label{subsec:lofo}
+Point estimates are also weaker than high-confidence risk control. Exact
+one-sided 95\% Clopper--Pearson upper bounds
+\cite{clopper1934fiducial} distinguish three event rates. Coverage failure has
+19 events among 160 graphs (rate 0.119, upper bound 0.169), so it does not
+certify risk at most 0.10. Under that same hypothetical iid model, joint harm
+has four events among all 160 graphs (0.025, upper bound 0.056), which would
+pass a 0.10 marginal-risk gate. Conditional harm has four events among only 12
+accepted routes (0.333, upper bound 0.609), so accepted-route safety is not
+established. These calculations were added after the audit and are sensitivity
+diagnostics, not replacements for its frozen decision. Fixed quotas and
+sequential de-duplication also invalidate the iid premise needed to interpret
+them as formal confidence statements for this experiment.
 
-LOFO retrains every learned component and the fixed prior on three families and evaluates the held-out fourth. Pooled GCTR is $89.3\pm149.8$ with $39/48$ hits; the heuristic is $86.5\pm141.6$ with $40/48$ ($p=0.832$), the point baseline $125.0\pm147.9$ with $38/48$ ($p=0.0051$), no trust region $82.2\pm142.8$ with $40/48$ ($p=0.686$), and the two-seed/full-cap control $73.8\pm135.5$ with $41/48$ ($p=0.0355$, control favored). These per-instance tests are exploratory because rows cluster within four fitted models.
+\subsection{Anytime behavior and resource accounting}
 
-The failure is heterogeneous. On held-out Barab\'asi--Albert graphs, GCTR reaches $7/12$ at mean $180.8$, versus heuristic $9/12$ at $136.8$ and point $10/12$ at $100.4$. On Watts--Strogatz, GCTR reaches $8/12$ at $148.8$, heuristic $7/12$ at $189.6$, and point $10/12$ at $97.6$. Erd\H{o}s--R\'enyi and random-regular cases are easy for the fixed prior. The full policy is neither pooled-best nor uniformly robust, and the control result contradicts an allocation-value claim.
+Figure~\ref{fig:audit}b shows mean normalized regret at all six checkpoints.
+The family fallback is better than the global arm early in the trajectory; the
+abstaining policy improves the mean primarily through a small number of
+random-regular instances. At 32 calls all three controls converge, while the
+unavailable per-checkpoint oracle remains lower. AURC rewards this early
+separation rather than only the terminal value.
 
-\subsection{Component ablation}
-\label{subsec:ablation}
+The legacy GCTR arm was not competitive: its confirmatory mean AURC was
+0.28577, compared with 0.17277 for the $d_t=0.75$ schedule and 0.17381 for
+$d_t=0.50$. Concentration, random multistart and SPSA recorded 0.29496,
+0.30629 and 0.30699, respectively. These values reinforce the original
+negative control: angle-distribution learning and trust-region geometry did
+not beat simple schedules in this regime.
 
-Table~\ref{tab:ablation} and Fig.~\ref{fig:ablation} dissect the policy. Policy-level variants reuse the full trained model and switch off one inference-time component; loss/feature variants retrain the network.
+The confirmatory resource ledger contains 5,760 offline objective queries for
+48 angle labels, 13,824 queries each for development and calibration portfolio
+traces, and 46,080 audit queries (nine arms times 160 graphs times 32 calls).
+These are experiment-construction costs. Operational deployment would execute
+one selected or fallback arm for at most 32 objective calls after computing
+cheap graph features; it would not evaluate all nine arms. The study used no
+shots, devices, compilation or queue time.
 
-\emph{The prior seed dominates.} Removing it raises capped cost from $15.0$ and $48/48$ to $249.4\pm178.8$ and $20/48$, close to the weak point baseline. This is the largest intervention and shows that favorable in-distribution behavior is primarily a safeguard supplied by the fixed prior.
-
-\emph{The hard boundary is distribution-dependent.} Removing it gives $22.9\pm55.6$ and $47/48$ in distribution, worse than full GCTR, but is slightly better pooled under LOFO ($82.2$, $40/48$ versus $89.3$, $39/48$). The intervention supports no universal direction.
-
-\emph{The allocation controls do not support the full rule.} The two-seed/full-cap control records $14.3\pm7.9$, $48/48$ in distribution and $73.8$, $41/48$ under shift, both below full GCTR. Replacing the held-out error score by raw covariance trace produces the wrong ranking sign ($\rho=-0.638$) and $22.3\pm55.6$, $47/48$, but this joint seed/cap change is not a causal test of score quality.
-
-\emph{The ranking penalty is contradicted.} Removing the Wasserstein term gives $15.6\pm9.6$, ECE $0.069$, $\rho=0.751$; removing the ranking penalty gives $17.3\pm17.2$, ECE $0.026$, $\rho=0.854$; removing spectral encodings gives $15.3\pm8.5$, ECE $0.081$, $\rho=0.665$. All three reach $48/48$. The ranking penalty improves neither held-out diagnostic in this run, and spectral features are not causally linked to transfer.
-
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=0.82\linewidth]{figures/Figure5_Ablation.pdf}
-\caption{Component ablation on $48$ instances using capped cost. Removing the heuristic seed causes the dominant failure ($249.4$, $20/48$ versus $15.0$, $48/48$). The two-seed/full-cap control slightly improves cost ($14.3$, $48/48$), while removing the ranking penalty improves ECE and rank correlation despite a modest cost increase.}
-\label{fig:ablation}
-\end{figure}
+\includegraphics[width=0.98\textwidth]{figures/Figure2_ConfirmatoryAudit.pdf}
+\caption{\textbf{Confirmatory audit.} \textbf{a}, Realized AURC differences for
+the 12 accepted routes; red points are harmful. \textbf{b}, mean anytime regret
+for the global schedule, family fallback, gated deployment and unavailable
+per-checkpoint oracle. \textbf{c}, family means expose concentration of gains
+in random-regular graphs and degradation in Barab\'asi--Albert graphs.
+\textbf{d}, the descriptive empirical coverage criterion fails even though the
+joint harm rate is below its numerical ceiling.}
+\label{fig:audit}
+\end{figure*}
 
-\begin{table}[t]
+\section{Discussion}
+
+This study separates three statements that are often merged. First, a
+portfolio can contain instance-level opportunity: the confirmatory oracle gap
+is nonzero. Second, a learned selector can lower the observed aggregate mean:
+the locked 4,000-resample percentile endpoints are negative, but that endpoint
+result is not robust to reasonable alternative inference. Third, a selector
+can be reliable under a prespecified deployment rule. The first is supported,
+the second is limited to the exact locked calculation, and the third fails.
+
+The negative decision is informative because the protocol was designed to make
+failure visible. A global TQA comparison would have credited the router partly
+for rediscovering that graph families prefer different schedules. Replacing it
+with a development-selected family fallback removes much of that easy gain.
+Abstention then reduces exposure but does not make the residual model
+conditionally valid. The result also shows why a marginal harm rate and
+conditional safety answer different questions: four harms are only 2.5\% of
+the full audit, but one third of accepted interventions. Exact-binomial
+sensitivity bounds sharpen that distinction: marginal joint harm can be small
+while the accepted set is too small and too failure-prone to support a
+selective-safety claim.
+
+Several mechanisms may explain the family asymmetry. The 16 summaries are
+invariant and transparent, but they can alias graphs with different QAOA
+landscapes. The ridge selector is intentionally low-capacity and may underfit
+interactions among density, clustering and spectrum. Conversely, replacing it
+after seeing the audit would create selection bias. The calibration split has
+only 48 graphs, so its upper residual order statistic is coarse. Moreover, the
+fixed family-by-size quotas and sequential cross-split non-isomorphism filter
+mean that calibration and audit residuals are not literally exchangeable under
+the standard pooled theorem. Even under idealized exchangeability, split
+conformal would be marginal and would not guarantee coverage within the
+Barab\'asi--Albert subgroup or conditional on acceptance
+\cite{angelopoulos2021gentle,barber2022exchangeability}. The BA degradation is
+therefore a failure mode to explain in a future, newly frozen study, not a cue
+for post hoc threshold adjustment here.
+
+The work is also bounded by its quantum evidence. All results are exact
+statevector simulations of unweighted MaxCut at $p=2$ and $n\in\{12,14\}$.
+The exact optimum is used to normalize regret. Shot noise can reorder arms,
+SPSA is designed for stochastic rather than exact objectives
+\cite{spall1992spsa}, and device compilation and latency can dominate an
+evaluation count. Recent work demonstrates parameter transfer and online
+learning on much larger or hardware-native problems
+\cite{shaydulin2023weighted,oleary2025online}; the present experiment neither
+matches that scale nor supplies hardware evidence. No quantum advantage,
+large-scale classical advantage or end-to-end wall-clock gain is claimed.
+
+Offline costs are unequal. The concentration, k-nearest-neighbor and legacy
+GCTR arms share 48 labels produced by 5,760 exact objective calls. The linear
+schedules, random multistart and SPSA require none. The audit pays to evaluate
+every arm only because ground truth is needed to judge routing; a deployed
+router would not. Any claim of amortized advantage must specify how many future
+instances repay the labels, model fit and portfolio audit. Label-free
+graph-conditioned trajectory learning is an important alternative
+\cite{nguyen2026meta}.
+
+A credible next stage would be a new protocol, not an update to this audit. It
+would increase calibration and audit sizes, include unknown-family or
+family-agnostic fallbacks, and use a sampling design and group-conditional
+method with a justified coverage theorem. It would also evaluate noisy and
+repeated-shot objectives and report total
+shots, latency and classical preprocessing. A method change must invalidate
+the current decision hash and use new audit seeds. Until such evidence exists,
+the strongest conclusion is methodological: a prespecified reliability audit
+can stop a small positive mean from being overstated as reliable learned
+optimization.
+
+\section{Methods}
+
+\subsection{Graph distributions and frozen splits}
+
+The heterogeneous protocol uses four unweighted random-graph families at
+$n=12$ and $n=14$. Erd\H{o}s--R\'enyi edge probability is sampled uniformly
+from $[0.15,0.75]$. Random-regular degree is sampled from the valid members of
+$\{2,3,4,5,6\}$. Barab\'asi--Albert attachment is sampled from
+$\{1,2,3,4\}$. Watts--Strogatz degree is sampled from $\{2,4,6,8\}$ and
+rewiring probability uniformly from $[0.02,0.95]$
+\cite{erdos1959random,barabasi1999emergence,watts1998collective}.
+
+Each family-size stratum contains six angle-training, six development, six
+calibration and 20 confirmatory audit graphs: 48, 48, 48 and 160 graphs,
+respectively. A candidate is rejected if its labeled edge hash duplicates a
+prior graph. A Weisfeiler--Lehman-plus-degree fingerprint screens possible
+isomorphs, which are then checked by exact NetworkX isomorphism
+\cite{hagberg2008networkx}. Generator parameters, seeds, edge hashes, exact
+MaxCut values and invariant fingerprints are stored in the frozen protocol.
+
+The successful heterogeneous development configuration and the confirmatory
+configuration share angle-training seed start 1,310,000; development start
+1,410,000; calibration start 1,510,000; model/optimizer seed 20,260,719; and all
+hyperparameters. Development used audit seeds from 1,610,000. Confirmation used
+a new range from 1,810,000 and increased the audit count from eight to 20 per
+stratum. Protocol construction rejects isomorphic overlap across every split.
+
+\begin{table*}[t]
+\caption{\textbf{Confirmatory split and exact-query ledger.} Per family-size
+is the number in each of eight family-by-size strata. Trace queries include all
+nine arms at 32 calls per graph.}
+\label{tab:protocol}
 \centering
-\caption{Ablation summary: capped cost (mean $\pm$ SD), target success, marginal angle ECE and Spearman $\rho$ between the operative score and realized warm-start error. Policy variants reuse the model; loss/feature variants retrain it. The two-seed/full-cap row changes two levers. The table is generated from source data.}
-\label{tab:ablation}
-\resizebox{\columnwidth}{!}{\input{tables/table_ablation}}
-\end{table}
-
-\subsection{The quality--cost frontier}
-\label{subsec:frontier}
-
-Appendix Fig.~\ref{fig:frontier} plots aggregate returned expectation quality against mean capped cost. Primary per-instance rows show both heuristic and GCTR reach $48/48$; the heuristic has lower cost and their aggregate ratios differ by only $0.0002$. On these endpoints, the fixed prior is empirically preferred. Error bars overlap and the plot is not a full quality--cost frontier over tunable budgets.
-
-\subsection{Robustness studies}
-\label{subsec:robustness}
-
-Three further studies are detailed in Appendix~\ref{app:extresults}. \emph{Seed stability}: four algorithm seeds give GCTR $17.6\pm4.2$ versus heuristic $12.3\pm0.0$, aggregate ratio $0.855\pm0.003$, and score correlation $0.767\pm0.085$ on the same graphs. \emph{Shot noise}: at $S=128$, GCTR is $22.6$, $47/48$, exact returned ratio $0.851$ versus heuristic $13.9$, $48/48$, $0.853$; at $S=1024$ the values are $15.2$, $48/48$, $0.857$ versus $13.4$, $48/48$, $0.857$. Success records the noisy stopping decision, not independently verified exact target attainment. \emph{Allocation and landscape}: issued caps span $100$--$222$ and nominal seeds $1$--$3$; a landscape slice shows the predicted ellipse is broad relative to the plotted angle chart. None establishes an advantage over the fixed prior.
-
-\section{Theoretical guarantees}
-\label{sec:theory}
-
-The guarantees are local and conditional. They do not assert global optimality of QAOA, nor that the predictor must find the global basin on arbitrary graph distributions. Throughout, $d=2p$, $m=|E|$, and
-$\mathcal{T}_r(G;c)=\{\theta:\|\Sigma^{-1/2}(\theta-c)\|_2\le r\}$ denotes a trust region with radius $r=2$ and center $c$.  In the implementation $c$ begins at the predicted mean and is then set to the best evaluated seed; the results below are stated for either center. Proofs are collected in Appendices~\ref{app:math} and \ref{app:statproofs}.
-
-\subsection{Local guarantees inside the trust region}
-
-\begin{proposition}[Local Lipschitz regularity]
-\label{prop:lipschitz}
-For a connected graph $G$ with $m$ edges, the depth-$p$ QAOA objective $F_G:\R^{2p}\to\R$ is real analytic. In particular, on any bounded set $K\subset\R^{2p}$,
-\begin{equation}
-L_{G,K}:=\sup_{\theta\in K}\|\nabla F_G(\theta)\|_2<\infty,
-\end{equation}
-and a conservative global bound is $L_G\leq 2m\sqrt{p(m^{2}+n^{2})}$, the $\ell_2$ aggregation of the per-coordinate bounds $2m^{2}$ ($\gamma$-coordinates) and $2mn$ ($\beta$-coordinates) derived in Appendix~\ref{app:smooth}.
-\end{proposition}
-
-\begin{theorem}[Expected objective inside the trust region]
-\label{thm:trobjective}
-For any center $c$, suppose $F_G(c)\ge q^\star C_{\max}$ for some quality level $q^\star\in(0,1]$. If the random iterate $\Theta$ is supported on $\mathcal{T}_r(G;c)$, then
-\begin{equation}
-\E F_G(\Theta)\;\ge\; q^\star C_{\max}-L_G\, r\,\sqrt{\opnorm{\Sigma}}.
-\end{equation}
-\end{theorem}
-
-\begin{corollary}[Radius condition for objective retention]
-\label{cor:variance}
-Under the conditions of Theorem~\ref{thm:trobjective}, if the largest predicted standard deviation satisfies $\sigma_{\max}\leq q^\star C_{\max}/(2L_G r)$, then $\E F_G(\Theta)\geq q^\star C_{\max}/2$.
-\end{corollary}
-
-\begin{observation}[Best-of-$K$ seeding]
-\label{obs:bestofk}
-Let $\theta_1,\ldots,\theta_K$ be independent samples from $\mathcal{N}(\mu,\Sigma)$, optionally retracted radially about $\mu$. Then $\E\max_k F_G(\theta_k)\ge\E F_G(\theta_1)\ge F_G(\mu)-L_G\sqrt{\tr\Sigma}$ (Appendix~\ref{app:math}). Without assumptions on the objective-value distribution, no rate in $K$ is claimed. The implemented seed set additionally contains the deterministic points $\mu$ and $\theta_{\rm conc}$, and best-so-far selection makes the returned value at least the best seed's value---the never-worse property used in Sec.~\ref{subsec:prior}.
-\end{observation}
-
-\begin{proposition}[Early-cap monotonicity under shared-cap scoring]
-\label{prop:capmonotonicity}
-Fix a target, a common scoring cap $B$, and one ordered trajectory of objective
-queries. Let $\tau$ be the first target-hit index, with $\tau=\infty$ if the
-trajectory has no hit by $B$. For an early cap $T\le B$, define the reported
-score
-\begin{equation}
- C_T=\begin{cases}\tau,&\tau\le T,\\ B,&\tau>T.\end{cases}
-\end{equation}
-Then $C_B\le C_T$ pointwise. Hence shortening an otherwise identical
-trajectory cannot improve mean shared-cap score or target attainment; it can
-only tie or worsen them.
-\end{proposition}
-
-If $\tau\le T$, both policies score $\tau$. If $\tau>T$, the early policy
-scores $B$, while continuation either first hits at some $\tau\le B$ and
-scores $\tau\le B$, or also misses and scores $B$. This proves the claim.
-The proposition does not compare policies with different seed sets, search
-directions or noisy histories. In particular, the released two-seed/full-cap
-control changes the seed set as well as the cap, so its empirical difference
-cannot be attributed to cap removal alone.
-
-\begin{proposition}[Retraction feasibility]
-\label{prop:retraction}
-The retraction~\eqref{eq:retraction} returns a point of $\mathcal{T}_r(G;c)$, leaves every point of $\mathcal{T}_r(G;c)$ unchanged, and equals the Euclidean projection onto the ball of radius $r$ in whitened coordinates $y=\Sigma^{-1/2}(\theta-c)$. It is not the Euclidean nearest feasible point in raw angle coordinates; feasibility, not metric optimality, is what the algorithm requires.
-\end{proposition}
-
-\begin{proposition}[Conformal radius, available extension]
-\label{prop:conformal}
-Fix the predictor $(\mu(G),\Sigma(G))$ independently of the calibration
-labels. Let $s_i=(\theta_i^\star-\mu_i)^\top\Sigma_i^{-1}(\theta_i^\star-\mu_i)$
-be nonconformity scores on an exchangeable calibration set and
-$\hat q_{1-\alpha}$ the split-conformal quantile~\cite{angelopoulos2021conformal,romano2019conformalized}. Then for a new exchangeable instance,
-\begin{equation}
-\Prob\{(\theta^\star-\mu)^\top\Sigma^{-1}(\theta^\star-\mu)\leq \hat q_{1-\alpha}\}\geq 1-\alpha.
-\end{equation}
-This coverage is marginal, not per-graph, and applies to the predictive ellipsoid centered at $\mu$.  Data-dependent re-centering on the winning seed changes the set and would require a separate calibration argument. The released policy uses the fixed radius $r=2$; the conformal radius is therefore an available alternative for an unrecentered variant, not a guarantee claimed for the shipped runs (Appendix~\ref{app:math}).
-\end{proposition}
-
-\begin{theorem}[Ordering under depolarizing noise]
-\label{thm:depolarizing}
-Under a global depolarizing model $\rho_\nu=(1-\nu)|\theta\rangle\langle\theta|+\nu I/2^n$, the noisy objective is $F_G^\nu(\theta)=(1-\nu)F_G(\theta)+\nu \bar C$. Let $\Pi_1$ and $\Pi_2$ be two fixed distributions over parameter points, chosen independently of $\nu$ and of noisy objective observations. Then
-\begin{equation}
-\E_{\Pi_1} F_G^\nu-\E_{\Pi_2} F_G^\nu=(1-\nu)\bigl(\E_{\Pi_1} F_G-\E_{\Pi_2} F_G\bigr),
-\end{equation}
-so their noiseless expected ordering is preserved for $\nu<1$. This statement does not cover an adaptive optimizer whose queried points depend on noisy observations; the finite-shot study of Appendix~\ref{app:extresults} measures that end-to-end behavior separately.
-\end{theorem}
-
-\subsection{Statistical foundations of the query metric}
-\label{sec:statfound}
-
-The guarantees above treat $F_G(\theta)$ as exactly known. On hardware it is not: every objective value is reconstructed from finitely many projective measurements through the Born rule, so estimating $F_G$ is a statistical estimation problem, optimizing under such estimates is stochastic optimization, and the graph-conditioned model supplies learned predictions before expensive queries. The following statements make the paper's resource accounting precise; proofs are in Appendix~\ref{app:statproofs}. Throughout, $0\le C(z)\le m$ so $0\le F_G\le C_{\max}\le m$.
-
-\begin{assumption}[Born-rule sampling oracle]
-\label{ass:oracle}
-One query at $\theta$ with $S$ shots returns $Z_1,\dots,Z_S$ i.i.d.\ from the Born distribution $P_\theta$ of measuring $|\theta\rangle$ in the computational basis, and the estimator uses the cut values $X_s:=C(Z_s)\in[0,m]$. Distinct queries use independent randomness.
-\end{assumption}
-
-\begin{assumption}[Local regularity]
-\label{ass:reg}
-On the compact search domain $K\supseteq\mathcal{T}_r(G)$ the objective $F_G$ is $L_G$-Lipschitz with $L_1$-Lipschitz gradient. Proposition~\ref{prop:lipschitz} and real analyticity guarantee that finite constants exist on $K$; only their existence, not an asserted closed-form Hessian constant, is used below.
-\end{assumption}
-
-\begin{proposition}[Unbiasedness and exact variance]
-\label{prop:unbias}
-Under Assumption~\ref{ass:oracle}, $\widehat F_G(\theta)=\frac1S\sum_{s} X_s$ satisfies $\E[\widehat F_G(\theta)]=F_G(\theta)$ and $\Var(\widehat F_G(\theta))=v_\theta/S$ with $v_\theta=\Var_{P_\theta}(C(Z))\le m^2/4$; moreover $v_\theta\le F_G(\theta)(m-F_G(\theta))$. This last bound tightens only when the mean approaches an endpoint of the full interval $[0,m]$; a high approximation ratio alone need not make it small when $C_{\max}<m$.
-\end{proposition}
-
-\begin{theorem}[Finite-sample confidence intervals]
-\label{thm:ci}
-Fix $\theta$ and $\delta\in(0,1)$. With probability at least $1-\delta$,
-\begin{equation}
-\bigl|\widehat F_G(\theta)-F_G(\theta)\bigr|
-\le m\sqrt{\frac{\log(2/\delta)}{2S}}
-\quad\text{(Hoeffding)},
-\label{eq:hoeff-ci}
-\end{equation}
-and also
-\begin{equation}
-\begin{aligned}
-\bigl|\widehat F_G(\theta)-F_G(\theta)\bigr|
-&\le \sqrt{\frac{2v_\theta\log(2/\delta)}{S}}\\
-&\quad+\frac{2m\log(2/\delta)}{3S}
-\quad\text{(Bernstein)}.
-\end{aligned}
-\label{eq:bern-ci}
-\end{equation}
-\end{theorem}
-
-\begin{corollary}[Shot complexity]
-\label{cor:shotcomplexity}
-$S\ge m^2\log(2/\delta)/(2\varepsilon^2)$ shots guarantee $|\widehat F_G(\theta)-F_G(\theta)|\le\varepsilon$ with confidence $1-\delta$. Bernstein gives the sufficient scaling
-$S=O\!\left((v_\theta\varepsilon^{-2}+m\varepsilon^{-1})\log\delta^{-1}\right)$; the linear term cannot be omitted even when $v_\theta$ is small.
-\end{corollary}
-
-The surrogate's value enters through the number of \emph{locations} at which the energy must be resolved. If a run resolves $M$ fixed angles each to accuracy $\varepsilon$, a union bound shows that $S\ge \tfrac{m^2}{2\varepsilon^2}\log(2M/\delta)$ shots per location suffice simultaneously. Thus
-$O\bigl(Mm^2\varepsilon^{-2}\log(M/\delta)\bigr)$ total shots are sufficient under this uniform-accuracy rule. This is an upper bound, not an end-to-end hardware-cost identity; compilation, batching, queueing and adaptive stopping can change wall-clock cost.
-
-\begin{theorem}[Cram\'er--Rao local lower bound]
-\label{thm:crlb}
-Along any smooth one-parameter family of Born distributions through $P_\theta$
-with $\dot F:=\partial_u F_G|_{u=0}\neq0$ and finite, positive single-shot
-Fisher information $0<\mathcal I(0)<\infty$, any unbiased estimator $T$ of
-$F_G$ from $S$ shots obeys
-$\Var(T)\ge \dot F^{2}/(S\mathcal I(0))$; root-mean-square error
-$\varepsilon$ requires $S=\Omega(\varepsilon^{-2})$ shots, with the implied
-constant fixed by this local family.
-\end{theorem}
-
-\begin{theorem}[Le Cam lower bound over bounded observation laws]
-\label{thm:lecam}
-Let $0<\varepsilon\le m/4$. Over the class of observation laws supported on
-$[0,m]$, there are two laws whose means differ by $2\varepsilon$ such that every
-estimator based on $S\le m^2/(32\varepsilon^2)$ samples has worst-case expected
-absolute error at least $\varepsilon/4$. Consequently, uniformly attaining
-error smaller than $\varepsilon/4$ over this bounded-law class requires
-$S=\Omega(m^2\varepsilon^{-2})$. This is not a lower bound for every fixed QAOA
-circuit family: both least-favourable laws need not be realizable by a specified
-ansatz.
-\end{theorem}
-
-The statistical results establish what an objective query estimates and how its
-shot cost scales with accuracy and confidence. They do not prove convergence or
-regret for the released pattern-search policy. The capped-cost comparisons in
-Sec.~\ref{sec:results} are empirical paired results, not consequences of applying
-a generic optimizer theorem to an algorithm with different update rules.
-
-\section{Discussion and limitations}
-\label{sec:discussion}
-
-The corrected experiment supports a narrower claim than the algorithm's design
-motivation. On the in-distribution test set, GCTR reaches the privileged
-reference on all $48$ instances with $15.0\pm7.8$ capped calls. It is far
-cheaper than random restarts and the learned point initializer under the same
-score, but it is more expensive than the fixed concentration prior
-($12.3\pm6.4$), and the paired comparison favors that prior. The no-heuristic
-ablation ($249.4\pm178.8$, $20/48$) shows that the learned mean is not the source
-of the low full-policy cost. The executable contribution is therefore a
-graph-conditioned policy and audit framework, not evidence that its learned
-geometry or allocation improves the strongest online-cost baseline.
-
-Distribution shift strengthens that boundary. Pooled leave-one-family-out
-GCTR records $89.3\pm149.8$ with $39/48$ hits, compared with $86.5\pm141.6$ and
-$40/48$ for the fixed prior, $82.2\pm142.8$ and $40/48$ without the hard
-boundary, and $73.8\pm135.5$ and $41/48$ for the two-seed/full-cap control.
-The latter comparison favors the control ($p=0.0355$), but it changes both
-seeding and truncation and therefore does not identify either mechanism.
-Proposition~\ref{prop:capmonotonicity} further shows that an early cap cannot
-improve shared-cap cost on an otherwise identical trajectory. A useful future
-allocation study must instead pre-register a target-free utility or a
-success--cost frontier and vary one intervention at a time.
-
-The evidence has several important limits. Every optimization experiment is an
-exact-statevector simulation at $p=2$ and $n\le16$; the finite-shot study is a
-single noisy realization at each of two shot counts, not hardware evidence.
-The $98\%$ stopping reference is a privileged simulation quantity derived from
-offline multi-start optimization. Configured target construction alone permits
-up to $176{,}640$ exact objective calls before the primary benchmark, and those
-calls are excluded from online counts. Training costs are also unequal across
-methods. The released test set was inspected while correcting this revision,
-so a future confirmatory claim requires a newly generated, untouched audit set,
-preferably including graph sources and devices outside the four synthetic
-families used here.
-
-The uncertainty model is likewise diagnostic rather than certified. Marginal
-angle coverage has ECE $0.101$ over $192$ residual coordinates and covers
-$0.901$ at nominal $0.95$; observed coverage is below nominal at all ten
-levels. The separate validation-fit score ranks realized warm-start error, but
-removing the ranking penalty improves both ECE and rank correlation. The
-diagonal Euclidean Gaussian also ignores the angles' periodic topology.
-Torus-aware distributions, pre-registered conformal calibration, sparse graph
-features and external objective-label callbacks are more defensible next steps
-than increasing model complexity without a fresh comparison.
-
-Finally, graph-only prediction avoids statevector simulation but is not itself
-an industry-scale training path: the implementation uses dense adjacency
-tensors and eigendecomposition, while fitting requires exact-simulation
-\texttt{Instance} labels. Hardware execution additionally introduces readout
-error, drift, compilation, batching and queueing~\cite{kandala2017hardware,harrigan2021quantum}.
-Whether a learned region helps an online surrogate or shot-allocation
-rule~\cite{cheng2024darbo,sung2020models,kubler2020adaptive,gu2021adaptive,hao2024endtoend}
-is an open empirical question. No matched comparison to adaptive online
-surrogates such as DARBO or the cited RBF approach was run; holding pattern
-search fixed isolates policy inputs but does not establish competitiveness with
-the strongest end-to-end optimizers.
-
-\section*{Data availability}
-
-All data used to render the reported figures and tables are included under
-\texttt{manuscript/source\_data/}. The schema-2 release contains aggregate
-CSVs, $288$ primary method--instance rows and $240$ leave-one-family-out
-method--instance rows with graph identity, capped score, raw evaluations and
-target attainment, per-instance expectation ratios for the primary benchmark,
-configuration and environment metadata, a portable hash manifest, and the
-exact generator-source archive identified by the digest in \texttt{meta.json}.
-Returned parameter vectors and per-instance expectation ratios for auxiliary
-studies are not retained and are not reconstructed. No restricted external
-dataset is used. A versioned archival DOI has not yet been assigned.
-
-\section*{Code availability}
-
-The complete implementation is included at repository root under
-\texttt{specops\_gctr/} as the installable MIT-licensed package
-\texttt{specops-gctr}: graph generation,
-spectral features, exact and finite-shot QAOA objectives, target generation,
-the GIN predictor and calibration head, policy and baselines, diagnostics,
-figures, tables, public model and callback interfaces, command-line optimization
-and the reproduction driver. The repository provides training and inference
-code but no pretrained checkpoint. \texttt{GCTRPolicyModel.fit} currently
-requires exact-simulation \texttt{Instance} objects and has no external
-calibration-error or objective-label callback; graph-only prediction uses dense
-linear algebra. These are explicit API limits, not implied hardware or
-large-scale capabilities. Unit and release tests ship under \texttt{tests/}.
-
-\appendix
-
-\section{Mathematical appendix}
-\label{app:math}
-
-This appendix expands the mathematical arguments used in the main text: how the graph-conditioned distribution enters the QAOA optimization problem, how the Mahalanobis trust region and its retraction are derived, what the calibration statements do and do not imply, and why the evaluation-count reduction is an empirical query-count claim rather than an approximation-ratio theorem. Throughout, $d=2p$ denotes the dimension of the QAOA parameter vector, $G=(V,E)$ is a graph with $n=|V|$ vertices and $m=|E|$ edges, and $f_\phi(G)=(\mu_G,\Sigma_G)$ is the trained predictor. The reference angle $\theta_G^\star$ is the local optimum obtained by the target-generation optimizer, not a certified global maximizer. All guarantees should therefore be read as local, distributional and conditional.
-
-\subsection{From MaxCut to a smooth QAOA objective}
-\label{app:smooth}
-
-For a bit string $z\in\{+1,-1\}^n$, the MaxCut value is
-\begin{equation}
-C(z)=\sum_{(i,j)\in E}\frac{1-z_i z_j}{2}.
-\end{equation}
-The corresponding diagonal Hamiltonian is
-\begin{equation}
-C=\sum_{(i,j)\in E} C_{ij},\qquad C_{ij}=\frac{I-Z_iZ_j}{2}.
-\end{equation}
-Each edge term has spectrum $\{0,1\}$, so $0\preceq C_{ij}\preceq I$ and $0\preceq C\preceq mI$. The mixer is $B=\sum_i X_i$. At depth $p$, define
-\begin{align}
-U(\theta)&=\prod_{\ell=p}^{1}
-\exp(-i\beta_\ell B)\exp(-i\gamma_\ell C),\\
-|\theta\rangle&=U(\theta)|+\rangle^{\otimes n}.
-\end{align}
-The expected objective is
-\begin{equation}
-F_G(\theta)=\langle +|U(\theta)^\dagger C U(\theta)|+\rangle.
-\end{equation}
-Because $U(\theta)$ is a finite product of matrix exponentials in finite dimension, every entry of $U(\theta)$ is analytic in $\theta$. Hence $F_G$ is real analytic on $\R^{2p}$. Analyticity is stronger than smoothness and justifies Taylor expansions on any compact region.
-
-The derivative with respect to an angle can be written by differentiating the corresponding unitary factor. If $\theta_a$ is generated by a Hermitian operator $H_a$ inserted at position $a$, then
-\begin{equation}
-\partial_a U(\theta)=U_{>a}(\theta)(-iH_a)U_{\leq a}(\theta),
-\end{equation}
-where $U_{\leq a}$ is the product through that factor and $U_{>a}$ is the product after that factor. Therefore
-\begin{align}
-\partial_a F_G(\theta)
-&=\langle +| (\partial_a U^\dagger) C U + U^\dagger C(\partial_a U)|+\rangle\\
-&= i\langle \theta_{\leq a}|[H_a,U_{>a}^\dagger C U_{>a}]|\theta_{\leq a}\rangle.
-\end{align}
-Using $\|[A,B]\|\leq 2\|A\|\|B\|$ gives the conservative bound
-\begin{equation}
-|\partial_a F_G(\theta)|\leq 2\|H_a\|\|C\|.
-\end{equation}
-For $\gamma$ coordinates, $H_a=C$ and $\|H_a\|\leq m$; for $\beta$ coordinates, $H_a=B$ and $\|H_a\|\leq n$. A sharper edge-local analysis can improve these constants, but the important point is that $\nabla F_G$ is bounded on compact sets. Thus for any compact $K\subset\R^{2p}$,
-\begin{equation}
-L_{G,K}:=\sup_{\theta\in K}\|\nabla F_G(\theta)\|_2<\infty,
-\end{equation}
-and the mean-value theorem yields
-\begin{equation}
-|F_G(\theta)-F_G(\theta')|\leq L_{G,K}\|\theta-\theta'\|_2,
-\qquad \theta,\theta'\in K.
-\end{equation}
-Collecting the per-coordinate bounds---$|\partial_a F_G|\le 2m^{2}$ for each of the $p$ $\gamma$-coordinates and $|\partial_a F_G|\le 2mn$ for each of the $p$ $\beta$-coordinates---into an $\ell_2$ norm gives $\|\nabla F_G\|_2\le\sqrt{p(2m^{2})^{2}+p(2mn)^{2}}=2m\sqrt{p(m^{2}+n^{2})}$, the global constant of Proposition~\ref{prop:lipschitz}. This elementary Lipschitz statement is the backbone of the trust-region objective bounds below.
-
-\subsection{Expected objective versus sampled best-bitstring value}
-\label{app:sampledratio}
-
-The expected objective $F_G(\theta)$ is the mean cut value under the distribution induced by measuring $|\theta\rangle$ in the computational basis. If $P_\theta(z)$ is that distribution, then
-\begin{equation}
-F_G(\theta)=\sum_z P_\theta(z)C(z).
-\end{equation}
-The sampled best-bitstring ratio after $S$ shots is
-\begin{equation}
-r_S(\theta)=\frac{1}{C_{\max}}\max_{1\leq s\leq S} C(Z_s),\qquad Z_s\sim P_\theta.
-\end{equation}
-These quantities are related but not identical. Since $\max_s C(Z_s)\geq C(Z_1)$, one has
-\begin{equation}
-\E[r_S(\theta)]\geq \frac{F_G(\theta)}{C_{\max}}.
-\end{equation}
-The reverse direction requires distributional information. Let $q_t(\theta)=P_\theta(C(Z)\geq t)$. Then
-\begin{equation}
-P\{\max_s C(Z_s)<t\}=(1-q_t(\theta))^S,
-\end{equation}
-and hence
-\begin{equation}
-P\{r_S(\theta)\geq t/C_{\max}\}=1-(1-q_t(\theta))^S.
-\end{equation}
-This explains the empirical saturation disclosed in Sec.~\ref{subsec:protocol}: at the tested sizes, $512$ samples nearly always contain a maximum cut for every method, so $r_S$ does not discriminate, while the smooth $F_G$ does. Both matter in a query-limited hardware setting: $F_G$ guides optimization, while $r_S$ is the quality of the returned classical solution.
-
-\subsection{Spectral features and deterministic sign canonicalization}
-\label{app:spectral}
-
-Let $A$ be the adjacency matrix, $D$ the degree matrix and $L=D-A$ the combinatorial Laplacian. For a connected graph, $L$ has eigenvalues
-\begin{equation}
-0=\lambda_1<\lambda_2\leq\cdots\leq\lambda_n,
-\end{equation}
-with orthonormal eigenvectors $u_1,u_2,\ldots,u_n$. The constant eigenvector $u_1$ is omitted, and the node feature matrix uses
-\begin{equation}
-X_v=\left[\frac{d_v}{n},\; u_2(v),\ldots,u_{k+1}(v)\right],
-\end{equation}
-zero-padded when fewer than $k$ eigenvectors remain after the first. For the connected released graphs, $u_1$ is the unique constant zero mode. A disconnected public-API input can have multiple zero modes, while the implementation still drops only the first. Eigenvectors are defined only up to sign: if $Lu=\lambda u$, then $L(-u)=\lambda(-u)$. The implementation makes the largest-magnitude entry positive. For a fixed labeled graph and numerical eigensolver this is deterministic, which the dataset test exercises. It is not a proof of graph-isomorphism invariance: repeated or nearly repeated eigenvalues permit rotations within an eigenspace, and ties in the largest-magnitude entry can depend on vertex order. Thus the permutation-invariance argument below is conditional on the input features transforming equivariantly. Sign- and basis-invariant spectral architectures~\cite{lim2023sign} are the principled replacement when this boundary matters.
-
-\subsection{GIN update and conditional permutation invariance}
-\label{app:gin}
-
-The predictor applies three graph-isomorphism-network layers
-\begin{equation}
-h_v^{(\ell+1)}={\rm MLP}^{(\ell)}\left((1+\epsilon^{(\ell)})h_v^{(\ell)}+\sum_{u\in N(v)}h_u^{(\ell)}\right).
-\end{equation}
-For any permutation $\pi$ of the vertices, let $P_\pi$ be its permutation matrix. The graph and feature matrix transform as $A\mapsto P_\pi A P_\pi^\top$ and $X\mapsto P_\pi X$. The multiset aggregation satisfies
-\begin{equation}
-\sum_{u\in N_{\pi(G)}(\pi(v))} h_{u}^{(\ell)}=\sum_{u\in N_G(v)} h_{\pi(u)}^{(\ell)},
-\end{equation}
-so by induction the node embeddings are equivariant:
-\begin{equation}
-H^{(\ell)}(\pi(G))=P_\pi H^{(\ell)}(G).
-\end{equation}
-The graph embedding concatenates mean and max pooling~\cite{ying2018hierarchical},
-\begin{equation}
-g(G)=\left[\frac{1}{n}\sum_v h_v^{(L)},\; \max_v h_v^{(L)}\right],
-\end{equation}
-which removes the vertex ordering. Consequently, the network is permutation invariant \emph{conditional on} the input features transforming equivariantly, $X\mapsto P_\pi X$. The deterministic spectral routine need not satisfy that condition inside repeated eigenspaces (Sec.~\ref{app:spectral}), so unconditional isomorphism invariance is not claimed. Message-passing networks~\cite{kipf2017semisupervised,hamilton2017inductive,bronstein2021geometric,gilmer2017neural} provide this conditional invariance and are standard for learning over combinatorial structures~\cite{cappart2023combinatorial}; the GIN aggregation is used for its injective multiset structure~\cite{xu2019gin}, and the spectral coordinates add global positional information that local degree aggregation cannot recover.
-
-\subsection{Gaussian heads and variance parameterization}
-\label{app:heads}
-
-The pooled embedding feeds two one-hidden-layer MLP heads,
-\begin{equation}
-\mu_G={\rm MLP}_\mu(g(G)),
-\qquad a_G={\rm MLP}_\sigma(g(G)),
-\end{equation}
-with
-\begin{equation}
-\log\sigma_G^2=\clip(a_G,-8,2),
-\qquad \Sigma_G=\diag(\sigma_{G,1}^2,\ldots,\sigma_{G,d}^2).
-\end{equation}
-Clamping is not only numerical hygiene. It prevents two degenerate behaviours. If $\sigma_j^2\to 0$, the negative log-likelihood can become unstable and the trust region collapses. If $\sigma_j^2\to\infty$, the likelihood can reduce squared-error penalties by inflating uncertainty, but the trust region becomes too large to save queries. The clamp enforces
-\begin{equation}
-e^{-8}\leq \sigma_{G,j}^2\leq e^{2}.
-\end{equation}
-At depth $p=2$, $d=4$ and a diagonal covariance gives four axis-aligned semi-axes in angle coordinates. At larger $p$, correlations between layers may become essential, motivating low-rank or full-covariance extensions (Appendix~\ref{app:depth}).
-
-\subsection{Training-loss derivations}
-\label{app:losses}
-
-\subsubsection{Heteroscedastic Gaussian negative log-likelihood}
-
-For a target angle $\theta_i^\star\in\R^d$ and prediction $\mathcal{N}(\mu_i,\diag(\sigma_i^2))$, minus the log-density is, up to an additive constant,
-\begin{equation}
--\log p(\theta_i^\star|G_i)
-=\sum_{j=1}^{d}\left[\frac{1}{2}\log\sigma_{ij}^2+
-\frac{(\theta_{ij}^\star-\mu_{ij})^2}{2\sigma_{ij}^2}\right],
-\end{equation}
-which is exactly the implemented $\mathcal{L}_{\rm NLL}$ of Sec.~\ref{subsec:training} after averaging over instances. Let $s_{ij}=\log\sigma_{ij}^2$ and $e_{ij}=\mu_{ij}-\theta^\star_{ij}$. The coordinate loss is $\ell_{ij}=\tfrac12\bigl(e^{-s_{ij}}e_{ij}^2+s_{ij}\bigr)$ with gradients
-\begin{equation}
-\frac{\partial \ell_{ij}}{\partial \mu_{ij}}=e^{-s_{ij}}e_{ij},
-\qquad
-\frac{\partial \ell_{ij}}{\partial s_{ij}}=\frac{1}{2}\left(1-e^{-s_{ij}}e_{ij}^2\right).
-\end{equation}
-The stationary condition in $s$ is $\sigma^2=e^2$: the likelihood tries to match predicted variance to squared residual, and the mean gradient is inverse-variance weighted. Early in training, before the mean is accurate, the NLL alone would inflate variances to absorb residuals. Training here is a \emph{single} phase; what anchors the variance scale is not a phase schedule but the reference-spread Wasserstein term derived next.
-
-\subsubsection{Closed-form Wasserstein term and the implemented reference-spread pull}
-
-For Gaussian measures $P_1=\mathcal{N}(\mu_1,\Sigma_1)$ and $P_2=\mathcal{N}(\mu_2,\Sigma_2)$, the squared 2-Wasserstein distance is
-\begin{equation}
-\begin{aligned}
-W_2^2(P_1,P_2)
-&=\|\mu_1-\mu_2\|_2^2+\tr\Bigl(\Sigma_1+\Sigma_2\\
-&\qquad-2(\Sigma_2^{1/2}\Sigma_1\Sigma_2^{1/2})^{1/2}\Bigr).
-\end{aligned}
-\end{equation}
-If both covariances are diagonal, $(\Sigma_2^{1/2}\Sigma_1\Sigma_2^{1/2})^{1/2}=\diag(\sigma_{1,1}\sigma_{2,1},\ldots,\sigma_{1,d}\sigma_{2,d})$, so the trace term telescopes to $\sum_j(\sigma_{1,j}-\sigma_{2,j})^2$ and
-\begin{equation}
-W_2^2(P_1,P_2)=\|\mu_1-\mu_2\|_2^2+\|\sigma_1-\sigma_2\|_2^2 .
-\end{equation}
-The implemented regularizer applies this closed form \emph{per instance}, pulling each predicted Gaussian toward a difficulty-scaled reference distribution centered at the instance's own target:
-\begin{equation}
-\begin{aligned}
-\mathcal{L}_{W_2}
-&=\frac{1}{N}\sum_{i=1}^{N} W_2^2\Bigl(
-\mathcal N(\mu_i,\Sigma_i),\\
-&\hspace{5.2em}\mathcal N(\theta^\star_i,\sigma_{{\rm ref},i}^2 I)\Bigr),\\
-\sigma_{{\rm ref},i}^2&=0.02+0.5\,e_i,
-\end{aligned}
-\end{equation}
-with $e_i$ the offline difficulty proxy. There is no pairwise coupling between instances. The mean part reinforces the squared-error pull toward the target; the spread part supervises the \emph{scale} of the covariance---easy instances toward tight regions, hard instances toward wide ones. This alignment matters because the covariance is consumed downstream as a feasible region and step preconditioner: mean squared error alone says nothing about how large a region to search, and the NLL alone lets the variance drift to whatever absorbs residuals. The reference spread encodes the design intent ``harder instances deserve wider regions'' directly in the loss geometry.
-
-\subsubsection{Difficulty-ranking penalty}
-
-The third term is a soft pairwise ranking hinge on the total predicted variance $u_i=\tr\Sigma_i$:
-\begin{equation}
-\begin{aligned}
-\mathcal{L}_{\rm rank}
-&=\frac{1}{|\mathcal{P}|}\sum_{(i,j)\in\mathcal P}
-\max\bigl(0,0.05-(u_i-u_j)\bigr),\\
-\mathcal{P}&=\{(i,j):e_i>e_j\},
-\end{aligned}
-\end{equation}
-which pushes the predicted total variance of a harder instance above that of an easier one by a margin of $0.05$. It is intended to shape the covariance's ordering, complementing the reference-spread term, which shapes its scale. The measured ablation contradicts that intended benefit: the full model has ECE $0.101$ and score correlation $0.671$, while removing the Wasserstein term gives ECE $0.069$ and correlation $0.751$, and removing the ranking term gives ECE $0.026$ and correlation $0.854$ (Table~\ref{tab:ablation}). These are component-removal associations from one run, not causal estimates, but they provide no empirical support for the ranking penalty.
-
-\subsection{Trust-region geometry, retraction and volume}
-\label{app:trgeometry}
-
-Given $\mathcal N(\mu_G,\Sigma_G)$ and the fixed radius $r=2$ (configuration constant \texttt{radius\_scale}), define
-\begin{equation}
-\mathcal{T}_r(G)=\{\theta:(\theta-c)^\top\Sigma_G^{-1}(\theta-c)\leq r^2\},
-\end{equation}
-centered initially at $c=\mu_G$ (and re-centered on the winning seed, Sec.~\ref{subsec:policy}). Let $y=\Sigma_G^{-1/2}(\theta-c)$. Then $\theta\in\mathcal{T}_r(G)$ if and only if $\|y\|_2\leq r$: the ellipsoid in angle coordinates is a Euclidean ball in whitened coordinates, with semi-axis $a_j=r\,\sigma_j$ in coordinate $j$. The region is small in directions where the predictor is confident and larger where it is uncertain; unlike a scalar trust-region radius, the learned covariance changes the anisotropy of the feasible search space~\cite{conn2000trust,nocedal2006numerical}.
-
-\emph{Retraction.} For a proposed point $\theta'$, set $y'=\Sigma^{-1/2}(\theta'-c)$. Euclidean projection onto the whitened ball is $\Pi_B(y')=\min(1,r/\|y'\|_2)\,y'$, and mapping back gives exactly Eq.~\eqref{eq:retraction}:
-\begin{equation}
-\Pi_{\mathcal{T}}(\theta')=c+
-\min\left(1,\frac{r}{\|\Sigma^{-1/2}(\theta'-c)\|_2}\right)(\theta'-c).
-\end{equation}
-In raw angle coordinates this is a \emph{radial feasibility retraction} along the center-to-point ray: it is the nearest feasible point in the whitened metric, not in the raw Euclidean metric, which is immaterial for the algorithm---feasibility and idempotence are what is required, and both are unit-tested. This proves Proposition~\ref{prop:retraction}: if the Mahalanobis norm is at most $r$ the multiplier is one and the point is unchanged; otherwise the displacement is rescaled to have exactly the boundary norm, and positive definiteness of $\Sigma$ makes the norm well-defined.
-
-\emph{$\chi^2$ interpretation of the radius.} If the target angles were distributed exactly as $\mathcal N(\mu_G,\Sigma_G)$, the whitened residual would satisfy $\|y\|_2^2\sim\chi^2_d$, and the implemented ball $r=2$ (i.e.\ $r^2=4$, $d=4$) would have nominal coverage $\Prob\{\chi^2_4\le4\}\approx0.594$. The implementation fixes $r=2$; it does not compute $\chi^2$ quantiles. The interpretation is useful only as a reading of how conservative the fixed radius is under the Gaussian idealization.
-
-\emph{Volume.} The ellipsoid volume is
-\begin{equation}
-\operatorname{Vol}(\mathcal{T}_r)=\frac{\pi^{d/2}}{\Gamma(d/2+1)}\,r^{d}\prod_{j=1}^{d}\sigma_j ,
-\end{equation}
-i.e.\ $V_d(r)\sqrt{\det\Sigma}$, since the whitening map has Jacobian $\sqrt{\det\Sigma}$. This volume quantifies how the diagonal scales change the local region, but it is not a literal fraction of the periodic angle domain unless the ellipsoid is contained in a chosen coordinate chart. Nor is it a speedup theorem: the optimizer does not sample uniformly from an ambient box.
-
-\subsection{Local objective guarantees}
-\label{app:localguarantees}
-
-\emph{Proof of Theorem~\ref{thm:trobjective}.} Assume $F_G$ is $L_G$-Lipschitz on $\mathcal{T}_r(G;c)$ and $F_G(c)\geq q^\star C_{\max}$. For any $\theta\in\mathcal{T}_r(G;c)$,
-\begin{align}
-\|\theta-c\|_2^2
-&\leq \opnorm{\Sigma_G}
-  (\theta-c)^\top\Sigma_G^{-1}(\theta-c)\\
-&\leq \opnorm{\Sigma_G}\,r^2 ,
-\end{align}
-so the Lipschitz property gives
-\begin{align}
-F_G(\theta)
-&\geq F_G(c)-L_G\|\theta-c\|_2\\
-&\geq q^\star C_{\max}
-  -L_G\,r\sqrt{\opnorm{\Sigma_G}} .
-\end{align}
-Taking expectation over any $\Theta$ supported on $\mathcal{T}_r(G;c)$ yields the claim. \qed
-
-\emph{Proof of Corollary~\ref{cor:variance}.} For diagonal $\Sigma$, $\opnorm{\Sigma}=\sigma_{\max}^2$. If $\sigma_{\max}\le q^\star C_{\max}/(2L_G r)$, the degradation term is at most $q^\star C_{\max}/2$. \qed
-
-This is not a global optimality result. It states that if the actual region center---the predicted mean before seed selection or the winning seed after re-centering---already has useful objective value and the covariance is sufficiently confined, the region cannot degrade the expected objective by more than a Lipschitz-radius term.
-
-\emph{Capture of the target local optimum.} If both $\theta$ and the reference optimum $\theta_G^\star$ lie in the same ball $\mathcal{T}_{\sqrt q}(G;c)$, the triangle inequality gives $\|\theta-\theta_G^\star\|_2\leq 2\sqrt{q\opnorm{\Sigma_G}}$, hence
-\begin{equation}
-F_G(\theta)\geq F_G(\theta_G^\star)-2L_G\sqrt{q\opnorm{\Sigma_G}} .
-\end{equation}
-This is the precise sense in which coverage matters: if the predicted ellipsoid captures the target region, every feasible iterate remains close to the target, up to the covariance-controlled radius.
-
-\emph{Monotonic best-so-far guarantee.} Let $\theta_1,\ldots,\theta_K$ be the seed candidates (in the implementation: the mean, the concentration angles, and the retracted Gaussian draws) and $\theta_t$ the retracted pattern-search iterates. Define
-\begin{equation}
-b_t=\max\{F_G(\theta_1),\ldots,F_G(\theta_K),F_G(\theta_0),\ldots,F_G(\theta_t)\}.
-\end{equation}
-Then $b_{t+1}\geq b_t$ because the maximum at time $t+1$ is over a superset. This monotonicity is algorithmic rather than analytic: the optimizer may propose worse points, but the returned best-so-far value cannot decrease, and in particular it is at least the concentration seed's value---the never-worse property of Sec.~\ref{subsec:policy}, verified by a dedicated unit test.
-
-\subsection{Gradient anti-concentration in a local basin}
-\label{app:anticoncentration}
-
-Assume $F_G$ is three times continuously differentiable near $\mu$ and that $\mu$ lies in a locally concave basin for maximization:
-\begin{equation}
--\nabla^2F_G(\mu)\succeq \kappa I.
-\end{equation}
-Let $H=\nabla^2F_G(\mu)$ and write a Taylor expansion for the gradient at $\theta=\mu+\delta$:
-\begin{equation}
-\nabla F_G(\mu+\delta)=\nabla F_G(\mu)+H\delta+R_2(\delta),
-\end{equation}
-where $\|R_2(\delta)\|_2\leq c_3\|\delta\|_2^2$ if third derivatives are bounded. If $\Theta$ is sampled symmetrically around $\mu$ in the trust region, then $\E[\delta]=0$ and the covariance of the linearized gradient is $H\Cov(\delta)H^\top$. If the sampling law has $\Cov(\delta)\succeq c_r\sigma_{\min}^2I$, then for any coordinate $j$,
-\begin{equation}
-\Var(e_j^\top H\delta)\geq c_r \sigma_{\min}^2\|H^\top e_j\|_2^2\geq c_r\kappa^2\sigma_{\min}^2 ,
-\end{equation}
-using that the curvature condition bounds every singular value of $H$ below by $\kappa$. For $X=e_j^\top H\delta$ and $Y=e_j^\top R_2(\delta)$, the reverse triangle inequality in $L^2$ gives $\sqrt{\Var(X+Y)}\ge[\sqrt{\Var X}-\sqrt{\Var Y}]_+$, while $\Var Y\le\E Y^2\le c_3^2\E\|\delta\|_2^4$. Therefore
-\begin{equation}
-\Var(\partial_jF_G(\Theta))\geq
-\left[\sqrt{c_r}\,\kappa\sigma_{\min}
--c_3\sqrt{\E\|\delta\|_2^4}\right]_+^2.
-\end{equation}
-For samples supported in the ellipsoid, $\|\delta\|_2\le r\sigma_{\max}$, so the second term is at most $c_3r^2\sigma_{\max}^2$. The result is a conditional local-variation statement, not a comparison with random initialization and not a barren-plateau theorem.
-
-\subsection{Sampling and best-of-$K$ analysis}
-\label{app:bestofk}
-
-Let $\Theta_1,\ldots,\Theta_K$ be independent feasible samples from the predicted distribution or its retracted version. Let $Y_k=F_G(\Theta_k)$ and $Y_{(K)}=\max_k Y_k$. For any threshold $t$,
-\begin{equation}
-\Prob(Y_{(K)}\leq t)=\Prob(Y_1\leq t)^K,
-\end{equation}
-so if $\Prob(Y_1>t)>0$, the hit probability at that specified threshold is $1-\Prob(Y_1\le t)^K$. A distribution-free lower bound follows from $Y_{(K)}\geq K^{-1}\sum_k Y_k$, so $\E[Y_{(K)}]\geq \E[Y_1]$, and combining with Lipschitz control around $\mu$,
-\begin{align}
-\E[F_G(\Theta_1)]
-&\geq F_G(\mu)
-  -L_G\E\|\Theta_1-\mu\|_2\\
-&\geq F_G(\mu)-L_G\sqrt{\tr(\Sigma)}
-\end{align}
-for an untruncated Gaussian; radial retraction about $\mu$ only reduces the displacement norm, so the same expression is conservative for those draws. No distribution-free improvement rate in $K$ follows from these facts. The implemented policy uses at most four seeds, with the deterministic mean and concentration seeds present whenever the effective budget is at least two.
-
-\subsection{Calibration diagnostics and the conformal alternative}
-\label{app:calibration}
-
-\subsubsection{Coverage ECE from per-dimension Gaussian residuals}
-
-The implemented calibration diagnostic works with per-dimension standardized residuals
-\begin{equation}
-z_{ij}=\frac{\theta^\star_{ij}-\mu_{ij}}{\sigma_{ij}},\qquad i=1,\ldots,n_{\rm test},\ j=1,\ldots,d,
-\end{equation}
-pooled into a single sample of $N=n_{\rm test}\,d$ values ($N=192$ here). If the predictive Gaussians were perfectly calibrated, $|z|$ would have the half-normal distribution, and the two-sided interval at nominal level $c$ (half-width quantile $\Phi^{-1}(0.5+c/2)$) would cover a fraction $c$ of residuals. For ten nominal levels $c_k=0.05,0.15,\ldots,0.95$, the reliability curve records
-\begin{equation}
-{\rm obs}(c_k)=\frac{1}{N}\sum_{i,j}\mathbf 1\bigl\{|z_{ij}|\le \Phi^{-1}(0.5+c_k/2)\bigr\},
-\end{equation}
-and the coverage expected calibration error is
-\begin{equation}
-{\rm ECE}=\frac{1}{10}\sum_{k=1}^{10}\bigl|{\rm obs}(c_k)-c_k\bigr| .
-\end{equation}
-The statistic is zero for a perfectly calibrated Gaussian and grows when $\sigma$ is systematically too small or too large; a unit test verifies that $3\times$ over- and under-dispersed synthetic residuals both score high while calibrated residuals score low. It measures \emph{marginal per-dimension} coverage, not joint Mahalanobis coverage; the counts underlying each level are cumulative in the level and are committed as source data. The measured value on the test set is $0.101$. Observed coverage is below nominal at every level and is $173/192=0.901$ at nominal $0.95$, indicating systematic undercoverage.
-
-\subsubsection{Rank correlation as the allocation-relevant diagnostic}
-
-The budget rule depends on ordering. Spearman correlation is computed by ranking validation-fit scores $U_i$ and realized errors $e_i$:
-\begin{equation}
-\rho_s=\frac{\sum_i(R(U_i)-\bar R_U)(R(e_i)-\bar R_e)}{\sqrt{\sum_i(R(U_i)-\bar R_U)^2}\sqrt{\sum_i(R(e_i)-\bar R_e)^2}} .
-\end{equation}
-High rank correlation means harder instances tend to receive larger scores, which is the premise of monotone budget allocation. A Gaussian angle head could have imperfect ECE while a separate score still ranks difficulty effectively; conversely, good angle coverage says nothing by itself about score ordering. In the measured run the covariance head has ECE $0.101$, while its trace anti-correlates with realized warm-start error ($\rho=-0.638$, $p=1.1\times10^{-6}$) and with the offline difficulty proxy ($\rho=-0.292$, $p=0.0437$). A post hoc sign flip would peek at test outcomes; the validation-fit error head instead supplies a positively associated ordering ($\rho=0.671$, $p=1.8\times10^{-7}$, $n=48$). This association diagnoses ranking on the inspected test set; it does not establish that the resulting allocation improves cost.
-
-\subsubsection{Split-conformal radius (available alternative, not used in the shipped runs)}
-
-Let $(G_i,\theta_i^\star)_{i=1}^M$ be an exchangeable calibration set with scores $s_i=(\theta_i^\star-\mu_i)^\top\Sigma_i^{-1}(\theta_i^\star-\mu_i)$, sorted as $s_{(1)}\le\cdots\le s_{(M)}$, and let
-\begin{equation}
-k=\lceil (M+1)(1-\alpha)\rceil,
-\qquad \hat q_{1-\alpha}=s_{(k)},
-\end{equation}
-where the standard convention $s_{(M+1)}=+\infty$ is used if $k=M+1$. For a new exchangeable test score $s_{M+1}$, the rank of $s_{M+1}$ among the $M+1$ scores is uniform, hence
-\begin{equation}
-\Prob\{s_{M+1}\le \hat q_{1-\alpha}\} \ge \frac{k}{M+1}\ge 1-\alpha,
-\end{equation}
-which proves Proposition~\ref{prop:conformal}~\cite{angelopoulos2021conformal,romano2019conformalized}. The coverage is marginal over the data-generating distribution, not per-graph. Replacing the fixed radius $r=2$ by $r_c=\sqrt{\hat q_{1-\alpha}}$ inflates the searched volume by
-\begin{equation}
-\eta_V=\Bigl(\frac{\sqrt{\hat q_{1-\alpha}}}{r}\Bigr)^{d},
-\end{equation}
-making the coverage--query tradeoff explicit: distribution-free coverage may cost search volume. The shipped policy prefers the fixed radius plus empirical calibration diagnostics; the conformal radius is the principled fallback when finite-sample coverage is the binding requirement.
-
-\subsection{The budget rule: derivation and stylized analysis}
-\label{app:budgetrule}
-
-The scalar driving allocation is the validation-fit error score $u=\widehat e(G)$ (Sec.~\ref{subsec:calibrator}); the no-error-head control replaces it by $\tr\Sigma_G$ with the corresponding validation statistics. With validation median and interquartile range,
-\begin{equation}
-z(G)=\frac{u(G)-U_{\rm med}}{U_{\rm iqr}},
-\end{equation}
-the implemented seed count is the monotone step function
-\begin{equation}
-K(G)=\clip(\lfloor 1+4\varsigma(z(G))\rfloor,1,4),
-\end{equation}
-whose thresholds follow from $1+4\varsigma(z)=2,3,4$:
-\begin{equation}
-\varsigma(z)=\tfrac14,\tfrac12,\tfrac34
-\;\Longleftrightarrow\;
-z=-\log 3,\;0,\;\log 3 .
-\end{equation}
-The mean and concentration seeds are evaluated unconditionally, so $K$ is nominal and the realized seed count is $\max(K,2)$.
-The evaluation cap is
-\begin{equation}
-\begin{aligned}
-T(G)&=\clip\bigl(\lfloor T_{\rm base}(0.5+z_+)\rfloor,40,400\bigr),\\
-T_{\rm base}&=\tfrac{400}{2}=200,
-\qquad z_+=\max(z,0),
-\end{aligned}
-\end{equation}
-also nondecreasing. For the shipped budget $B=400$ the lower clip at $40$ is dormant ($T\ge100$ always); it exists as a safety floor for smaller budgets. Both monotonicity and the caps are unit-tested; the allocations realized on the test set are shown in Fig.~\ref{fig:budget}.
-
-A stylized regret statement clarifies the premise. Suppose residual regret after allocation $K$ satisfies
-\begin{equation}
-R(G,K)\leq c_0+c_1\sqrt{u(G)}+\frac{c_2}{\sqrt{K}} .
-\end{equation}
-If $K(G)$ is larger on graphs with larger $u(G)$, the allocation targets the instance-varying part of the bound. The ordering premise is empirically associated with the data: the validation-fit score ranks realized error with $\rho=0.671$ ($0.767\pm0.085$ across algorithm seeds), so larger scores identify harder instances on the tested distributions. Driving the same rule with the raw trace instead---anti-correlated with realized error ($\rho=-0.638$)---orders allocations opposite to observed difficulty and yields $22.3\pm55.6$ capped calls with $47/48$ hits (Table~\ref{tab:ablation}); the joint policy change does not identify a causal cost effect. Moreover, Proposition~\ref{prop:capmonotonicity} rules out an advantage from early truncation under shared-cap scoring when all other trajectory choices are fixed. Similarly, a stylized expected-cost objective
-\begin{equation}
-\begin{aligned}
-\min_{Q(G)}\;&\E_G\left[R(G,Q(G))+\lambda Q(G)\right],\\
-R(G,Q)&\approx a(G)+\frac{b(G)}{\sqrt{Q}},
-\end{aligned}
-\end{equation}
-has optimal continuous allocation $Q^{\star}(G)=(b(G)/2\lambda)^{2/3}$: the rule uses the difficulty score as a proxy for $b(G)$, the marginal value of extra queries. The implemented rule is not the exact optimizer of this stylized problem; it is a bounded, auditable approximation that gives more effort to instances predicted to be harder.
-
-\subsection{Noise, finite shots, and allocation across locations}
-\label{app:noise}
-
-\subsubsection{Depolarizing-noise ordering (proof of Theorem~\ref{thm:depolarizing})}
-
-Under global depolarizing noise, the noisy state at a fixed parameter point is
-\begin{equation}
-\rho_\nu(\theta)=(1-\nu)|\theta\rangle\langle\theta|+\nu\frac{I}{2^n},
-\end{equation}
-where, e.g., $\nu=1-(1-\epsilon)^{2p}$ for a per-layer model. The noisy objective is
-\begin{equation}
-F_G^\nu(\theta)=\tr(C\rho_\nu(\theta))=(1-\nu)F_G(\theta)+\nu\bar C,
-\qquad \bar C=\frac{\tr C}{2^n},
-\end{equation}
-Integrating this pointwise identity against two fixed parameter distributions
-$\Pi_1$ and $\Pi_2$ cancels the common $\nu\bar C$ term, so their expected
-difference is scaled by $(1-\nu)$ and their ordering is preserved for $\nu<1$.
-\qed
-
-This is a limited fixed-distribution statement: it does not handle coherent
-errors, biased readout, or optimizer trajectories that change in response to
-noisy estimates. The last of these is what the empirical shot-noise study
-measures (Appendix~\ref{app:extresults}).
-
-\subsubsection{Finite-shot estimator and multiple comparisons}
-
-With $S$ shots at $\theta$, $\widehat F_G(\theta)=S^{-1}\sum_s C(Z_s)$ is unbiased with $\Var\le m^2/(4S)$, and Hoeffding's inequality gives
-\begin{equation}
-\Prob\{|\widehat F_G(\theta)-F_G(\theta)|\geq \epsilon\}\leq 2\exp\left(-\frac{2S\epsilon^2}{m^2}\right).
-\end{equation}
-If an optimizer compares $M$ candidate objective values, a union bound yields
-\begin{equation}
-\begin{aligned}
-&\Prob\left\{\max_{1\leq r\leq M}
-|\widehat F_G(\theta_r)-F_G(\theta_r)|\geq \epsilon\right\}\\
-&\qquad\leq 2M\exp\left(-\frac{2S\epsilon^2}{m^2}\right).
-\end{aligned}
-\end{equation}
-If a policy reduces the number of objective locations $M$, then under a fixed shot-per-location rule it uses fewer quantum queries and incurs fewer noisy comparisons. Under a fixed total-shot budget, fewer locations also permit larger $S$ per location. In the present simulations GCTR reduces shared-cap locations relative to random restarts and the point initializer, but not relative to the fixed heuristic or simpler control; no equal-total-shot comparison was run.
-
-\subsubsection{Optimal shot allocation across locations}
-
-If a total budget $S_{\rm tot}$ is distributed across $M$ queried angles with per-location variances $v_r$, minimizing the proxy $\sum_r v_r/S_r$ under $\sum_r S_r=S_{\rm tot}$ by a Lagrange multiplier gives
-\begin{equation}
-S_r=S_{\rm tot}\frac{\sqrt{v_r}}{\sum_{q=1}^{M}\sqrt{v_q}} :
-\end{equation}
-optimal shot allocation is proportional to objective standard deviation~\cite{kubler2020adaptive,gu2021adaptive}. A policy that reliably reduces $M$ would address a complementary dimension, and a future hardware implementation could combine a pre-registered graph-level rule for choosing $M$ with within-region variance estimates for choosing $S_r$. The present controls do not establish that GCTR provides this reduction against the strongest online baselines.
-
-\subsubsection{Bias from selecting the maximum noisy estimate}
-
-Let $\widehat F_r=F_r+\epsilon_r$ with $\E[\epsilon_r]=0$. The selected estimate $\max_r \widehat F_r$ is upwardly biased by convexity, and the selected true value can be below the true best. For any gap $\Delta=F_{r^\star}-F_r>0$ and sub-Gaussian noise of proxy variance $\sigma^2$,
-\begin{equation}
-\begin{aligned}
-\Prob\{\widehat F_r\ge \widehat F_{r^\star}\}
-&\le \exp\left(-\frac{\Delta^2}{4\sigma^2}\right),\\
-\Prob\{\hat r\ne r^\star\}
-&\le \sum_{r\ne r^\star}
-\exp\left(-\frac{(F_{r^\star}-F_r)^2}{4\sigma^2}\right).
-\end{aligned}
-\end{equation}
-Reducing the number of candidate locations reduces this upper bound on the multiple-comparisons burden. Whether a particular adaptive policy improves selected true value at fixed total shots remains an empirical question.
-
-\subsection{Second-order trust-region analysis and the learned metric}
-\label{app:secondorder}
-
-The first-order Lipschitz bounds are deliberately conservative. Let $\delta=\theta-\mu$ and expand
-\begin{equation}
-F_G(\mu+\delta)=F_G(\mu)+g^\top \delta+\frac{1}{2}\delta^\top H\delta+R_3(\delta),
-\end{equation}
-with $g=\nabla F_G(\mu)$, $H=\nabla^2F_G(\mu)$, $|R_3(\delta)|\le M_3\Vert\delta\Vert_2^3/6$. For a search distribution symmetric around $\mu$, $\E[\delta]=0$ and
-\begin{equation}
-\E[F_G(\Theta)]\approx F_G(\mu)+\frac{1}{2}\tr(H\Cov(\delta)),
-\end{equation}
-so in a locally concave basin the expected degradation is $\approx\frac12\sum_j(-H_{jj})\Var(\Theta_j)$ for diagonal covariance: a coordinatewise curvature--variance tradeoff. This is the local mathematical reason covariance prediction matters---a point predictor controls $\mu$ only; a distributional predictor also controls how much degradation is expected when exploring around it.
-
-The corresponding quadratic trust-region problem,
-\begin{equation}
-\max_{\delta}\ g^\top\delta+\frac{1}{2}\delta^\top H\delta
-\quad \text{s.t.}\quad \delta^\top \Sigma^{-1}\delta\le r^2,
-\end{equation}
-whitens to $\max_{\|y\|\le r} (\Sigma^{1/2}g)^\top y+\frac{1}{2}y^\top(\Sigma^{1/2}H\Sigma^{1/2})y$: the learned covariance changes both the effective gradient and the effective Hessian. The KKT stationarity conditions give
-\begin{equation}
-(\lambda \Sigma^{-1}-H)\,\delta=g,\qquad
-\delta(\lambda)^\top \Sigma^{-1}\delta(\lambda)=r^2
-\end{equation}
-for an active boundary solution: the inverse covariance acts as a learned metric, penalizing movement in confident directions and permitting it in uncertain ones. The projected pattern search used in the code does not solve this quadratic subproblem explicitly, but every retraction enforces the same metric constraint, and the step preconditioning $\propto\sigma_j$ moves fastest along exactly the directions the metric leaves cheap.
-
-\subsection{Parameter-shift and locality viewpoints}
-\label{app:locality}
-
-Although the implementation uses derivative-free search, gradient identities clarify the landscape. For the standard half-angle convention with a Pauli generator $P^2=I$, $U(\theta)=e^{-i\theta P/2}=\cos(\theta/2)I-i\sin(\theta/2)P$, the parameter-shift identity is
-\begin{equation}
-\frac{\partial}{\partial \theta}\langle O\rangle_\theta=
-\frac{1}{2}\left(\langle O\rangle_{\theta+\pi/2}-\langle O\rangle_{\theta-\pi/2}\right).
-\end{equation}
-QAOA cost angles are generated by sums of commuting edge terms, whose aggregate generator generally has more than two eigenvalues; the displayed two-shift identity therefore does not apply to a shared cost angle without decomposing the layer or using a generalized shift rule. For generator $H_a$ at a given layer, the convention-independent identity $\partial_a F_G(\theta)=i\langle \psi_a|[H_a,O_a]|\psi_a\rangle$ holds, with $O_a$ the cost observable conjugated through later layers.
-
-At depth one, an edge expectation is controlled by a bounded neighbourhood: with $e^{i\beta X}Ze^{-i\beta X}=\cos(2\beta)Z+\sin(2\beta)Y$,
-\begin{align}
-e^{i\beta B}Z_iZ_j e^{-i\beta B}
-=&(\cos(2\beta)Z_i+\sin(2\beta)Y_i)\nonumber\\
-&\times(\cos(2\beta)Z_j+\sin(2\beta)Y_j),
-\end{align}
-and cost conjugation affects a Pauli string only through incident edge terms, so the expectation of $C_{ij}$ depends on degrees, triangles and short cycles near the edge; at depth $p$ the light cone has radius $p$. This locality motivates the use of graph neural networks: low-depth QAOA objectives are structured functions of local and mesoscopic graph statistics. Spectral features are intended to add global information without flattening adjacency to a fixed vertex count, but no cross-size feature ablation establishes that design rationale here.
-
-\subsection{Depth scaling and torus-aware extensions}
-\label{app:depth}
-
-At depth $p$ the raw parameter dimension is $d=2p$; the diagonal model outputs $4p$ scalars. A full covariance via a Cholesky factor needs $2p+p(2p+1)$ outputs (quadratic in $p$); a low-rank-plus-diagonal model $\Sigma=DD^\top+\diag(s^2)$, $D\in\R^{d\times r}$, needs $dr+d$ and captures dominant layer correlations. Alternatively one can predict coefficients of a smooth depth schedule, $\gamma_\ell\approx\sum_r a_r\cos(\pi r\tau_\ell)$, $\beta_\ell\approx\sum_r b_r\cos(\pi r\tau_\ell)$ with $\tau_\ell=\ell/(p+1)$, and push the coefficient covariance through the Jacobian, $\Sigma_\theta=J\Sigma_cJ^\top$.
-
-Angles are periodic, so the Euclidean Gaussian is a local approximation on the torus $\mathbb{T}^{2p}$. It can be reasonable when high-quality angles concentrate in a small chart, and is inadequate near chart boundaries or with separated basins; the broad landscape ellipse and systematic undercoverage in this run do not validate the approximation. A torus-aware Mahalanobis score could use wrapped differences $\operatorname{wrap}(a-b)=\operatorname{atan2}(\sin(a-b),\cos(a-b))$,
-\begin{equation}
-s_{\mathbb{T}}(\theta)=\sum_{j=1}^{d}\frac{\operatorname{wrap}(\theta_j-\mu_j)^2}{\sigma_j^2},
-\end{equation}
-and a product von Mises model $p(\theta)=\prod_j \exp(\kappa_j\cos(\theta_j-\mu_j))/(2\pi I_0(\kappa_j))$ with its standard negative log-likelihood is the natural drop-in at larger $p$, at the cost of different calibration and retraction machinery. Barren plateaus also become more relevant at larger depth, where expressibility and trainability interact~\cite{sim2019expressibility}; the present method makes no global claims about gradient variance---it places the optimizer in a local region where useful variation remains, and at $p>2$ may need layerwise parameterizations or interpolation schedules to avoid high-dimensional sampling inefficiency.
-
-\subsection{Relation to Bayesian optimization, in equations}
-\label{app:bo}
-
-Bayesian optimization~\cite{frazier2018tutorial,snoek2012practical,shahriari2016taking} places a surrogate prior on the unknown $F_G(\theta)$ and updates it after each evaluation, choosing $\theta_{t+1}=\argmax_\theta a_t(\theta)$; for QAOA this includes Gaussian-process surrogates with adaptive trust regions~\cite{cheng2024darbo}, local surrogate models~\cite{sung2020models} and BO studies~\cite{tibaldi2022bayesian}. The graph-conditioned policy instead computes $(\mu_G,\Sigma_G)=f_\phi(G)$ \emph{before the first evaluation} and restricts the feasible set to $\mathcal{T}_r(G)$. The approaches are compatible: a hybrid acquisition rule
-\begin{equation}
-\theta_{t+1}= \argmax_{\theta\in \mathcal{T}_r(G)} a_t(\theta),
-\end{equation}
-with kernel length scales initialized from $\Sigma_G$, would combine amortized graph-level structure with online landscape modelling. The present paper uses retracted pattern search because it is simple and deterministic under fixed seeds. The current ablations do not causally isolate learned covariance from all other policy components.
-
-\subsection{Failure-mode diagnostics}
-\label{app:failuremodes}
-
-The method can fail in four ways, each with a direct diagnostic, and the measured run exhibits a specific, informative pattern.
-\begin{itemize}
-\item Mean failure: $Q_{\rm point}$ remains high.
-\item Covariance overconfidence: $Q_{\rm noTR}<Q_{\rm full}$ systematically.
-\item Uncertainty-order failure: $\rho_s\approx0$ or $\rho_s<0$.
-\item Representation shift: cross-size degradation dominates
-in-distribution degradation.
-\end{itemize}
-On the committed run, three diagnostics fire. The point baseline records
-$264.4\pm164.0$ capped calls and only $20/48$ hits, while removing the fixed-prior
-seed gives $249.4\pm178.8$ and $20/48$; the learned mean alone is therefore a
-weak initializer at $n=14$. The raw covariance trace also trips the ordering
-diagnostic ($\rho=-0.638$ against realized error and $\rho=-0.292$ against the
-difficulty proxy); the held-out error head supplies a positively associated
-score ($\rho=0.671$), but the controls show no allocation advantage. Finally,
-the hard-boundary association changes with distribution: removing it is worse
-in distribution ($22.9\pm55.6$, $47/48$, versus $15.0\pm7.8$, $48/48$) but has
-a lower pooled leave-one-family-out mean ($82.2$, $40/48$, versus $89.3$,
-$39/48$). Removing spectral encodings gives $15.3\pm8.5$, $48/48$ and ECE
-$0.081$; no cross-size feature ablation was run.
-
-\subsection{Summary of assumptions and claim boundary}
-\label{app:claimboundary}
-
-The theoretical claims have graded assumptions: analyticity of $F_G$ is
-unconditional; Lipschitz continuity holds on compact regions; objective
-retention needs a useful actual region center and confined covariance;
-capture-based bounds need coverage of the reference optimum; and affine
-depolarizing attenuation applies only to fixed parameter distributions. Early
-cap monotonicity is unconditional only after the target, common cap and ordered
-trajectory are fixed. Empirically, schema-2 rows record target attainment and
-capped cost to a privileged reference, while the Gaussian angle head has
-marginal coverage diagnostics and a separate validation-fit score ranks
-warm-start difficulty. The tested low-depth MaxCut results are not
-matched-hardware-cost, global-QAOA, hardware, asymptotic or universal-QUBO
-guarantees.
-
-In words, conditional coverage of the predictive ellipsoid near $\theta_G^\star$
-together with local regularity of $F_G$ on $\mathcal{T}_r(G;c)$ implies that
-retracted search preserves local quality up to a covariance-controlled radius.
-The marginal angle-coverage curve probes one part of the first premise, the
-separate rank correlation probes allocation ordering, the Lipschitz analysis
-addresses the second premise, and paired capped-cost comparisons test only the
-empirical benchmark conclusion.
-
-\section{Proofs for the statistical foundations}
-\label{app:statproofs}
-
-This appendix supplies the proofs of the results stated in Sec.~\ref{sec:statfound}. We reuse the notation of the main text: $d=2p$, $m=|E|$, $0\le C(z)\le m$, $F_G(\theta)=\E_{Z\sim P_\theta}[C(Z)]$, and $\widehat F_G(\theta)=S^{-1}\sum_{s=1}^S C(Z_s)$ with $Z_s$ i.i.d.\ from the Born distribution $P_\theta$ (Assumption~\ref{ass:oracle}).
-
-\subsection{Unbiasedness and variance (Proposition~\ref{prop:unbias})}
-
-Linearity of expectation gives unbiasedness; independence gives $\Var(\widehat F_G)=S^{-2}\sum_s \Var(X_s)=v_\theta/S$. Since $X_s\in[0,m]$, Popoviciu's inequality yields $v_\theta\le m^2/4$. For the $F_G$-dependent bound, write $Y=X/m\in[0,1]$; then $\Var(X)=m^2\Var(Y)$ and, because $Y^2\le Y$ on $[0,1]$, $\Var(Y)\le \E[Y](1-\E[Y])$. Substituting $\E[Y]=F_G/m$ gives $v_\theta\le F_G(m-F_G)$. \qed
-
-\subsection{Concentration for the shot estimator (Theorem~\ref{thm:ci} and Corollary~\ref{cor:shotcomplexity})}
-
-Set $X_s=C(Z_s)$; these are i.i.d.\ with $X_s\in[0,m]$ and mean $F_G(\theta)$.
-
-\emph{Hoeffding.} For independent variables $X_s\in[a_s,b_s]$, Hoeffding's inequality~\cite{hoeffding1963probability} states
-$\Prob\{|\bar X-\E\bar X|\ge t\}\le 2\exp\!\bigl(-2S^2t^2/\sum_s(b_s-a_s)^2\bigr)$.
-Here $b_s-a_s=m$ for all $s$, so $\sum_s(b_s-a_s)^2=Sm^2$ and
-\begin{equation}
-\Prob\{|\widehat F_G-F_G|\ge t\}\le 2\exp\!\Bigl(-\tfrac{2St^2}{m^2}\Bigr).
-\label{eq:hoeff-tail}
-\end{equation}
-Equating the right side to $\delta$ gives $t=m\sqrt{\log(2/\delta)/(2S)}$, which is \eqref{eq:hoeff-ci}.
-
-\emph{Bernstein.} Bernstein's inequality for independent variables with $|X_s-\E X_s|\le m$ and variance $v_\theta$ gives~\cite{boucheron2013concentration}
-\begin{equation}
-\Prob\{|\widehat F_G-F_G|\ge t\}\le
-2\exp\!\Bigl(-\tfrac{St^2/2}{v_\theta+mt/3}\Bigr).
-\label{eq:bern-tail}
-\end{equation}
-Set the exponent equal to $\log(2/\delta)$, i.e.\ $St^2/2=(v_\theta+mt/3)\log(2/\delta)$. Writing $L=\log(2/\delta)$ this is the quadratic $St^2/2-(mL/3)t-v_\theta L=0$, whose positive root is
-\begin{equation}
-t=\frac{(mL/3)+\sqrt{(mL/3)^2+2Sv_\theta L}}{S}
-\le \frac{2mL}{3S}+\sqrt{\frac{2v_\theta L}{S}},
-\end{equation}
-where the inequality uses $\sqrt{a+b}\le\sqrt a+\sqrt b$.  This is the
-stated form~\eqref{eq:bern-ci}.  Corollary~\ref{cor:shotcomplexity} follows by
-setting the right-hand sides equal to $\varepsilon$ and solving for $S$. \qed
-
-\subsection{Local Cram\'er--Rao bound (Theorem~\ref{thm:crlb})}
-
-Let $\{P_\theta^{(u)}\}$ be a regular one-parameter family (densities/pmfs differentiable in $u$ with finite Fisher information)
-\begin{equation}
-\mathcal I(u)=\E_{Z\sim P^{(u)}}\!\Bigl[\bigl(\partial_u\log
-p^{(u)}(Z)\bigr)^2\Bigr],
-\end{equation}
-and let $\psi(u)=F_G(P^{(u)})=\E_{P^{(u)}}[C(Z)]$ be the scalar functional of interest with $\dot\psi(0)=\dot F\neq0$. For $S$ i.i.d.\ shots the sample Fisher information is $S\mathcal I(u)$ by additivity. The Cram\'er--Rao inequality for a differentiable functional of a regular family states that any unbiased estimator $T$ of $\psi(u)$ satisfies~\cite{lehmann1998theory}
-\begin{equation}
-\Var_u(T)\ge \frac{\dot\psi(u)^2}{S\mathcal I(u)}.
-\end{equation}
-Evaluating at $u=0$ gives $\Var(T)\ge \dot F^2/(S\mathcal I(0))$. If $T$ has root-mean-square error at most $\varepsilon$ then $\Var(T)\le\varepsilon^2$, so $S\ge \dot F^2/(\varepsilon^2\mathcal I(0))=\Omega(\varepsilon^{-2})$ under the theorem's finite-information regularity assumption. \qed
-
-\subsection{Le Cam two-point bound (Theorem~\ref{thm:lecam})}
-
-We use Le Cam's method~\cite{tsybakov2009introduction}. For two distributions $P_0,P_1$ and a functional with values $\psi_0,\psi_1$, the testing reduction for absolute loss gives
-\begin{equation}
-\inf_T\max_{b\in\{0,1\}}\E_b|T-\psi_b|
-\ge \frac{|\psi_0-\psi_1|}{4}\bigl(1-\mathrm{TV}(P_0^{\otimes S},P_1^{\otimes S})\bigr).
-\end{equation}
-Here $P_b^{\otimes S}$ is the law of $S$ independent shots. Define squared
-Hellinger distance by $H^2(P,Q)=\sum_x(\sqrt{p(x)}-\sqrt{q(x)})^2$, for which
-$\mathrm{TV}(P,Q)\le H(P,Q)$ and
-$H^2(P_0^{\otimes S},P_1^{\otimes S})\le S H^2(P_0,P_1)$.
-Take laws on $\{0,m\}$ with success probabilities
-$q_0=1/2-\eta$ and $q_1=1/2+\eta$, where
-$\eta=\varepsilon/m\le1/4$. Their means differ by $2\varepsilon$, and
-\begin{equation}
-H^2(P_0,P_1)=2-2\sqrt{1-4\eta^2}\le 8\eta^2
-=\frac{8\varepsilon^2}{m^2}.
-\end{equation}
-Consequently, when $S\le m^2/(32\varepsilon^2)$,
-$\mathrm{TV}(P_0^{\otimes S},P_1^{\otimes S})\le1/2$. Substituting
-$|\psi_0-\psi_1|=2\varepsilon$ in the testing bound gives worst-case expected
-absolute error at least $\varepsilon/4$, as claimed. \qed
-
-\section{Extended results}
-\label{app:extresults}
-
-All quantities in this appendix are from the committed schema-2 run used in the main text (\texttt{results.json}, \texttt{meta.json}); figures and tables are regenerated from those sources by \texttt{gctr-reproduce --replot-only}.
-
-\subsection{Cross-size transfer and the quality--cost frontier}
-\label{app:transferfrontier}
-
-The cross-size and frontier plots support results summarized in
-Secs.~\ref{subsec:crosssize} and \ref{subsec:frontier}; they are placed here to
-keep the main text to six display items.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.80\linewidth]{figures/Figure4_Generalization.pdf}
-\caption{Cross-size transfer of a single policy trained at $n=14$, evaluated on test sets at each size under shared-cap scoring. Random-to-GCTR mean-cost ratios are $13.47\times$, $8.47\times$, $13.95\times$, $12.82\times$ and $10.40\times$ at $n=8,10,12,14,16$; GCTR hits $48,47,48,48,48$ of $48$ targets. The fixed heuristic is cheaper at four of five sizes; only at $n=10$ is GCTR slightly cheaper, with both at $47/48$. These are simulation-benchmark ratios, not hardware speedups.}
-\label{fig:transfer}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.78\linewidth]{figures/Figure6_QualityCostFrontier.pdf}
-\caption{Aggregate quality--cost plane at $n=14$: exact expectation ratio of returned angles against mean shared-cap cost. The concentration heuristic records $12.3$ calls at ratio $0.85744$ and GCTR $15.0$ at $0.85766$, both with $48/48$ target hits. Instance-level costs, attainment and expectation ratios are released, but this aggregate chart alone is not a statistical Pareto comparison.}
-\label{fig:frontier}
-\end{figure}
-
-\subsection{Realized budget allocations}
-\label{app:budgetfig}
-
-Figure~\ref{fig:budget} shows the per-instance allocations the budget rule issued on the $48$-instance test set (committed as \texttt{Figure7\_BudgetPolicy.csv}). Standardized scores span $z=-2.368$ to $0.613$, nominal seed counts span $K=1$ to $K=3$, and caps span $T=100$ to $T=222$. Because the mean and fixed-prior seeds are unconditional, nominal $K=1$ still evaluates two deterministic seeds and adds no Gaussian draw. The mapping is monotone and capped by construction (Sec.~\ref{subsec:budget}); the data do not show that its variation improves shared-cap cost.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.78\linewidth]{figures/Figure7_UncertaintyBudgetPolicy.pdf}
-\caption{Difficulty-score-guided allocation on the $48$ test instances. The robust-standardized validation-fit score $z(G)$ determines nominal $K\in[1,4]$ (realized seeds $\max(K,2)$ because two deterministic seeds are unconditional) and cap $T\in[40,400]$; issued values span $K=1$--$3$ and $T=100$--$222$.}
-\label{fig:budget}
-\end{figure}
-
-\subsection{An exact landscape slice with the predicted trust region}
-\label{app:landscape}
-
-Figure~\ref{fig:landscape} shows an exactly computed two-dimensional slice of the $p=2$ landscape for a concrete held-out instance---a Barab\'asi--Albert graph with generation seed $9030$, $n=14$, $C_{\max}=18$. The slice sweeps $(\gamma_1,\beta_1)$ over a $41\times41$ grid ($\gamma_1\in[0,\pi]$, $\beta_1\in[0,\pi/2]$) with $(\gamma_2,\beta_2)$ fixed at $(1.129,0.832)$, evaluating the exact expectation ratio at every grid point. The predicted swept-coordinate mean is $(0.605,0.756)$ with standard deviations $(0.694,0.587)$; consequently much of the $r=2$ ellipse lies outside the displayed coordinate chart. The plot is a traceable diagnostic of a broad predicted region, not evidence that the region isolates a productive basin.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.74\linewidth]{figures/Figure9_LandscapeSlice.pdf}
-\caption{Exactly computed landscape slice for a held-out Barab\'asi--Albert test instance (seed $9030$, $n=14$): expectation ratio over a $41\times41$ grid in $(\gamma_1,\beta_1)$ with $(\gamma_2,\beta_2)$ fixed as recorded in \texttt{meta.json}. The broad $r=2$ predicted cross-section extends mostly outside the displayed chart; it neither isolates nor certifies a high-value basin.}
-\label{fig:landscape}
-\end{figure}
-
-\subsection{Seed stability}
-\label{app:seeds}
-
-The stability study retrains the model and reruns the full query benchmark under four algorithm seeds ($20260424$, $1$, $2$, $3$); benchmark graphs and targets stay fixed, while training and stochastic search change. Across seeds, GCTR records $17.6\pm4.2$ capped calls at aggregate expectation ratio $0.855\pm0.003$, versus the deterministic concentration heuristic's $12.3\pm0.0$ at $0.857$. Difficulty-score rank correlation is $\rho=0.767\pm0.085$, while the Gaussian angle-head coverage ECE is $0.087\pm0.009$. These are sensitivity runs on the same instances, not independent replications.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.80\linewidth]{figures/ExtendedData/ED_Fig3_SeedStability.pdf}
-\caption{Algorithm-seed sensitivity on the same benchmark graphs. GCTR: $17.6\pm4.2$ capped calls at aggregate ratio $0.855\pm0.003$; concentration heuristic: $12.3\pm0.0$ at $0.857$; difficulty-score rank correlation $\rho=0.767\pm0.085$. The point baseline varies most ($210.5\pm38.2$ capped calls).}
-\label{fig:seedstability}
-\end{figure}
-
-\subsection{Shot-noise robustness}
-\label{app:shots}
-
-The shot-noise study reruns the benchmark with the optimizer seeing only $S$-shot estimates of the objective (the unbiased mean cut value of $S$ Born-rule samples per query), for random restarts, the concentration heuristic and GCTR. A target decision uses the noisy estimate, while convergence or cap may also stop the search; the reported quality is the exact expectation of the returned angles, recomputed once outside the query count. At $S=128$, GCTR records $22.6\pm55.6$, $47/48$ stopping decisions and ratio $0.851\pm0.028$; the heuristic records $13.9\pm8.7$, $48/48$ and $0.853\pm0.028$. At $S=1024$, the corresponding values are GCTR $15.2\pm7.7$, $48/48$, $0.857\pm0.026$ and heuristic $13.4\pm8.7$, $48/48$, $0.857\pm0.027$. Random restarts record $194.4\pm152.4$, $35/48$ and $0.828\pm0.032$ at $128$ shots, and $203.1\pm156.4$, $36/48$ and $0.832\pm0.035$ at $1024$ shots. The success field records the noisy stopping decision, not independently verified exact target attainment. With one noise realization per shot level and no equal-total-shot comparison, inferential robustness is not established; Theorem~\ref{thm:depolarizing} does not imply this adaptive-trajectory result.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.80\linewidth]{figures/ExtendedData/ED_Fig2_ShotNoiseRobustness.pdf}
-\caption{Finite-shot stress tests at $S=128$ and $S=1024$ shots per objective estimate. GCTR records $22.6$ ($47/48$ noisy stopping decisions) and $15.2$ ($48/48$); the heuristic $13.9$ and $13.4$ (both $48/48$); random restarts $194.4$ ($35/48$) and $203.1$ ($36/48$). One realization is run at each shot level.}
-\label{fig:shotnoise}
-\end{figure}
-
-\subsection{Map of the theoretical guarantees}
-\label{app:theorymap}
-
-Figure~\ref{fig:theorymap} sketches how the predicted Gaussian feeds geometry and how the separate validation-fit error score $\widehat e(G)$ feeds nominal seed and cap allocation; $\tr\Sigma$ is used for allocation only in the no-error-head control.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.90\linewidth]{figures/Figure8_TheoryMap.pdf}
-\caption{Structure of the conditional guarantees. The predicted Gaussian feeds trust-region geometry; the separate validation-fit error score $\widehat e(G)$ feeds allocation. Empirical controls, not the conditional bounds, determine whether those interventions improve capped cost.}
-\label{fig:theorymap}
-\end{figure}
-
-\section{Reproducibility details}
-\label{app:repro}
-
-\subsection{Package layout and module contract}
-\label{app:layout}
-
-The artifact is a single installable Python package, \texttt{specops-gctr}, under the root \texttt{specops\_gctr/} directory:
-\begin{itemize}
-\item \texttt{graphs.py} --- instance generation for the four families, exact MaxCut by brute force, Laplacian spectral features with deterministic sign canonicalization;
-\item \texttt{qaoa.py} --- exact-statevector QAOA objective, finite-shot estimator, sampled best-bitstring ratio;
-\item \texttt{targets.py} --- offline multi-start target generation ($8\times60$ evaluations);
-\item \texttt{model.py} --- GIN encoder, Gaussian heads, error-calibrator head, dense batching;
-\item \texttt{losses.py} --- Gaussian NLL, diagonal-Gaussian $W_2^2$, difficulty-ranking penalty;
-\item \texttt{optimization.py} --- query counter, trust-region retraction, seeded preconditioned pattern search, policy runner;
-\item \texttt{baselines.py} --- random restarts, concentration heuristic, $1$-NN transfer, TQA, GNN point, and the full GCTR policy with its ablation switches;
-\item \texttt{calibration.py} --- reliability curve, coverage ECE, Spearman diagnostics;
-\item \texttt{pipeline.py} --- configuration, data preparation, training, calibrator fitting, budget rule, and all evaluation studies (queries, calibration, cross-size, leave-one-family-out, ablation, seed stability, shot noise, landscape);
-\item \texttt{plots.py}, \texttt{tables.py} --- all data figures and both numerical tables rendered from committed source data, plus deterministic conceptual schematics;
-\item \texttt{reproduce.py} --- the \texttt{gctr-reproduce} console entry point;
-\item \texttt{cli.py} --- the tunable \texttt{gctr-optimize} single-instance command.
-\end{itemize}
-The root \texttt{run.py} dispatcher forwards reviewer arguments to the same two command implementations without introducing a second package layer.
-The mapping from equations to modules is part of the scientific claim: each mathematical component described in Sec.~\ref{sec:method} has a direct implementation site and a corresponding test. The implementation-level consistency conditions are few and checkable: every predicted mean and variance vector has length $2p$; the same $\Sigma$ is used for the retraction and the step preconditioning; the evaluation counter increments on every objective call, including seed evaluations; the reported ratio is the exact expectation of the returned angles; and the error calibrator is fit only on validation residuals.
-
-Figure~\ref{fig:repo} sketches the reviewer-facing architecture using the literal released paths. Installable source feeds the public API and commands; release tests verify mathematical and artifact contracts; and committed evidence feeds generated data figures, tables, the manuscript and its source archive. Generator source is archived separately from display-only code so numerical provenance survives later presentation changes.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.82\linewidth]{figures/Figure10_RepositoryArchitecture.pdf}
-\caption{Reviewer-facing release architecture: installable source and commands, release tests and validation, and committed evidence leading to the manuscript artifacts. Generator source is retained independently of display-only code.}
-\label{fig:repo}
-\end{figure}
-
-\subsection{Test suite}
-\label{app:tests}
-
-The tests in \texttt{tests/test\_package.py} split into component tests of the mathematical contracts the manuscript relies on---the QAOA objective against an independent dense computation and the $\theta=0$ closed form, approximate unbiasedness of the finite-shot estimator, feasibility and idempotence of the trust-region retraction, exact query counting including seed evaluations, duplicate-seed suppression, the budget cap, the never-worse-than-best-seed guarantee, exactness of the reported value of returned parameters, monotonicity and clamping of the budget rule, discrimination of the coverage ECE on synthetic residuals, the Spearman interface, the TQA midpoint-ramp schedule, the heuristic's use of supplied angles, dataset determinism, agreement of the configuration defaults with this manuscript, the public API plus single-instance command, and callback-policy query accounting and invalid-geometry rejection---and smoke tests of the release path: entry-point callability, rebuilding every figure from the committed source data, regenerating both tables, manifest validation, aggregate-statistic consistency, and the \texttt{-{}-replot-only} command line.
-
-\subsection{Reviewer commands}
-\label{app:commands}
-
-\begin{lstlisting}[caption={Complete reviewer workflow.},label={lst:commands}]
-pip install .
-pip install -e ".[test]" && pytest -q
-python run.py reproduce --validate-only
-gctr-reproduce                 # full run
-gctr-reproduce --quick         # smoke run
-gctr-reproduce --replot-only   # re-render figures/tables
-                               # from committed source data
-gctr-reproduce --validate-only # verify portable hashes only
+\input{tables/table_portfolio_protocol.tex}
+\end{table*}
+
+\subsection{Angle labels and legacy model}
+
+Each angle-training graph receives three random-start coordinate searches,
+each capped at 40 exact calls. The best four-angle vector is the label, costing
+120 queries per graph and 5,760 in total. The coordinate-wise median label is
+the concentration arm. The nearest-neighbor arm standardizes the 16 invariant
+features using angle-training statistics and transfers the label with smallest
+Euclidean feature distance.
+
+The legacy arm retains the earlier graph-conditioned idea as a deliberately
+strong learned comparator. A three-layer graph isomorphism network with width
+48 and six Laplacian spectral node features predicts diagonal-Gaussian mean and
+log variance \cite{xu2019gin}. It is trained for 80 Adam epochs at learning
+rate 0.005 with heteroscedastic Gaussian negative log likelihood and a small
+log-variance penalty. Its mean starts coordinate search, the concentration
+vector is an additional counted seed, predicted standard deviations scale
+steps, and a radius-two Mahalanobis ball limits proposals. The region recenters
+on the best seed. No development, calibration or audit result is used to fit
+this model.
+
+\subsection{Optimizer arms and exact accounting}
+
+The four schedule arms use midpoint grid
+$g_j=(j-1/2)/p$ and angles
+$\gamma_j=g_jd_t$, $\beta_j=(1-g_j)d_t$. Concentration, schedule, k-nearest
+neighbor and legacy arms use the same best-so-far coordinate pattern search:
+initial step 0.3; both signed proposals for each coordinate; halve the step
+after a non-improving sweep; and, once the step falls below $10^{-3}$, restart
+near the incumbent so that the target-free trace consumes all 32 calls.
+Random multistart divides the budget across four random QAOA starts. SPSA
+maximizes the objective with $a=0.18$, $c=0.12$, decay exponents 0.602 and
+0.101, and records both signed evaluations \cite{spall1992spsa}.
+
+The \code{BudgetedObjective} raises an exception on a 33rd call. A trace is
+valid only if it contains exactly 32 calls and monotonically non-decreasing
+best-so-far values. It stores checkpoint parameters and values,
+\code{objective\_queries=32}, \code{shots\_used=0} and backend
+\code{exact\_statevector}. Unit tests cover budget exhaustion, monotonicity,
+SPSA and multistart accounting.
+
+\subsection{Selector, residual-order-statistic abstention and gate}
+
+The selector is fit once to the 48 development rows and nine arm utilities.
+Every feature is standardized with the development mean and standard deviation;
+constant scales are set to one. Ridge regression includes an unpenalized
+intercept and penalty one. Family fallbacks are selected by development mean
+as in Eq.~\eqref{eq:fallback}.
+
+The selected arm for each of 48 calibration graphs is determined without its
+utility. Residuals in Eq.~\eqref{eq:residual} then set the one-sided order
+statistic. The margin is zero. A standard split-conformal statement would
+assume exchangeable calibration and future residuals with a decision function
+fixed independently of both outcome sets. The realized protocol does not meet
+exact pooled exchangeability: it fixes the count in every family-by-size
+stratum and accepts graphs sequentially only after excluding isomorphs from all
+earlier splits. We therefore invoke no finite-sample coverage theorem. The
+order statistic is a prespecified abstention heuristic, and its audit coverage
+is a descriptive gate rather than a calibrated risk guarantee. Even the
+idealized pooled statement would say nothing about exact subgroup or
+acceptance-conditional coverage. Modern selection-conditional conformal
+procedures instead construct calibration sets around the selection event and
+control false coverage statements in online settings \cite{bao2025cap}. The
+pooled residual heuristic used here is not such a procedure, so its marginal
+motivation must not be read as accepted-route safety.
+
+The confirmatory follow-up flag required all of the following: portfolio
+opportunity at least 5\% of global-baseline AURC; upper end of the stratified
+95\% interval below zero versus both global and family baselines; at least ten
+accepted graphs; empirical one-sided coverage at least 0.90; and joint harm
+rate at most 0.10. \code{nmi\_claim\_ready} additionally required a
+confirmatory study label. The code evaluates these Boolean criteria without
+manual interpretation. That legacy field name is only a mechanical experiment
+label; it is not, and cannot be, a determination of journal readiness.
+
+\subsection{Statistical analysis}
+
+The experimental unit is a graph. The primary estimand is the arithmetic mean
+of paired per-graph AURC differences between the deployed arm and the frozen
+family fallback. The 95\% interval is a nonparametric bootstrap with 4,000
+resamples, sampling with replacement separately inside each of the eight
+family-by-size strata and then taking the 2.5th and 97.5th percentiles
+\cite{efron1993bootstrap}. The bootstrap seed is fixed in the configuration.
+No post hoc $p$-value or multiplicity-adjusted family inference is reported.
+Per-family means diagnose heterogeneity and are descriptive.
+
+Descriptive empirical coverage is the fraction satisfying
+$u_s-u_b\le U(x)$, whether or not the route is accepted. A joint harm is
+\code{accepted} and deployed-minus-fallback AURC greater than zero. The
+conditional harm rate divides harms by accepted routes and is descriptive; it
+was not a gate criterion. Opportunity is
+$(\overline u_{\rm global}-\overline u_{\rm oracle})/
+\overline u_{\rm global}$.
+
+The retrospective risk sensitivity uses the one-sided exact
+Clopper--Pearson upper bound
+\begin{equation}
+ p_{\rm U}=\operatorname{Beta}^{-1}_{1-\eta}(k+1,n-k)
+\end{equation}
+for $k<n$ events among $n$ units at confidence $1-\eta=0.95$; $p_{\rm U}=1$
+when $k=n$. The nominal-coverage tail probability is
+$\Pr\{\operatorname{Binomial}(160,0.90)\le141\}$. These calculations assume
+independent identically distributed Bernoulli events. They are deliberately
+labelled sensitivity diagnostics because the locked sampling design does not
+establish that premise.
+
+\subsection{Internal locking, chronology and provenance}
+
+Canonical JSON uses sorted keys and compact separators before SHA-256 hashing.
+The confirmatory configuration hash begins \code{a0e66aa4c41f}; protocol hash
+\code{58692d57df9c}; implementation hash \code{42aa34816315}; and frozen
+decision hash \code{962f63d71dc2}. The decision stores the selector
+coefficients, family arms, residual order statistic, non-audit trace hash and legacy
+model hash. It is written after development/calibration and before audit
+evaluation. The runner refuses to proceed if \code{traces.jsonl} already
+exists, requiring a new directory and protocol for any repeat.
+
+The manifest hashes angle labels, model checkpoint, non-audit traces, decision,
+all traces and summary. Validation recomputes file, protocol, decision,
+configuration and implementation hashes. The manuscript plotting script first
+validates all three studies, reads only locked JSON/JSONL, and records hashes of
+its generated PDFs, PNGs, tables and numerical macros. Running it twice yields
+the same artifact hashes in the recorded environment.
+
+These hashes provide tamper evidence and the runner enforces an internal
+execution order. They are not an independent timestamped preregistration:
+the protocol, frozen decision and audit outcomes first entered the public Git
+history together in one repository commit. Repository history therefore
+cannot independently verify that the decision existed before the outcomes.
+A future confirmatory study must publish an immutable external timestamp for
+the executable protocol, trained selector, calibration thresholds and analysis
+code before any audit outcome is generated.
+
+\subsection{Use of generative artificial intelligence}
+
+A generative language model assisted with software implementation, numerical
+analysis, figure and table generation, and manuscript drafting. Molena Huynh
+is the sole author, verified the code, locked records, results, citations and
+scientific claims, and retains full responsibility for the final work.
+
+\section{Data availability}
+
+All graph identities, generator parameters, objective traces, exact query
+counts, split summaries and hashes used here are included in
+\path{portfolio_results/}. The controlling confirmation is
+\path{portfolio_results/heterogeneous_confirmatory_v1/}. No external or
+proprietary dataset is used. Exact MaxCut values and expectation ratios are
+small-instance simulation data, not measurements from a quantum processor.
+
+\section{Code availability}
+
+The installable package is in \path{specops_gctr/}. The portfolio entry point
+is \code{gctr-portfolio}; configurations are in \path{configs/}. The
+deterministic manuscript generator is
+\path{manuscript/generate_portfolio_artifacts.py}. A reviewer can verify the
+locked audit and regenerate display artifacts with
+\begin{lstlisting}
+python run.py portfolio \
+  --config configs/portfolio_heterogeneous_confirmatory.json \
+  --output-dir portfolio_results/heterogeneous_confirmatory_v1 \
+  --validate-only
+python manuscript/generate_portfolio_artifacts.py
+gctr-risk-audit \
+  portfolio_results/heterogeneous_confirmatory_v1/summary.json
+pytest -q
 \end{lstlisting}
+The existing audit cannot be overwritten by the runner. The exact-binomial
+diagnostic is implemented separately in \path{specops_gctr/risk_control.py};
+it does not alter the frozen result. The file
+\path{configs/prospective_risk_control_v2.design.json} is an unexecuted design
+specification, explicitly marked unregistered and incomplete. It supports
+planning only and contains no future outcome.
 
-Verification is supported at three levels of cost: static inspection and \texttt{-{}-validate-only} $<$ smoke execution (\texttt{pytest -q}, \texttt{-{}-quick}, \texttt{-{}-replot-only}) $<$ a new full experiment (\texttt{gctr-reproduce}). The committed schema-2 evidence was generated from the exact source archived as \texttt{generator-source-efe87496.zip}; its package digest is recorded in \texttt{meta.json}. Display-only plotting and table code may evolve independently and has its own manifest digest. Failures at the first two levels---broken imports, malformed source data, infeasible retraction, plotting mismatches or hash drift---are caught before a full run is attempted. Figure~\ref{fig:workflow} shows the end-to-end workflow.
+\section*{Author contributions}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.82\linewidth]{figures/Figure11_ReproducibilityWorkflow.pdf}
-\caption{End-to-end reproducibility workflow of the released package: generate instances, train the predictor, evaluate all baselines, assess marginal angle coverage, fit the held-out difficulty score, regenerate figures and tables, and run the tests over the committed source data.}
-\label{fig:workflow}
-\end{figure}
+M.H. conceived the study, designed the methods, implemented and verified the
+software, conducted the analysis, interpreted the results, and wrote the
+manuscript.
 
-\subsection{Determinism and recorded environment}
-\label{app:environment}
+\section*{Competing interests}
 
-The generator environment recorded in \texttt{meta.json} is Python 3.13.12, NumPy 2.4.3, SciPy 1.17.1, NetworkX 3.6.1, PyTorch 2.11.0 with \texttt{torch\_num\_threads}$=1$, Matplotlib 3.10.8 and pandas 3.0.2 on macOS/arm64, at seed $20260424$. Package version $3.2.0$ and generator digest \texttt{efe87496...81265b} are retained with the exact source archive. No cross-platform bit-for-bit guarantee is made: learned quantities can shift across PyTorch/BLAS builds, and \texttt{runtime\_ms} is machine-dependent. The cross-seed sensitivity on fixed graphs appears in Appendix~\ref{app:seeds}.
-
-\subsection{Source-data audit}
-\label{app:sourcedata}
-
-Every data figure has an explicit committed source consumed by the plotting code, so the replot contract is $\mathcal{P}_{\rm fig}(\mathcal{D}_{\rm fig})\to$ figure: \texttt{Figure2\_QueryEfficiency.csv} (aggregate primary metrics and paired $p$-values), \texttt{Figure3\_CalibrationAndUncertainty.csv} (the ten-level reliability curve with counts), \texttt{Figure4\_Generalization.csv} (per-size costs and attainment), \texttt{Figure5\_Ablation.csv} (per-variant cost, attainment, ECE and $\rho$), \texttt{Figure7\_BudgetPolicy.csv} (per-instance $z$, $K$, $T$), \texttt{EDFig2\_ShotNoise.csv}, \texttt{EDFig3\_SeedStability.csv}, \texttt{QueryEfficiency\_InstanceLevel.csv}, \texttt{LOFO\_InstanceLevel.csv}, \texttt{results.json} and \texttt{meta.json}. The last two declare shared-cap score semantics, attainment observability and generator provenance. The portable manifest hashes source and generated artifacts and separately records the current replot implementation. Both main-text tables are generated by \texttt{tables.py} and included verbatim via \texttt{\textbackslash input}; no numerical table row in this paper is hand-typed.
+The author declares no competing interests.
 
 \section*{References}
 
 \begin{thebibliography}{99}
-\bibitem{farhi2014quantum} Farhi, E., Goldstone, J. \& Gutmann, S. A quantum approximate optimization algorithm. \emph{arXiv} https://arxiv.org/abs/1411.4028 (2014).
-\bibitem{cerezo2021variational} Cerezo, M. \emph{et al.} Variational quantum algorithms. \emph{Nat. Rev. Phys.} \textbf{3}, 625--644 (2021).
-\bibitem{zhou2020qaoa} Zhou, L., Wang, S.-T., Choi, S., Pichler, H. \& Lukin, M. D. Quantum approximate optimization algorithm: performance, mechanism, and implementation on near-term devices. \emph{Phys. Rev. X} \textbf{10}, 021067 (2020).
-\bibitem{brandao2018fixed} Brandao, F. G. S. L., Broughton, M., Farhi, E., Gutmann, S. \& Neven, H. For fixed control parameters the quantum approximate optimization algorithm's objective function value concentrates for typical instances. \emph{arXiv} https://arxiv.org/abs/1812.04170 (2018).
-\bibitem{egger2021warm} Egger, D. J., Marecek, J. \& Woerner, S. Warm-starting quantum optimization. \emph{Quantum} \textbf{5}, 479 (2021).
-\bibitem{xu2019gin} Xu, K., Hu, W., Leskovec, J. \& Jegelka, S. How powerful are graph neural networks? In \emph{International Conference on Learning Representations} (2019).
-\bibitem{mcclean2018barren} McClean, J. R., Boixo, S., Smelyanskiy, V. N., Babbush, R. \& Neven, H. Barren plateaus in quantum neural network training landscapes. \emph{Nat. Commun.} \textbf{9}, 4812 (2018).
-\bibitem{ruiz2025alphatensor} Ruiz, F. J. R. \emph{et al.} Quantum circuit optimization with AlphaTensor. \emph{Nat. Mach. Intell.} \textbf{7}, 374--385 (2025). doi:10.1038/s42256-025-01001-1.
-\bibitem{angelopoulos2021conformal} Angelopoulos, A. N. \& Bates, S. A gentle introduction to conformal prediction and distribution-free uncertainty quantification. \emph{arXiv} https://arxiv.org/abs/2107.07511 (2021).
-\bibitem{goemans1995improved} Goemans, M. X. \& Williamson, D. P. Improved approximation algorithms for maximum cut and satisfiability problems using semidefinite programming. \emph{J. ACM} \textbf{42}, 1115--1145 (1995).
-\bibitem{barabasi1999emergence} Barabasi, A.-L. \& Albert, R. Emergence of scaling in random networks. \emph{Science} \textbf{286}, 509--512 (1999).
-\bibitem{watts1998collective} Watts, D. J. \& Strogatz, S. H. Collective dynamics of small-world networks. \emph{Nature} \textbf{393}, 440--442 (1998).
-\bibitem{erdos1959random} Erdos, P. \& Renyi, A. On random graphs. \emph{Publ. Math. Debrecen} \textbf{6}, 290--297 (1959).
-\bibitem{kipf2017semisupervised} Kipf, T. N. \& Welling, M. Semi-supervised classification with graph convolutional networks. In \emph{International Conference on Learning Representations} (2017).
-\bibitem{hamilton2017inductive} Hamilton, W. L., Ying, R. \& Leskovec, J. Inductive representation learning on large graphs. In \emph{Advances in Neural Information Processing Systems} (2017).
-\bibitem{kingma2015adam} Kingma, D. P. \& Ba, J. Adam: a method for stochastic optimization. In \emph{International Conference on Learning Representations} (2015).
-\bibitem{wilcoxon1945individual} Wilcoxon, F. Individual comparisons by ranking methods. \emph{Biometrics Bull.} \textbf{1}, 80--83 (1945).
-\bibitem{spearman1904proof} Spearman, C. The proof and measurement of association between two things. \emph{Am. J. Psychol.} \textbf{15}, 72--101 (1904).
-\bibitem{villani2009optimal} Villani, C. \emph{Optimal Transport: Old and New}. Springer (2009).
-\bibitem{dunning2017jump} Dunning, I., Gupta, S. \& Silberholz, J. What works best when? A systematic evaluation of heuristics for Max-Cut and QUBO. \emph{INFORMS J. Comput.} \textbf{30}, 608--624 (2018).
-\bibitem{fiedler1973algebraic} Fiedler, M. Algebraic connectivity of graphs. \emph{Czechoslovak Math. J.} \textbf{23}, 298--305 (1973).
-\bibitem{ying2018hierarchical} Ying, Z. \emph{et al.} Hierarchical graph representation learning with differentiable pooling. In \emph{Advances in Neural Information Processing Systems} (2018).
-\bibitem{lakshminarayanan2017simple} Lakshminarayanan, B., Pritzel, A. \& Blundell, C. Simple and scalable predictive uncertainty estimation using deep ensembles. In \emph{Advances in Neural Information Processing Systems} (2017).
-\bibitem{guo2017calibration} Guo, C., Pleiss, G., Sun, Y. \& Weinberger, K. Q. On calibration of modern neural networks. In \emph{International Conference on Machine Learning} (2017).
-\bibitem{romano2019conformalized} Romano, Y., Patterson, E. \& Candes, E. Conformalized quantile regression. In \emph{Advances in Neural Information Processing Systems} (2019).
-\bibitem{guerreschi2019qaoa} Guerreschi, G. G. \& Matsuura, A. Y. QAOA for Max-Cut requires hundreds of qubits for quantum speed-up. \emph{Sci. Rep.} \textbf{9}, 6903 (2019).
-\bibitem{willsch2020benchmarking} Willsch, D., Willsch, M., De Raedt, H. \& Michielsen, K. Benchmarking the quantum approximate optimization algorithm. \emph{Quantum Inf. Process.} \textbf{19}, 197 (2020).
-\bibitem{larocca2022diagnosing} Larocca, M. \emph{et al.} Diagnosing barren plateaus with tools from quantum optimal control. \emph{Quantum} \textbf{6}, 824 (2022).
-\bibitem{sim2019expressibility} Sim, S., Johnson, P. D. \& Aspuru-Guzik, A. Expressibility and entangling capability of parameterized quantum circuits. \emph{Adv. Quantum Technol.} \textbf{2}, 1900070 (2019).
-\bibitem{preskill2018nisq} Preskill, J. Quantum computing in the NISQ era and beyond. \emph{Quantum} \textbf{2}, 79 (2018).
-\bibitem{bharti2022noisy} Bharti, K. \emph{et al.} Noisy intermediate-scale quantum algorithms. \emph{Rev. Mod. Phys.} \textbf{94}, 015004 (2022).
-\bibitem{biamonte2017quantum} Biamonte, J. \emph{et al.} Quantum machine learning. \emph{Nature} \textbf{549}, 195--202 (2017).
-\bibitem{bronstein2021geometric} Bronstein, M. M., Bruna, J., Cohen, T. \& Velickovic, P. Geometric deep learning: grids, groups, graphs, geodesics, and gauges. \emph{arXiv} https://arxiv.org/abs/2104.13478 (2021).
-\bibitem{fawzi2022discovering} Fawzi, A. \emph{et al.} Discovering faster matrix multiplication algorithms with reinforcement learning. \emph{Nature} \textbf{610}, 47--53 (2022).
-\bibitem{lucas2014ising} Lucas, A. Ising formulations of many NP problems. \emph{Front. Phys.} \textbf{2}, 5 (2014).
-\bibitem{harrigan2021quantum} Harrigan, M. P. \emph{et al.} Quantum approximate optimization of non-planar graph problems on a planar superconducting processor. \emph{Nat. Phys.} \textbf{17}, 332--336 (2021).
-\bibitem{kandala2017hardware} Kandala, A. \emph{et al.} Hardware-efficient variational quantum eigensolver for small molecules and quantum magnets. \emph{Nature} \textbf{549}, 242--246 (2017).
-\bibitem{schuld2021effect} Schuld, M., Sweke, R. \& Meyer, J. J. Effect of data encoding on the expressive power of variational quantum-machine-learning models. \emph{Phys. Rev. A} \textbf{103}, 032430 (2021).
-\bibitem{holmes2022connecting} Holmes, Z. \emph{et al.} Connecting ansatz expressibility to gradient magnitudes and barren plateaus. \emph{PRX Quantum} \textbf{3}, 010313 (2022).
-\bibitem{arrasmith2021effect} Arrasmith, A., Cerezo, M., Czarnik, P., Cincio, L. \& Coles, P. J. Effect of barren plateaus on gradient-free optimization. \emph{Quantum} \textbf{5}, 558 (2021).
-\bibitem{akshay2021reachability} Akshay, V., Rabinovich, D., Campos, E. \& Biamonte, J. Parameter concentrations in quantum approximate optimization. \emph{Phys. Rev. A} \textbf{104}, L010401 (2021).
-\bibitem{lotshaw2022empirical} Lotshaw, P. C. \emph{et al.} Empirical performance bounds for quantum approximate optimization. \emph{Quantum Inf. Process.} \textbf{21}, 302 (2022).
-\bibitem{shaydulin2023parameter} Shaydulin, R., Hadfield, S., Hogg, T. \& Safro, I. Classical symmetries and the quantum approximate optimization algorithm. \emph{Quantum Inf. Process.} \textbf{20}, 359 (2021).
-\bibitem{verdon2019quantum} Verdon, G. \emph{et al.} Quantum graph neural networks. \emph{arXiv} https://arxiv.org/abs/1909.12264 (2019).
-\bibitem{bengio2021machine} Bengio, Y., Lodi, A. \& Prouvost, A. Machine learning for combinatorial optimization: a methodological tour d'horizon. \emph{Eur. J. Oper. Res.} \textbf{290}, 405--421 (2021).
-\bibitem{frazier2018tutorial} Frazier, P. I. A tutorial on Bayesian optimization. \emph{arXiv} https://arxiv.org/abs/1807.02811 (2018).
-\bibitem{nocedal2006numerical} Nocedal, J. \& Wright, S. J. \emph{Numerical Optimization}. Springer (2006).
-\bibitem{conn2000trust} Conn, A. R., Gould, N. I. M. \& Toint, P. L. \emph{Trust Region Methods}. SIAM (2000).
-\bibitem{wainwright2019high} Wainwright, M. J. \emph{High-Dimensional Statistics: A Non-Asymptotic Viewpoint}. Cambridge University Press (2019).
-\bibitem{hadfield2019quantum} Hadfield, S. \emph{et al.} From the quantum approximate optimization algorithm to a quantum alternating operator ansatz. \emph{Algorithms} \textbf{12}, 34 (2019).
-\bibitem{farhi2016quantum} Farhi, E. \& Harrow, A. W. Quantum supremacy through the quantum approximate optimization algorithm. \emph{arXiv} https://arxiv.org/abs/1602.07674 (2016).
-\bibitem{khairy2020learning} Khairy, S., Shaydulin, R., Cincio, L., Alexeev, Y. \& Balaprakash, P. Learning to optimize variational quantum circuits to solve combinatorial problems. In \emph{Proceedings of the AAAI Conference on Artificial Intelligence} \textbf{34}, 2367--2375 (2020).
-\bibitem{verdon2019learning} Verdon, G. \emph{et al.} Learning to learn with quantum neural networks via classical neural networks. \emph{arXiv} https://arxiv.org/abs/1907.05415 (2019).
-\bibitem{galda2021transferability} Galda, A., Liu, X., Lykov, D., Alexeev, Y. \& Safro, I. Transferability of optimal QAOA parameters between random graphs. In \emph{IEEE International Conference on Quantum Computing and Engineering (QCE)} 171--180 (2021).
-\bibitem{sack2021quantum} Sack, S. H. \& Serbyn, M. Quantum annealing initialization of the quantum approximate optimization algorithm. \emph{Quantum} \textbf{5}, 491 (2021).
-\bibitem{cappart2023combinatorial} Cappart, Q. \emph{et al.} Combinatorial optimization and reasoning with graph neural networks. \emph{J. Mach. Learn. Res.} \textbf{24}, 1--61 (2023).
-\bibitem{gilmer2017neural} Gilmer, J., Schoenholz, S. S., Riley, P. F., Vinyals, O. \& Dahl, G. E. Neural message passing for quantum chemistry. In \emph{International Conference on Machine Learning} 1263--1272 (2017).
-\bibitem{lim2023sign} Lim, D. \emph{et al.} Sign and basis invariant networks for spectral graph representation learning. In \emph{International Conference on Learning Representations} (2023).
-\bibitem{snoek2012practical} Snoek, J., Larochelle, H. \& Adams, R. P. Practical Bayesian optimization of machine learning algorithms. In \emph{Advances in Neural Information Processing Systems} 2951--2959 (2012).
-\bibitem{shahriari2016taking} Shahriari, B., Swersky, K., Wang, Z., Adams, R. P. \& de Freitas, N. Taking the human out of the loop: a review of Bayesian optimization. \emph{Proc. IEEE} \textbf{104}, 148--175 (2016).
-\bibitem{bonet2023performance} Bonet-Monroig, X. \emph{et al.} Performance comparison of optimization methods on variational quantum algorithms. \emph{Phys. Rev. A} \textbf{107}, 032407 (2023).
-\bibitem{hoeffding1963probability} Hoeffding, W. Probability inequalities for sums of bounded random variables. \emph{J. Am. Stat. Assoc.} \textbf{58}, 13--30 (1963).
-\bibitem{boucheron2013concentration} Boucheron, S., Lugosi, G. \& Massart, P. \emph{Concentration Inequalities: A Nonasymptotic Theory of Independence}. Oxford University Press (2013).
-\bibitem{lehmann1998theory} Lehmann, E. L. \& Casella, G. \emph{Theory of Point Estimation}, 2nd ed. Springer (1998).
-\bibitem{tsybakov2009introduction} Tsybakov, A. B. \emph{Introduction to Nonparametric Estimation}. Springer (2009).
-\bibitem{srinivas2010gaussian} Srinivas, N., Krause, A., Kakade, S. M. \& Seeger, M. Gaussian process optimization in the bandit setting: no regret and experimental design. In \emph{International Conference on Machine Learning} 1015--1022 (2010).
-\bibitem{jain2022gnn} Jain, N., Coyle, B., Kashefi, E. \& Kumar, N. Graph neural network initialisation of quantum approximate optimisation. \emph{Quantum} \textbf{6}, 861 (2022).
-\bibitem{cheng2024darbo} Cheng, L., Chen, Y.-Q., Zhang, S.-X. \& Zhang, S. Quantum approximate optimization via learning-based adaptive optimization. \emph{Commun. Phys.} \textbf{7}, 83 (2024).
-\bibitem{meng2024diffusion} Meng, F., Zhou, X., Zhu, P. \& Luo, Y. Conditional diffusion-based parameter generation for quantum approximate optimization algorithm. \emph{EPJ Quantum Technol.} \textbf{12}, 100 (2025). doi:10.1140/epjqt/s40507-025-00397-4.
-\bibitem{amosy2022iterationfree} Amosy, O., Danzig, T., Lev, O., Porat, E., Chechik, G. \& Makmal, A. Iteration-free quantum approximate optimization algorithm using neural networks. \emph{Quantum Mach. Intell.} \textbf{6}, 38 (2024). doi:10.1007/s42484-024-00159-y.
-\bibitem{hao2024endtoend} Hao, T., He, Z., Shaydulin, R., Larson, J. \& Pistoia, M. End-to-end protocol for high-quality QAOA parameters with few shots. \emph{Phys. Rev. Research} \textbf{7}, 033179 (2025).
-\bibitem{shaydulin2023transfer} Shaydulin, R., Lotshaw, P. C., Larson, J., Ostrowski, J. \& Humble, T. S. Parameter transfer for quantum approximate optimization of weighted MaxCut. \emph{ACM Trans. Quantum Comput.} \textbf{4}, 19 (2023).
-\bibitem{kubler2020adaptive} K\"ubler, J. M., Arrasmith, A., Cincio, L. \& Coles, P. J. An adaptive optimizer for measurement-frugal variational algorithms. \emph{Quantum} \textbf{4}, 263 (2020).
-\bibitem{gu2021adaptive} Gu, A., Lowe, A., Dub, P. A., Coles, P. J. \& Arrasmith, A. Adaptive shot allocation for fast convergence in variational quantum algorithms. \emph{arXiv} https://arxiv.org/abs/2108.10434 (2021).
-\bibitem{sung2020models} Sung, K. J. \emph{et al.} Using models to improve optimizers for variational quantum algorithms. \emph{Quantum Sci. Technol.} \textbf{5}, 044008 (2020).
-\bibitem{liang2024graphlearning} Liang, Z. \emph{et al.} Graph learning for parameter prediction of quantum approximate optimization algorithm. In \emph{61st ACM/IEEE Design Automation Conference} 361:1--361:4 (2024). doi:10.1145/3649329.3663523.
-\bibitem{falla2024transferability} Falla, J., Langfitt, Q., Alexeev, Y. \& Safro, I. Graph representation learning for parameter transferability in quantum approximate optimization algorithm. \emph{Quantum Mach. Intell.} \textbf{6}, 46 (2024). doi:10.1007/s42484-024-00178-9.
-\bibitem{tibaldi2022bayesian} Tibaldi, S., Vodola, D., Tignone, E. \& Ercolessi, E. Bayesian optimization for QAOA. \emph{IEEE Trans. Quantum Eng.} \textbf{4}, 1--11 (2023). doi:10.1109/TQE.2023.3325167.
-\bibitem{jiang2025qseer} Jiang, L., Zhang, C. \& Chen, F. QSeer: a quantum-inspired graph neural network for parameter initialization in quantum approximate optimization algorithm circuits. \emph{arXiv} https://arxiv.org/abs/2505.06810 (2025).
-\bibitem{zheng2026neuralqaoa2} Zheng, Z., Wu, J. \& Liu, S. Neural QAOA$^2$: differentiable joint graph partitioning and parameter initialization for quantum combinatorial optimization. In \emph{International Conference on Machine Learning} (2026); \emph{arXiv} https://arxiv.org/abs/2605.13072.
-\bibitem{oleary2025online} O'Leary, T., Czarnik, P., Pelofske, E., Sornborger, A. T., McKerns, M. \& Cincio, L. Efficient online quantum circuit learning with no upfront training. \emph{Commun. Phys.} \textbf{8}, 514 (2025). doi:10.1038/s42005-025-02423-4.
+
+\bibitem{farhi2014qaoa}
+Farhi, E., Goldstone, J. \& Gutmann, S. A quantum approximate optimization
+algorithm. \emph{arXiv} https://arxiv.org/abs/1411.4028 (2014).
+
+\bibitem{hadfield2019alternating}
+Hadfield, S. \emph{et al.} From the quantum approximate optimization algorithm
+to a quantum alternating operator ansatz. \emph{Algorithms} \textbf{12}, 34
+(2019).
+
+\bibitem{zhou2020qaoa}
+Zhou, L., Wang, S.-T., Choi, S., Pichler, H. \& Lukin, M. D. Quantum
+approximate optimization algorithm: performance, mechanism, and implementation
+on near-term devices. \emph{Phys. Rev. X} \textbf{10}, 021067 (2020).
+
+\bibitem{cerezo2021variational}
+Cerezo, M. \emph{et al.} Variational quantum algorithms.
+\emph{Nat. Rev. Phys.} \textbf{3}, 625--644 (2021).
+
+\bibitem{bharti2022noisy}
+Bharti, K. \emph{et al.} Noisy intermediate-scale quantum algorithms.
+\emph{Rev. Mod. Phys.} \textbf{94}, 015004 (2022).
+
+\bibitem{brandao2018fixed}
+Brandao, F. G. S. L., Broughton, M., Farhi, E., Gutmann, S. \& Neven, H.
+For fixed control parameters the quantum approximate optimization algorithm's
+objective function value concentrates for typical instances. \emph{arXiv}
+https://arxiv.org/abs/1812.04170 (2018).
+
+\bibitem{akshay2021concentration}
+Akshay, V., Rabinovich, D., Campos, E. \& Biamonte, J. Parameter
+concentrations in quantum approximate optimization. \emph{Phys. Rev. A}
+\textbf{104}, L010401 (2021).
+
+\bibitem{egger2021warm}
+Egger, D. J., Marecek, J. \& Woerner, S. Warm-starting quantum optimization.
+\emph{Quantum} \textbf{5}, 479 (2021).
+
+\bibitem{jain2022gnn}
+Jain, N., Coyle, B., Kashefi, E. \& Kumar, N. Graph neural network
+initialisation of quantum approximate optimisation. \emph{Quantum} \textbf{6},
+861 (2022).
+
+\bibitem{jiang2025qseer}
+Jiang, L., Zhang, C. \& Chen, F. QSeer: a quantum-inspired graph neural
+network for parameter initialization in quantum approximate optimization
+algorithm circuits. \emph{arXiv} https://arxiv.org/abs/2505.06810 (2025).
+
+\bibitem{khairy2020learning}
+Khairy, S., Shaydulin, R., Cincio, L., Alexeev, Y. \& Balaprakash, P.
+Learning to optimize variational quantum circuits to solve combinatorial
+problems. In \emph{Proc. AAAI Conf. Artif. Intell.} \textbf{34}, 2367--2375
+(2020).
+
+\bibitem{nguyen2026meta}
+Nguyen, K. X. \& Safro, I. Graph-conditioned meta-optimizer for QAOA
+parameter generation on multiple problem classes. \emph{arXiv}
+https://arxiv.org/abs/2604.25275 (2026).
+
+\bibitem{huynh2026gctr}
+Huynh, M. Query-efficient quantum approximate optimization via
+graph-conditioned trust regions. \emph{arXiv:2604.24803v1}
+https://arxiv.org/abs/2604.24803v1 (2026).
+
+\bibitem{bonet2023performance}
+Bonet-Monroig, X. \emph{et al.} Performance comparison of optimization methods
+on variational quantum algorithms. \emph{Phys. Rev. A} \textbf{107}, 032407
+(2023).
+
+\bibitem{spall1992spsa}
+Spall, J. C. Multivariate stochastic approximation using a simultaneous
+perturbation gradient approximation. \emph{IEEE Trans. Autom. Control}
+\textbf{37}, 332--341 (1992).
+
+\bibitem{montanez2025ramp}
+Monta\~nez-Barrera, J. A. \& Michielsen, K. Toward a linear-ramp QAOA
+protocol: evidence of a scaling advantage in solving some combinatorial
+optimization problems. \emph{npj Quantum Inf.} \textbf{11}, 131 (2025).
+
+\bibitem{shaydulin2023weighted}
+Shaydulin, R., Lotshaw, P. C., Larson, J., Ostrowski, J. \& Humble, T. S.
+Parameter transfer for quantum approximate optimization of weighted MaxCut.
+\emph{ACM Trans. Quantum Comput.} \textbf{4}, 19 (2023).
+
+\bibitem{oleary2025online}
+O'Leary, T. \emph{et al.} Efficient online quantum circuit learning with no
+upfront training. \emph{Commun. Phys.} \textbf{8}, 514 (2025).
+
+\bibitem{xu2019gin}
+Xu, K., Hu, W., Leskovec, J. \& Jegelka, S. How powerful are graph neural
+networks? In \emph{International Conference on Learning Representations}
+(2019).
+
+\bibitem{rice1976selection}
+Rice, J. R. The algorithm selection problem. \emph{Adv. Comput.} \textbf{15},
+65--118 (1976).
+
+\bibitem{cawley2010overfitting}
+Cawley, G. C. \& Talbot, N. L. C. On over-fitting in model selection and
+subsequent selection bias in performance evaluation. \emph{J. Mach. Learn.
+Res.} \textbf{11}, 2079--2107 (2010).
+
+\bibitem{moussa2020quantum}
+Moussa, C., Calandra, H. \& Dunjko, V. To quantum or not to quantum:
+towards algorithm selection in near-term quantum optimization.
+\emph{Quantum Sci. Technol.} \textbf{5}, 044009 (2020).
+
+\bibitem{balcan2021generalization}
+Balcan, M.-F., Sandholm, T. \& Vitercik, E. Generalization in
+portfolio-based algorithm selection. In \emph{Proc. AAAI Conf. Artif.
+Intell.} \textbf{35}, 12225--12232 (2021).
+
+\bibitem{angelopoulos2021gentle}
+Angelopoulos, A. N. \& Bates, S. A gentle introduction to conformal prediction
+and distribution-free uncertainty quantification. \emph{arXiv}
+https://arxiv.org/abs/2107.07511 (2021).
+
+\bibitem{bao2025cap}
+Bao, Y., Huo, Y., Ren, H. \& Zou, C. CAP: a general algorithm for online
+selective conformal prediction with FCR control. \emph{J. Mach. Learn. Res.}
+\textbf{26}, 1--74 (2025).
+
+\bibitem{romano2019cqr}
+Romano, Y., Patterson, E. \& Cand\`es, E. J. Conformalized quantile
+regression. In \emph{Advances in Neural Information Processing Systems}
+\textbf{32} (2019).
+
+\bibitem{barber2022exchangeability}
+Barber, R. F., Cand\`es, E. J., Ramdas, A. \& Tibshirani, R. J. Conformal
+prediction beyond exchangeability. \emph{arXiv}
+https://arxiv.org/abs/2202.13415 (2022).
+
+\bibitem{erdos1959random}
+Erd\H{o}s, P. \& R\'enyi, A. On random graphs. \emph{Publ. Math. Debrecen}
+\textbf{6}, 290--297 (1959).
+
+\bibitem{barabasi1999emergence}
+Barab\'asi, A.-L. \& Albert, R. Emergence of scaling in random networks.
+\emph{Science} \textbf{286}, 509--512 (1999).
+
+\bibitem{watts1998collective}
+Watts, D. J. \& Strogatz, S. H. Collective dynamics of small-world networks.
+\emph{Nature} \textbf{393}, 440--442 (1998).
+
+\bibitem{hagberg2008networkx}
+Hagberg, A. A., Schult, D. A. \& Swart, P. J. Exploring network structure,
+dynamics, and function using NetworkX. In \emph{Proc. 7th Python in Science
+Conference}, 11--15 (2008).
+
+\bibitem{efron1993bootstrap}
+Efron, B. \& Tibshirani, R. J. \emph{An Introduction to the Bootstrap}
+(Chapman \& Hall/CRC, 1993).
+
+\bibitem{clopper1934fiducial}
+Clopper, C. J. \& Pearson, E. S. The use of confidence or fiducial limits
+illustrated in the case of the binomial. \emph{Biometrika} \textbf{26},
+404--413 (1934).
+
 \end{thebibliography}
 
 \end{document}

@@ -59,7 +59,16 @@ def _implementation_files() -> list[Path]:
     checkout and an installed wheel.
     """
     package_dir = Path(__file__).resolve().parent
-    return sorted(package_dir.rglob("*.py"),
+    # Portfolio-v1 is a separate prospective experiment and does not alter the
+    # frozen schema-2 manuscript generator/replot contract.  Excluding those
+    # additive modules preserves the meaning of the committed legacy manifest;
+    # the portfolio runner records its own broader implementation digest.
+    portfolio_only = {
+        "fixed_budget.py", "portfolio.py", "portfolio_experiment.py",
+        "protocol.py", "risk_control.py",
+    }
+    return sorted((path for path in package_dir.rglob("*.py")
+                   if path.name not in portfolio_only),
                   key=lambda path: path.relative_to(package_dir).as_posix())
 
 
