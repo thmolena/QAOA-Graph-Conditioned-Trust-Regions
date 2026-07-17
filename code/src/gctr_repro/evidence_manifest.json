@@ -17,8 +17,8 @@
       "size": 18022
     },
     "manuscript/artifact_reproduction_map.json": {
-      "sha256": "5291075fabb00c3e6f60800ceefc41fb67ac4f1290603099f6bf814719fcc076",
-      "size": 8409
+      "sha256": "0068b9ba12855c9a3fbc3e8bb3a03fcad4749109f6bf8606624301a5061a0476",
+      "size": 6900
     },
     "manuscript/figures/ExtendedData/ED_Fig2_ShotNoiseRobustness.pdf": {
       "sha256": "0162b25db721719c230f823dcbb8129612db97ad10fba539bc3a2cf3f9e94733",
@@ -421,6 +421,6 @@
       "size": 1927498
     }
   },
-  "manifest_sha256": "4bf28b18d13132cec028d7973ebefb6449462515cb0f6f678eec2cc06d630ebe",
+  "manifest_sha256": "52051e5ad146565352310c6f94018ce5b0b31390691646572ccc6bdd64afff93",
   "schema_version": 1
 }

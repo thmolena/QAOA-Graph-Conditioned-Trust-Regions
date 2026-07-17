@@ -66,14 +66,14 @@
     "manuscript/figures/Figure7_AnytimeByFamily.png": "e8a12116c48f582d7ba994e66d5ad86fcfec3e508e381bbdb7d3bd741f1168ee",
     "manuscript/figures/Figure8_FamilyEffects.pdf": "42e0e4d6241a66ee145cb0fc4182157cd130b37e1d6d5fb427f2d77a3a797f44",
     "manuscript/figures/Figure8_FamilyEffects.png": "03dcc4a3d10f8eb1acdc6b1e5920625f840b2cee0224e57255884fd0a2e82b49",
-    "manuscript/figures/Figure9_RiskSensitivity.pdf": "f9fe28892cb573fd4a3a4a8551135dcbb13a3d7ed59d8561f2daf146a048c13f",
-    "manuscript/figures/Figure9_RiskSensitivity.png": "8d248a0a160e6714bbaf9cf5e2d2713921930045c673536b2e2c1de2c65664b9",
-    "manuscript/tables/portfolio_numbers.tex": "a9f1e04c8bee78d477bfaa8a415498ff97022f8185345a8df50d0c49ef71e7c2",
+    "manuscript/figures/Figure9_RiskSensitivity.pdf": "fbbe57dfae6ecfd467613024b5523c9f52fee1183d6c8911fbbda9fea8cde99a",
+    "manuscript/figures/Figure9_RiskSensitivity.png": "b1c5bc1322458a1aaff058218cd52f99be9a9b5ce6e7ad574ad02ab14231deed",
+    "manuscript/tables/portfolio_numbers.tex": "0fa8fa8547bdecbbf442d3b956d3da0212d9c2708e1ee353da65f517ab1b4a3c",
     "manuscript/tables/table_confirmatory_gate.tex": "807d5ee0fd00b37844b9e91dae984f8cf2f8120b004c8565f03d505c2caa79ec",
-    "manuscript/tables/table_confirmatory_results.tex": "a56470a6516bbf885281f95b2e20e2060e3cb8b3d379261b230ef4c9d2e0fb48",
+    "manuscript/tables/table_confirmatory_results.tex": "0d39ffc186d590e9370b55aeaffa65c55a4e5170284d648bc2e161688f5d1f39",
     "manuscript/tables/table_portfolio_arms.tex": "639641f62cc227381be053a489a760a64872d4d46a81ee80464c7292717c682e",
     "manuscript/tables/table_portfolio_protocol.tex": "bba977786de0eeef19d4b7995ca2ea8b59d57a65597f14272b7d4b62f1cf035b",
     "manuscript/tables/table_resource_accounting.tex": "708bc4bf5080c4daff0a7e70d83233152d4ff3010ee090ad7057c6ce69ab895b"
   },
-  "manifest_sha256": "f5e0d65ff67c313162a3d9d389730755df0473cbeed410b0c637fc13c47932c5"
+  "manifest_sha256": "344e2452996ac2181f178abcc0b915459e23f1c3d41503ad6e865900ddde45f3"
 }

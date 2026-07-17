@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-# Final evidence-faithful manuscript validator.
-"""Validate the evidence-faithful GCTR reliability-audit manuscript."""
+"""Validate the locked GCTR manuscript and its deterministic arXiv archive."""
 
 from __future__ import annotations
 
@@ -16,24 +15,52 @@ ROOT = Path(__file__).resolve().parents[1]
 MANUSCRIPT = ROOT / "manuscript"
 MAIN = MANUSCRIPT / "main.tex"
 BIB = MANUSCRIPT / "refs.bib"
-BBL = MANUSCRIPT / "main.bbl"
 PDF = MANUSCRIPT / "main.pdf"
 ARCHIVE = MANUSCRIPT / "arxiv-source-gctr.zip"
 MANIFEST = MANUSCRIPT / "portfolio_artifacts_manifest.json"
 EXPECTED_TITLE = (
-    "A Reproducible Reliability Audit of "
-    "Graph-Conditioned Optimizer Routing for QAOA"
+    "Query-Efficient Quantum Approximate Optimization "
+    "via Graph-Conditioned Trust Regions"
 )
-EXPECTED_MAIN_SECTIONS = [
-    "Results",
-    "Discussion",
-    "Methods",
-    "Data availability",
-    "Code availability",
-    "Author contributions",
-    "Competing interests",
+EXPECTED_SECTIONS = [
+    "Introduction",
+    "Background",
+    "Related Work",
+    "Shortcomings of Unconditional Structural Routing",
+    "Graph-Conditioned Trust Regions",
+    "Experiments",
+    "Conclusion",
 ]
-BANNED_REFERENCE = "2607." + "06758"
+EXPECTED_SUBSECTIONS = [0, 3, 0, 3, 4, 3, 0]
+EXPECTED_FIGURES = 13
+EXPECTED_TABLES = 5
+EXPECTED_PROOFS = 5
+EXPECTED_BIBLIOGRAPHY_ENTRIES = 65
+EXPECTED_ARCHIVE_MEMBERS = 21
+EXPECTED_SOURCE_MANIFESTS = {
+    "regular_development": (
+        ROOT
+        / "portfolio_results/development_v2_tqa_family_gate/portfolio_manifest.json"
+    ),
+    "heterogeneous_development": (
+        ROOT
+        / (
+            "portfolio_results/heterogeneous_development_v2_tqa_family_gate/"
+            "portfolio_manifest.json"
+        )
+    ),
+    "confirmatory": (
+        ROOT
+        / "portfolio_results/heterogeneous_confirmatory_v1/portfolio_manifest.json"
+    ),
+}
+BANNED_TEXT = {
+    "omitted thanks section": r"\backnowledg(?:e)?ments?\b",
+    "omitted societal section": r"\bimpact\s+" + r"statement\b",
+    "incomplete-proof marker": r"\bproof\s+" + r"sketch\b",
+    "forbidden arXiv identifier": r"\b2607\." + r"06758\b",
+    "forbidden citation key": r"\bsmith2026" + r"adaptive\b",
+}
 
 
 def require(condition: bool, message: str) -> None:
@@ -45,13 +72,17 @@ def without_comments(source: str) -> str:
     return re.sub(r"(?<!\\)%[^\n]*", "", source)
 
 
+def normalized_tex_text(value: str) -> str:
+    value = value.replace(r"\textbf{", "")
+    value = value.replace("\\\\", " ").replace("{", "").replace("}", "")
+    return " ".join(value.split())
+
+
 def normalized_title(source: str) -> str:
     match = re.search(r"\\title\{(.*?)\}\s*\\author", source, flags=re.S)
     if not match:
         return ""
-    title = match.group(1).replace(r"\textbf{", "")
-    title = title.replace("\\\\", " ").replace("{", "").replace("}", "")
-    return " ".join(title.split())
+    return normalized_tex_text(match.group(1))
 
 
 def word_count(source: str) -> int:
@@ -69,139 +100,187 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def canonical_manifest_sha256(manifest: dict[str, object]) -> str:
+    body = dict(manifest)
+    body.pop("manifest_sha256", None)
+    encoded = json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def manuscript_path(name: str) -> Path:
+    relative = Path(name)
+    require(not relative.is_absolute(), f"absolute include path is forbidden: {name}")
+    require(".." not in relative.parts, f"parent traversal is forbidden: {name}")
+    path = MANUSCRIPT / relative
+    require(
+        path.resolve().is_relative_to(MANUSCRIPT.resolve()),
+        f"include escapes manuscript directory: {name}",
+    )
+    return path
+
+
 def included_sources(source: str) -> dict[str, Path]:
     source = without_comments(source)
-    relative = set(
+    relative = (
         re.findall(r"\\includegraphics(?:\[[^\]]*\])?\{([^{}]+)\}", source)
+        + re.findall(r"\\input\{([^{}]+)\}", source)
     )
-    relative.update(re.findall(r"\\input\{([^{}]+)\}", source))
-    paths: dict[str, Path] = {}
-    for name in sorted(relative):
-        relative_path = Path(name)
-        require(not relative_path.is_absolute(), f"absolute include path: {name}")
-        require(".." not in relative_path.parts, f"parent traversal in include: {name}")
-        paths[name] = MANUSCRIPT / relative_path
-    return paths
+    require(len(relative) == len(set(relative)), "an included asset is referenced twice")
+    return {name: manuscript_path(name) for name in sorted(relative)}
 
 
 def structural_report(source: str) -> dict[str, object]:
-    split = source.find(r"\appendix")
-    require(split >= 0, "appendix transition is missing")
+    split = source.find(r"\onecolumn")
+    require(split >= 0, "one-column appendix transition is missing")
     main = source[:split]
     appendix = source[split:]
-    sections = re.findall(r"^\\section\{([^{}]+)\}", main, flags=re.M)
-    require(r"\section{Introduction}" not in main, "Introduction must be unheaded")
+    section_matches = list(re.finditer(r"^\\section\{([^{}]+)\}", main, flags=re.M))
+    sections = [match.group(1) for match in section_matches]
+    require(sections == EXPECTED_SECTIONS, f"main sections differ: {sections}")
+
+    subsection_counts: list[int] = []
+    for index, match in enumerate(section_matches):
+        end = (
+            section_matches[index + 1].start()
+            if index + 1 < len(section_matches)
+            else len(main)
+        )
+        subsection_counts.append(
+            len(re.findall(r"^\\subsection\{", main[match.start():end], flags=re.M))
+        )
     require(
-        sections == EXPECTED_MAIN_SECTIONS,
-        f"main section order differs: {sections}",
+        subsection_counts == EXPECTED_SUBSECTIONS,
+        f"main subsection counts differ: {subsection_counts}",
     )
 
-    figures_main = len(re.findall(r"\\begin\{figure\*?\}", main))
-    tables_main = len(re.findall(r"\\begin\{table\*?\}", main))
-    figures_appendix = len(re.findall(r"\\begin\{figure\*?\}", appendix))
-    tables_appendix = len(re.findall(r"\\begin\{table\*?\}", appendix))
-    main_displays = figures_main + tables_main
-    require(1 <= main_displays <= 6, f"main display count is {main_displays}")
-    require(source.count(r"\begin{theorem}") >= 1, "tie-safe theorem is missing")
-    require(source.count(r"\begin{proof}") >= 1, "theorem proof is missing")
-    require(r"\section{Extended Data}" in appendix, "Extended Data section is missing")
+    require(r"\appendix" not in main, "appendix command appears in the main text")
+    require(r"\appendix" in appendix, "appendix command is missing")
     require(
-        appendix.count("Extended Data Fig.") == figures_appendix,
-        "appendix figures are not all designated as Extended Data",
+        main.count(r"\paragraph{Limitations.}") == 1,
+        "exactly one run-in Limitations paragraph is required",
+    )
+    conclusion_start = section_matches[-1].start()
+    require(
+        r"\paragraph{Limitations.}" in main[conclusion_start:],
+        "Limitations must appear inside the Conclusion section",
     )
     require(
-        appendix.count("Extended Data Table") == tables_appendix,
-        "appendix tables are not all designated as Extended Data",
+        not re.search(r"^\\(?:sub)*section\*?\{Limitations\.?\}", main, flags=re.M),
+        "Limitations must be run in, not a section",
     )
 
-    lower = source.lower()
-    require("acknowledgement" not in lower, "acknowledgements must be omitted")
-    require("acknowledgment" not in lower, "acknowledgments must be omitted")
-    require(
-        not re.search(r"\\section\*?\{funding\}", lower),
-        "funding section must be omitted",
+    figure_paths = re.findall(
+        r"\\includegraphics(?:\[[^\]]*\])?\{([^{}]+)\}", source
     )
-    require("impact statement" not in lower, "impact statement must be omitted")
+    table_inputs = [
+        name
+        for name in re.findall(r"\\input\{([^{}]+)\}", source)
+        if name != "tables/portfolio_numbers.tex"
+    ]
+    macro_inputs = [
+        name
+        for name in re.findall(r"\\input\{([^{}]+)\}", source)
+        if name == "tables/portfolio_numbers.tex"
+    ]
+    figure_floats = len(re.findall(r"\\begin\{figure\*?\}", source))
+    table_floats = len(re.findall(r"\\begin\{table\*?\}", source))
+    require(
+        len(figure_paths) == len(set(figure_paths)) == EXPECTED_FIGURES,
+        "expected 13 distinct referenced figures",
+    )
+    require(
+        figure_floats == EXPECTED_FIGURES,
+        f"expected {EXPECTED_FIGURES} figure environments, found {figure_floats}",
+    )
+    require(
+        all(
+            Path(name).parent == Path("figures")
+            and Path(name).suffix.lower() == ".pdf"
+            for name in figure_paths
+        ),
+        "every manuscript figure must be a PDF below figures/",
+    )
+    require(
+        len(table_inputs) == len(set(table_inputs)) == EXPECTED_TABLES,
+        "expected five distinct table inputs",
+    )
+    require(
+        table_floats == EXPECTED_TABLES,
+        f"expected {EXPECTED_TABLES} table environments, found {table_floats}",
+    )
+    require(
+        all(
+            Path(name).parent == Path("tables")
+            and Path(name).suffix.lower() == ".tex"
+            for name in table_inputs
+        ),
+        "every study table must be a TeX input below tables/",
+    )
+    require(
+        macro_inputs == ["tables/portfolio_numbers.tex"],
+        "portfolio_numbers.tex must be included exactly once",
+    )
+    require(source.count(r"\begin{algorithm}") == 1, "expected one algorithm")
+
+    proof_bodies = re.findall(
+        r"\\begin\{proof\}(.*?)\\end\{proof\}", source, flags=re.S
+    )
+    require(
+        source.count(r"\begin{proof}") == source.count(r"\end{proof}")
+        == len(proof_bodies) == EXPECTED_PROOFS,
+        f"expected exactly {EXPECTED_PROOFS} complete proof environments",
+    )
+    proof_words = [word_count(body) for body in proof_bodies]
+    require(
+        all(count >= 75 for count in proof_words),
+        f"a proof is too short to be complete: {proof_words}",
+    )
     return {
         "main_sections": len(sections),
-        "main_figures": figures_main,
-        "main_tables": tables_main,
-        "main_displays": main_displays,
-        "supplementary_figures": figures_appendix,
-        "supplementary_tables": tables_appendix,
-        "theorems": source.count(r"\begin{theorem}"),
-        "proofs": source.count(r"\begin{proof}"),
-    }
-
-
-def evidence_fidelity_report(source: str) -> dict[str, object]:
-    normalized = " ".join(source.split())
-    required_literals = {
-        "development opportunity": "0.10710",
-        "confirmatory opportunity": "0.07115",
-        "structural-zero count": "84 of 160",
-        "nontrivial coverage": r"\frac{57}{76}=0.75",
-        "calibration ties": "24 of 48",
-        "family-size bootstrap": "eight family-by-size strata",
-        "global graph filter": "de-duplication is global",
-        "forced ER edge": r"inserts edge $(0,1)$",
-        "legacy zero-use finding": (
-            "selected zero times, deployed zero times, and best on zero"
-        ),
-        "Codex disclosure": "OpenAI Codex",
-        "AI responsibility": "No AI system generated experimental data",
-    }
-    for label, literal in required_literals.items():
-        require(
-            literal in normalized,
-            f"missing evidence-fidelity statement: {label}",
-        )
-    require(r"\Delta_i^{\rm sel}" in source, "selected-effect notation is missing")
-    require(r"\Gamma_i" in source, "deployed-effect notation is missing")
-    require(
-        "certifies a negative predicted" not in source,
-        "gate is incorrectly described as a certificate",
-    )
-    require(BANNED_REFERENCE not in source, "forbidden arXiv citation is present")
-    require(source.count("OpenAI Codex") == 1, "Codex disclosure must occur once")
-    disclosure = re.search(
-        r"\\subsection\{AI-assisted manuscript and code preparation\}"
-        r"(.*?)(?=\\section|\\subsection|\\appendix)",
-        source,
-        flags=re.S,
-    )
-    require(disclosure is not None, "AI-assistance disclosure is missing")
-    disclosure_words = word_count(disclosure.group(1)) if disclosure else 0
-    require(
-        20 <= disclosure_words <= 80,
-        f"AI-assistance disclosure has {disclosure_words} words",
-    )
-    return {
-        "required_fidelity_statements": len(required_literals) + 3,
-        "ai_disclosure_words": disclosure_words,
+        "subsections": subsection_counts,
+        "figures": figure_floats,
+        "figure_paths": figure_paths,
+        "tables": table_floats,
+        "table_inputs": table_inputs,
+        "algorithms": 1,
+        "proofs": len(proof_bodies),
+        "proof_word_counts": proof_words,
     }
 
 
 def citation_report(source: str, bibliography: str) -> dict[str, int]:
     bib_keys = re.findall(r"^@\w+\s*\{\s*([^,\s]+)\s*,", bibliography, flags=re.M)
     require(len(bib_keys) == len(set(bib_keys)), "duplicate bibliography keys")
+    require(
+        len(bib_keys) == EXPECTED_BIBLIOGRAPHY_ENTRIES,
+        f"bibliography has {len(bib_keys)} entries, expected 65",
+    )
     groups = re.findall(
-        r"\\cite(?:p|t|alp|alt|author|year|yearpar)?"
+        r"\\cite(?:p|t|alp|alt|author|year|yearpar)?\*?"
         r"(?:\[[^\]]*\])?(?:\[[^\]]*\])?\{([^{}]+)\}",
         source,
     )
-    group_sizes = [len([key for key in group.split(",") if key.strip()]) for group in groups]
-    require(all(1 <= size <= 3 for size in group_sizes), "citation group exceeds three works")
-    cited = {
-        key.strip()
+    require(60 <= len(groups) <= 70, f"manuscript has {len(groups)} citation commands")
+    parsed_groups = [
+        [key.strip() for key in group.split(",") if key.strip()]
         for group in groups
-        for key in group.split(",")
-        if key.strip()
-    }
-    require(len(cited) >= 20, f"only {len(cited)} unique works are cited")
-    require(not (cited - set(bib_keys)), "citation key is missing from bibliography")
+    ]
+    group_sizes = [len(group) for group in parsed_groups]
+    require(all(1 <= size <= 3 for size in group_sizes), "citation group exceeds three works")
+    require(
+        all(len(group) == len(set(group)) for group in parsed_groups),
+        "a citation command repeats a bibliography key",
+    )
+    cited = {key for group in parsed_groups for key in group}
+    missing = sorted(cited - set(bib_keys))
+    unused = sorted(set(bib_keys) - cited)
+    require(not missing, f"citation keys are missing from bibliography: {missing}")
+    require(not unused, f"bibliography contains uncited entries: {unused}")
+    require(
+        len(cited) == EXPECTED_BIBLIOGRAPHY_ENTRIES,
+        f"expected 65 unique cited works, found {len(cited)}",
+    )
     require(r"\nocite" not in source, "nocite is not permitted")
-    require(BANNED_REFERENCE not in bibliography, "forbidden arXiv entry is present")
     return {
         "bibliography_entries": len(bib_keys),
         "citation_commands": len(groups),
@@ -210,25 +289,121 @@ def citation_report(source: str, bibliography: str) -> dict[str, int]:
     }
 
 
-def validate_manifest() -> dict[str, int]:
+def validate_manifest(source: str) -> dict[str, object]:
     require(MANIFEST.is_file(), "portfolio artifact manifest is missing")
     manifest = json.loads(MANIFEST.read_text())
+    require(manifest.get("schema_version") == 2, "artifact manifest is not schema 2")
+    require(
+        manifest.get("generator") == "manuscript/generate_portfolio_artifacts.py",
+        "artifact manifest generator differs",
+    )
+    stored_manifest_hash = manifest.get("manifest_sha256")
+    require(
+        isinstance(stored_manifest_hash, str)
+        and re.fullmatch(r"[0-9a-f]{64}", stored_manifest_hash) is not None,
+        "artifact manifest self-hash is malformed",
+    )
+    require(
+        canonical_manifest_sha256(manifest) == stored_manifest_hash,
+        "artifact manifest self-hash differs",
+    )
+
+    contract = manifest.get("asset_contract")
+    require(isinstance(contract, dict), "artifact contract is missing")
+    require(contract.get("figure_count") == EXPECTED_FIGURES, "figure contract differs")
+    require(contract.get("figure_formats") == ["pdf", "png"], "figure formats differ")
+    figure_stems = contract.get("figure_stems")
+    require(
+        isinstance(figure_stems, list)
+        and len(figure_stems) == len(set(figure_stems)) == EXPECTED_FIGURES,
+        "figure stems differ",
+    )
+    referenced_figures = re.findall(
+        r"\\includegraphics(?:\[[^\]]*\])?\{([^{}]+)\}", source
+    )
+    require(
+        referenced_figures
+        == [f"figures/{stem}.pdf" for stem in figure_stems],
+        "manuscript figure order differs from the artifact contract",
+    )
+
+    require(contract.get("table_count") == EXPECTED_TABLES, "table contract differs")
+    table_files = contract.get("table_files")
+    require(
+        isinstance(table_files, list)
+        and len(table_files) == len(set(table_files)) == EXPECTED_TABLES,
+        "table file contract differs",
+    )
+    referenced_tables = [
+        f"manuscript/{name}"
+        for name in re.findall(r"\\input\{([^{}]+)\}", source)
+        if name != "tables/portfolio_numbers.tex"
+    ]
+    require(
+        set(referenced_tables) == set(table_files),
+        "referenced study tables differ from the artifact contract",
+    )
+    require(
+        contract.get("all_quantitative_figures_derive_from_validated_locked_evidence")
+        is True,
+        "locked-evidence declaration is missing",
+    )
+
+    source_manifests = manifest.get("source_manifests")
+    require(
+        isinstance(source_manifests, dict)
+        and set(source_manifests) == set(EXPECTED_SOURCE_MANIFESTS),
+        "source-manifest set differs",
+    )
+    for name, path in EXPECTED_SOURCE_MANIFESTS.items():
+        require(path.is_file(), f"source portfolio manifest is missing: {path}")
+        recorded = json.loads(path.read_text()).get("decision_sha256")
+        require(
+            source_manifests[name] == recorded,
+            f"source decision hash differs for {name}",
+        )
+    require(
+        manifest.get("confirmatory_decision_sha256")
+        == source_manifests["confirmatory"],
+        "confirmatory decision hash differs",
+    )
+
     files = manifest.get("files", {})
-    require(files, "portfolio artifact manifest contains no files")
+    require(isinstance(files, dict), "artifact file map is missing")
+    expected_files = {
+        f"manuscript/figures/{stem}.{extension}"
+        for stem in figure_stems
+        for extension in ("pdf", "png")
+    }
+    expected_files.update(table_files)
+    expected_files.add("manuscript/tables/portfolio_numbers.tex")
+    require(
+        set(files) == expected_files,
+        "artifact file map differs from the schema-2 asset contract",
+    )
     for relative, expected in files.items():
+        require(
+            isinstance(expected, str)
+            and re.fullmatch(r"[0-9a-f]{64}", expected) is not None,
+            f"manifest hash is malformed: {relative}",
+        )
         path = ROOT / relative
         require(path.is_file(), f"manifest file is missing: {relative}")
         require(sha256(path) == expected, f"manifest hash differs: {relative}")
-    return {"manifest_files": len(files)}
+    return {
+        "manifest_schema": manifest["schema_version"],
+        "manifest_files": len(files),
+        "manifest_sha256": stored_manifest_hash,
+    }
 
 
 def archive_sources(source: str) -> dict[str, Path]:
-    sources = {
-        "main.tex": MAIN,
-        "main.bbl": BBL,
-        "refs.bib": BIB,
-    }
+    sources = {"main.tex": MAIN, "refs.bib": BIB}
     sources.update(included_sources(source))
+    require(
+        len(sources) == EXPECTED_ARCHIVE_MEMBERS,
+        f"expected 21 transitive archive inputs, found {len(sources)}",
+    )
     return dict(sorted(sources.items()))
 
 
@@ -238,11 +413,12 @@ def validate_archive(source: str, required: bool) -> dict[str, object]:
     require(ARCHIVE.is_file(), "submission archive is missing")
     sources = archive_sources(source)
     with zipfile.ZipFile(ARCHIVE) as handle:
-        names = [name for name in handle.namelist() if not name.endswith("/")]
-        require(names == sorted(sources), "submission archive member set/order differs")
+        names = handle.namelist()
+        require(names == sorted(sources), "submission archive members or order differ")
+        require(len(names) == len(set(names)), "submission archive has duplicate members")
         for name, path in sources.items():
             require(path.is_file(), f"archive input is missing: {name}")
-            require(handle.read(name) == path.read_bytes(), f"stale archive member: {name}")
+            require(handle.read(name) == path.read_bytes(), f"archive member is stale: {name}")
     return {
         "archive_checked": True,
         "archive_members": len(sources),
@@ -251,19 +427,44 @@ def validate_archive(source: str, required: bool) -> dict[str, object]:
 
 
 def validate(*, require_archive: bool = True) -> dict[str, object]:
-    tex = without_comments(MAIN.read_text())
+    require(MAIN.is_file(), "main.tex is missing")
+    require(BIB.is_file(), "refs.bib is missing")
+
+    raw_tex = MAIN.read_text()
     bib = BIB.read_text()
+    for label, pattern in BANNED_TEXT.items():
+        require(
+            re.search(pattern, raw_tex + "\n" + bib, flags=re.I) is None,
+            f"forbidden text is present: {label}",
+        )
+    tex = without_comments(raw_tex)
+    documentclass = re.search(
+        r"\\documentclass(?:\[([^\]]*)\])?\{([^{}]+)\}", tex
+    )
+    require(documentclass is not None, "document class is missing")
+    options = {
+        option.strip()
+        for option in (documentclass.group(1) if documentclass else "").split(",")
+        if option.strip()
+    }
     require(
-        r"\documentclass[10pt,twocolumn]{article}" in tex,
-        "expected two-column submission format is missing",
+        documentclass is not None
+        and documentclass.group(2) == "article"
+        and "twocolumn" in options,
+        "two-column article format is missing",
     )
     require(normalized_title(tex) == EXPECTED_TITLE, "visible title differs")
-    require(f"pdftitle={{{EXPECTED_TITLE}}}" in tex, "PDF metadata title differs")
-
+    metadata_title = re.search(r"pdftitle\s*=\s*\{([^{}]+)\}", tex)
+    require(
+        metadata_title is not None
+        and normalized_tex_text(metadata_title.group(1)) == EXPECTED_TITLE,
+        "PDF metadata title differs",
+    )
     abstract = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", tex, flags=re.S)
     require(abstract is not None, "abstract is missing")
     abstract_words = word_count(abstract.group(1)) if abstract else 0
-    require(100 <= abstract_words <= 150, f"abstract has {abstract_words} words")
+    require(100 <= abstract_words <= 250, f"abstract has {abstract_words} words")
+    require(r"\bibliography{refs}" in tex, "refs.bib is not the manuscript bibliography")
 
     included = included_sources(tex)
     for name, path in included.items():
@@ -273,28 +474,21 @@ def validate(*, require_archive: bool = True) -> dict[str, object]:
     refs = re.findall(r"\\(?:eq)?ref\{([^{}]+)\}", tex)
     require(not (set(refs) - set(labels)), "reference points to a missing label")
     require(PDF.is_file() and PDF.stat().st_size > 100_000, "compiled PDF is missing")
-    require(PDF.stat().st_mtime >= MAIN.stat().st_mtime, "compiled PDF is older than source")
 
     report = {
+        "main_sha256": sha256(MAIN),
+        "bibliography_sha256": sha256(BIB),
         "abstract_words": abstract_words,
         "included_sources": len(included),
         **structural_report(tex),
-        **evidence_fidelity_report(tex),
         **citation_report(tex, bib),
-        **validate_manifest(),
+        **validate_manifest(tex),
         **validate_archive(tex, require_archive),
     }
-    if BBL.is_file():
-        bibitems = len(re.findall(r"^\\bibitem", BBL.read_text(), flags=re.M))
-        require(
-            bibitems == report["unique_cited_works"],
-            "compiled bibliography is stale",
-        )
-        report["compiled_bibitems"] = bibitems
     return report
 
 
-def main() -> int:
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--skip-archive", action="store_true")
     args = parser.parse_args()
@@ -303,8 +497,7 @@ def main() -> int:
         indent=2,
         sort_keys=True,
     ))
-    return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

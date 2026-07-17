@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Final evidence-faithful manuscript artifact generator.
 """Generate the portfolio manuscript figures, tables and numerical macros.
 
 The script reads only the validated, locked portfolio evidence.  It performs
@@ -928,8 +927,6 @@ def make_family_effects_figure(evidence: dict) -> list[Path]:
 def make_risk_sensitivity_figure(evidence: dict) -> list[Path]:
     item = evidence["confirmatory"]
     risk = summarize_locked_audit(item["summary"])
-    calibration = _routing_diagnostics(item, "calibration")
-    audit_diagnostics = _routing_diagnostics(item, "audit")
     names = (
         "coverage failure",
         "joint harm",
@@ -966,49 +963,37 @@ def make_risk_sensitivity_figure(evidence: dict) -> list[Path]:
         loc="left", weight="bold")
     axes[0].legend(frameon=False, fontsize=6.7)
 
-    coverage_parts = []
-    for diagnostics in (calibration, audit_diagnostics):
-        structural = diagnostics["selected_arms"] == diagnostics["fallback_arms"]
-        covered = diagnostics["covered"]
-        coverage_parts.append((
-            int((structural & covered).sum()),
-            int((~structural & covered).sum()),
-            int((~structural & ~covered).sum()),
-        ))
-    labels = ["calibration\n(n=48)", "audit\n(n=160)"]
-    structural = np.asarray([row[0] for row in coverage_parts])
-    nontrivial_covered = np.asarray([row[1] for row in coverage_parts])
-    nontrivial_uncovered = np.asarray([row[2] for row in coverage_parts])
-    x2 = np.arange(2)
+    audit = item["summary"]["splits"]["audit"]
+    covered = int(round(
+        audit["empirical_one_sided_coverage"] * audit["n_graphs"]))
+    counts = [covered, audit["n_graphs"] - covered]
     axes[1].bar(
-        x2, structural, color=COLORS["gray"], width=0.58,
-        label=r"structural covered ($s=b$)")
-    axes[1].bar(
-        x2, nontrivial_covered, bottom=structural,
-        color=COLORS["green"], width=0.58,
-        label="covered nontrivial")
-    axes[1].bar(
-        x2, nontrivial_uncovered,
-        bottom=structural + nontrivial_covered,
-        color=COLORS["red"], width=0.58,
-        label="uncovered nontrivial")
-    for xpos, parts in enumerate(coverage_parts):
-        structural_count, covered_count, uncovered_count = parts
-        nontrivial_count = covered_count + uncovered_count
+        ["covered", "not covered"], counts,
+        color=[COLORS["green"], COLORS["red"]], width=0.58)
+    axes[1].axhline(
+        0.90 * audit["n_graphs"], color=COLORS["red"],
+        linestyle="--", lw=1.0, label="0.90 point requirement")
+    for xpos, value in enumerate(counts):
         axes[1].text(
-            xpos, sum(parts) + 4,
-            f"pooled covered {structural_count + covered_count}/{sum(parts)}\n"
-            f"nontrivial {covered_count}/{nontrivial_count}",
-            ha="center", va="bottom", fontsize=7.0, weight="bold")
-    axes[1].set_xticks(x2, labels)
-    axes[1].set_ylim(0, 185)
-    axes[1].set_ylabel("number of graphs")
+            xpos, value + 3, f"{value}/{audit['n_graphs']}",
+            ha="center", fontsize=8, weight="bold")
+    axes[1].set_ylim(0, audit["n_graphs"] * 1.05)
+    axes[1].set_ylabel("audit graphs")
     axes[1].set_title(
-        "b  Structural zeros dominate pooled coverage",
+        "b  Frozen point gate and model sensitivity",
         loc="left", weight="bold")
-    axes[1].legend(frameon=False, loc="upper left", fontsize=6.5)
+    axes[1].text(
+        0.04, 0.55,
+        "Binomial lower-tail probability\n"
+        f"at p=0.90: {risk['coverage_lower_tail_probability_at_nominal']:.3f}\n"
+        "diagnostic only; not a certificate",
+        transform=axes[1].transAxes, fontsize=7.2,
+        bbox={"boxstyle": "round,pad=0.3", "fc": "white",
+              "ec": COLORS["gray"]},
+    )
+    axes[1].legend(frameon=False, loc="upper right", fontsize=6.8)
     fig.suptitle(
-        "Marginal, selective, and conditional risks are not interchangeable",
+        "Observed rates and confidence bounds answer different questions",
         x=0.01, ha="left", fontsize=11.5, weight="bold")
     return save_figure(fig, "Figure9_RiskSensitivity")
 
@@ -1373,7 +1358,7 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
     table_results.write_text(
         "\\begin{tabular}{@{}lrrrrrr@{}}\n"
         "\\toprule\n"
-        "Stratum & $N$ & Fallback & Gated & $\\Gamma$ & Accepted & Harms \\\\\n"
+        "Stratum & $N$ & Fallback & Gated & $\\Delta$ & Accepted & Harms \\\\\n"
         "\\midrule\n"
         + "\n".join(rows)
         + "\n\\midrule\n"
@@ -1472,28 +1457,9 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
     macros = TABLES / "portfolio_numbers.tex"
     ci = audit["family_control_delta_bootstrap_95_interval"]
     dev = evidence["heterogeneous_development"]["summary"]["splits"]["audit"]
-    confirm_diagnostics = _routing_diagnostics(item, "audit")
-    calibration_diagnostics = _routing_diagnostics(item, "calibration")
-    confirm_structural = (
-        confirm_diagnostics["selected_arms"]
-        == confirm_diagnostics["fallback_arms"]
-    )
-    calibration_structural = (
-        calibration_diagnostics["selected_arms"]
-        == calibration_diagnostics["fallback_arms"]
-    )
-    confirm_nontrivial_covered = int((
-        ~confirm_structural & confirm_diagnostics["covered"]
-    ).sum())
-    legacy_index = confirm_diagnostics["arms"].index("legacy_gctr")
-    audit_winners = np.argmin(confirm_diagnostics["utilities"], axis=1)
     macro_values = {
         "ConfirmN": str(audit["n_graphs"]),
         "ConfirmGlobalAURC": f"{audit['baseline_mean_aurc']:.5f}",
-        "ConfirmUngatedAURC": f"{audit['ungated_selector_mean_aurc']:.5f}",
-        "ConfirmUngatedDelta": (
-            f"{audit['ungated_selector_mean_aurc'] - audit['family_label_control_mean_aurc']:.6f}"
-        ),
         "ConfirmGatedAURC": f"{audit['gated_selector_mean_aurc']:.5f}",
         "ConfirmFamilyAURC": f"{audit['family_label_control_mean_aurc']:.5f}",
         "ConfirmOracleAURC": f"{audit['oracle_mean_aurc']:.5f}",
@@ -1507,19 +1473,7 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
         "ConfirmCoverage": f"{audit['empirical_one_sided_coverage']:.5f}",
         "ConfirmNominal": f"{1.0-config['selector']['alpha']:.2f}",
         "ConfirmAcceptedRate": f"{audit['accepted_rate']:.3f}",
-        "ConfirmOpportunity": f"{audit['portfolio_opportunity_fraction']:.5f}",
-        "DevOpportunity": f"{dev['portfolio_opportunity_fraction']:.5f}",
-        "CalibrationStructuralZeros": str(int(calibration_structural.sum())),
-        "ConfirmStructuralZeros": str(int(confirm_structural.sum())),
-        "ConfirmNontrivialCount": str(int((~confirm_structural).sum())),
-        "ConfirmNontrivialCovered": str(confirm_nontrivial_covered),
-        "ConfirmAcceptedKNN": str(int((
-            confirm_diagnostics["accepted"]
-            & (confirm_diagnostics["deployed_arms"] == "knn")
-        ).sum())),
-        "LegacySelected": str(audit["selected_arm_counts"]["legacy_gctr"]),
-        "LegacyDeployed": str(audit["deployed_arm_counts"]["legacy_gctr"]),
-        "LegacyWins": str(int((audit_winners == legacy_index).sum())),
+        "ConfirmOpportunity": f"{audit['portfolio_opportunity_fraction']:.3f}",
         "ConfirmBAdelta": f"{audit['per_family']['ba']['mean_delta_gated_minus_family_control']:+.6f}",
         "ConfirmRRdelta": f"{audit['per_family']['rr']['mean_delta_gated_minus_family_control']:+.6f}",
         "ConfirmWSdelta": f"{audit['per_family']['ws']['mean_delta_gated_minus_family_control']:+.6f}",

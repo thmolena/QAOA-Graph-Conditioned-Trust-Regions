@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-# Final deterministic arXiv source builder.
-"""Build and verify a deterministic, dependency-closed arXiv source archive."""
+"""Build the deterministic 21-member GCTR arXiv source archive."""
 
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 import sys
 import zipfile
@@ -25,18 +25,21 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def archive_inputs() -> dict[str, Path]:
+def archive_inputs() -> list[Path]:
     source = validate_manuscript.without_comments(
         (MANUSCRIPT / "main.tex").read_text()
     )
-    paths = validate_manuscript.archive_sources(source)
-    missing = [name for name, path in paths.items() if not path.is_file()]
+    sources = validate_manuscript.archive_sources(source)
+    paths = [sources[name] for name in sorted(sources)]
+    missing = [
+        str(path.relative_to(MANUSCRIPT)) for path in paths if not path.is_file()
+    ]
     if missing:
         raise FileNotFoundError(f"archive inputs are missing: {missing}")
-    return dict(sorted(paths.items()))
+    return paths
 
 
-def write_archive(paths: dict[str, Path]) -> None:
+def write_archive(paths: list[Path]) -> None:
     temporary = OUTPUT.with_suffix(".zip.tmp")
     if temporary.exists():
         temporary.unlink()
@@ -46,7 +49,8 @@ def write_archive(paths: dict[str, Path]) -> None:
         compression=zipfile.ZIP_DEFLATED,
         compresslevel=9,
     ) as archive:
-        for relative, path in paths.items():
+        for path in paths:
+            relative = path.relative_to(MANUSCRIPT).as_posix()
             info = zipfile.ZipInfo(relative, FIXED_TIMESTAMP)
             info.compress_type = zipfile.ZIP_DEFLATED
             info.create_system = 3
@@ -55,34 +59,30 @@ def write_archive(paths: dict[str, Path]) -> None:
     temporary.replace(OUTPUT)
 
 
-def verify_archive(paths: dict[str, Path]) -> None:
-    expected = list(paths)
+def verify_archive(paths: list[Path]) -> None:
+    expected = sorted(path.relative_to(MANUSCRIPT).as_posix() for path in paths)
     with zipfile.ZipFile(OUTPUT) as archive:
         names = archive.namelist()
         if names != expected:
-            raise RuntimeError(
-                f"archive member mismatch: expected {expected}, observed {names}"
-            )
-        for relative, path in paths.items():
-            member = archive.getinfo(relative)
-            if member.date_time != FIXED_TIMESTAMP:
-                raise RuntimeError(f"archive timestamp differs: {relative}")
-            if member.external_attr >> 16 != 0o100644:
-                raise RuntimeError(f"archive permissions differ: {relative}")
-            if archive.read(relative) != path.read_bytes():
-                raise RuntimeError(f"archive byte mismatch: {relative}")
+            raise RuntimeError(f"archive member mismatch: {names}")
+        for path, member in zip(paths, names):
+            if archive.read(member) != path.read_bytes():
+                raise RuntimeError(f"archive byte mismatch: {member}")
 
 
 def main() -> int:
-    # The archive cannot be a precondition for building itself.
-    validate_manuscript.validate(require_archive=False)
+    preflight = validate_manuscript.validate(require_archive=False)
+    print("[arxiv] preflight validation passed")
+    print(json.dumps(preflight, indent=2, sort_keys=True))
     paths = archive_inputs()
     write_archive(paths)
     verify_archive(paths)
-    final_report = validate_manuscript.validate(require_archive=True)
+    final = validate_manuscript.validate(require_archive=True)
     print(f"[arxiv] wrote {OUTPUT}")
     print(f"  members: {len(paths)}")
-    print(f"  sha256: {final_report['archive_sha256']}")
+    print(f"  sha256: {sha256(OUTPUT)}")
+    print("[arxiv] post-build validation passed")
+    print(json.dumps(final, indent=2, sort_keys=True))
     return 0
 
 
