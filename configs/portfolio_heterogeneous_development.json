@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "study_stage": "development",
+  "experiment_name": "target-free-portfolio-heterogeneous-development-v2-tqa-family-gate",
+  "families": ["er", "rr", "ba", "ws"],
+  "sizes": [12, 14],
+  "generator_parameter_ranges": {
+    "er": {"p": [0.15, 0.75]},
+    "rr": {"degrees": [2, 3, 4, 5, 6]},
+    "ba": {"attachments": [1, 2, 3, 4]},
+    "ws": {"degrees": [2, 4, 6, 8], "rewiring": [0.02, 0.95]}
+  },
+  "per_family_size": {
+    "angle_train": 6,
+    "development": 6,
+    "calibration": 6,
+    "audit": 8
+  },
+  "seed_start": {
+    "angle_train": 1310000,
+    "development": 1410000,
+    "calibration": 1510000,
+    "audit": 1610000
+  },
+  "p_depth": 2,
+  "angle_label_starts": 3,
+  "angle_label_budget": 40,
+  "budget": 32,
+  "checkpoints": [1, 2, 4, 8, 16, 32],
+  "model": {
+    "spectral_k": 6,
+    "hidden_dim": 48,
+    "num_layers": 3,
+    "epochs": 80,
+    "learning_rate": 0.005
+  },
+  "selector": {
+    "ridge": 1.0,
+    "alpha": 0.1,
+    "margin": 0.0,
+    "minimum_accepted": 10,
+    "bootstrap_resamples": 4000
+  },
+  "seed": 20260719
+}

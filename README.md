@@ -92,12 +92,13 @@ The distribution name is `specops-gctr` and the import name is
 that the index upload has already happened.
 
 The installed console commands remain the primary interface. From a checkout,
-the root dispatcher offers the same two entry points without path-specific
+the root dispatcher offers the same three entry points without path-specific
 shell wrappers:
 
 ```bash
 python run.py optimize --help
 python run.py reproduce --validate-only
+python run.py portfolio --help
 ```
 
 ## Fit and use the complete learned policy
@@ -262,6 +263,74 @@ PyTorch, BLAS, and platform builds. The recorded environment is stored in
 [`manuscript/source_data/meta.json`](manuscript/source_data/meta.json), and
 wall-clock columns are machine-dependent.
 
+## Target-free optimizer portfolio (development and confirmatory evidence)
+
+The repository also contains a separate prospective redesign that is not used
+to support the current manuscript. It compares concentration, four fixed TQA
+schedules (`dt = 0.25, 0.50, 0.75, 1.00`), k-NN, random multistart, SPSA, and
+legacy GCTR under the same 32-call ceiling. Every arm records a best-so-far
+trace at calls `1, 2, 4, 8, 16, 32`; selection uses equal-weight area under
+normalized-regret checkpoints (AURC). Exact MaxCut normalizes the offline
+analysis only and is never an optimizer stopping signal.
+
+A relabelling-invariant ridge selector is fit on development graphs. For each
+family, the strongest development arm is then frozen as the deployment
+fallback. A separate calibration split supplies a finite-sample one-sided
+split-conformal residual quantile for selected-arm minus family-fallback AURC.
+Under exchangeability, its guarantee is marginal over future instances; it is
+not a conditional, distribution-shift, or hardware guarantee.
+
+Two new-seed `p=2`, `n in {12, 14}` development studies were run once after
+freezing their protocols. Lower AURC is better.
+
+| Development study | Audit graphs | Global baseline | Global / gated / family AURC | Gated - family (stratified 95% bootstrap interval) | Accepted; harms | Coverage | Frozen gate |
+| --- | ---: | --- | --- | --- | --- | ---: | --- |
+| Regular generator grid | 48 | k-NN | 0.17236 / 0.16317 / 0.16224 | +0.00094 (-0.00209, +0.00401) | 13; 9 | 0.771 | fail |
+| Heterogeneous parameters | 64 | TQA `dt=0.75` | 0.17659 / 0.16714 / 0.17651 | -0.00937 (-0.01645, -0.00250) | 10; 1 | 0.938 | follow-up triggered |
+
+The regular-grid result fails both nominal coverage and harm-rate checks. The
+heterogeneous development result cleared every frozen mechanical criterion, so
+it triggered one separately frozen confirmatory audit with 20 new graphs per
+family-size stratum (160 total), unchanged non-audit seeds and hyperparameters,
+and no post-audit tuning:
+
+| Confirmatory audit | Global / gated / family AURC | Gated - family (stratified 95% bootstrap interval) | Accepted; harms | Coverage | Decision |
+| --- | --- | --- | --- | ---: | --- |
+| Heterogeneous parameters | 0.17277 / 0.16930 / 0.17207 | -0.00277 (-0.00570, -0.00008) | 12; 4 | 0.881 | **no-go** |
+
+The mean improvement replicated, but the predeclared gate failed because
+one-sided coverage was below its nominal `0.90` requirement. Four of 12
+accepted deployments were harmful relative to their family fallback; all four
+were Barabasi-Albert cases, whose family mean worsened by `+0.00376`. The
+confirmed gain was concentrated in random-regular graphs (`-0.01327`, five
+acceptances, no harms). Both `confirmatory_followup_ready` and
+`nmi_claim_ready` are therefore false. This remains exact-statevector evidence
+with zero device shots; it does not support a reliability or NMI-readiness
+claim.
+
+Freeze, run once, and validate an evidence directory with:
+
+```bash
+python run.py portfolio \
+  --config configs/portfolio_heterogeneous_confirmatory.json \
+  --output-dir portfolio_results/heterogeneous_confirmatory_v1 \
+  --freeze-only
+python run.py portfolio \
+  --config configs/portfolio_heterogeneous_confirmatory.json \
+  --output-dir portfolio_results/heterogeneous_confirmatory_v1 \
+  --run-only
+python run.py portfolio \
+  --config configs/portfolio_heterogeneous_confirmatory.json \
+  --output-dir portfolio_results/heterogeneous_confirmatory_v1 \
+  --validate-only
+```
+
+`--run-only` refuses to overwrite an existing audit trace. Each directory
+retains the frozen protocol and decision, generator parameters, model
+checkpoint, per-query traces, exact resource ledger, summary, and content
+hashes. The two development configurations and their evidence directories are
+retained alongside the confirmatory audit.
+
 ## Distribution checks
 
 ```bash
@@ -284,6 +353,8 @@ replot or validation commands.
 | `model`, `losses`, `estimator` | GIN Gaussian, training objectives, serializable high-level policy |
 | `calibration` | Reliability and uncertainty diagnostics |
 | `optimization`, `baselines` | Query-counted search, callback adapter, comparisons |
+| `fixed_budget`, `portfolio`, `protocol` | Target-free traces, optimizer arms, invariant routing, conformal abstention, frozen splits |
+| `portfolio_experiment` | Single-use runner, analyzer, resource ledger, and hash validation |
 | `pipeline` | Data, training, calibration, allocation, evaluations |
 | `plots`, `tables` | Source data to publication artifacts |
 | `cli`, `reproduce` | User command and full artifact command |
@@ -291,9 +362,11 @@ replot or validation commands.
 ## Repository map
 
 ```text
-specops_gctr/            canonical package, estimator, and two console commands
+specops_gctr/            canonical package, estimator, and three console commands
+configs/                 frozen-protocol portfolio configurations
+portfolio_results/       hashed development and confirmatory evidence
 tests/                    mathematical-contract, API, CLI, and reproduction tests
-run.py                    root dispatcher for optimize and reproduce commands
+run.py                    root dispatcher for optimize, reproduce, and portfolio
 pyproject.toml            single package and build definition
 manuscript/main.tex      article source
 manuscript/main.pdf      compiled article

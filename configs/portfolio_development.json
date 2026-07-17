@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "study_stage": "development",
+  "experiment_name": "target-free-portfolio-development-v2-tqa-family-gate",
+  "families": ["er", "rr", "ba", "ws"],
+  "sizes": [12, 14],
+  "per_family_size": {
+    "angle_train": 4,
+    "development": 4,
+    "calibration": 4,
+    "audit": 6
+  },
+  "seed_start": {
+    "angle_train": 910000,
+    "development": 1010000,
+    "calibration": 1110000,
+    "audit": 1210000
+  },
+  "p_depth": 2,
+  "angle_label_starts": 3,
+  "angle_label_budget": 40,
+  "budget": 32,
+  "checkpoints": [1, 2, 4, 8, 16, 32],
+  "model": {
+    "spectral_k": 6,
+    "hidden_dim": 48,
+    "num_layers": 3,
+    "epochs": 80,
+    "learning_rate": 0.005
+  },
+  "selector": {
+    "ridge": 1.0,
+    "alpha": 0.1,
+    "margin": 0.0,
+    "minimum_accepted": 10,
+    "bootstrap_resamples": 4000
+  },
+  "seed": 20260718
+}
