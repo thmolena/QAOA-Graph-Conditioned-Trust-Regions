@@ -1,0 +1,14 @@
+name: specops-gctr-reproduction
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13.12
+  - pip
+  - pip:
+      - numpy==2.4.3
+      - scipy==1.17.1
+      - networkx==3.6.1
+      - torch==2.11.0
+      - matplotlib==3.10.8
+      - pandas==3.0.2
+      - pytest==8.4.2

@@ -46,3 +46,7 @@ Paper = "https://arxiv.org/abs/2604.24803"
 [tool.setuptools]
 packages = ["specops_gctr"]
 include-package-data = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

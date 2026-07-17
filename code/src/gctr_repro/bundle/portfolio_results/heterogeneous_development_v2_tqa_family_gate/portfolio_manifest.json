@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "experiment_name": "target-free-portfolio-heterogeneous-development-v2-tqa-family-gate",
+  "protocol_sha256": "b97cd7ec6137ef1ca5b18016fd126249650a1c35dd72487df5714a9d7fadcfc1",
+  "implementation_sha256": "42aa34816315126b4519d92da86a24120443cdee6a654cf92c932c7b91ce9f3d",
+  "config_sha256": "d92fb0a097da21fb086c0e69f8aed793f0a0cd714d1cf9bb6f252f835cb26a8a",
+  "decision_sha256": "a7cd5518e466c6f9bc03aa397238ccf0313b0d7613686b61b530c15c655e86be",
+  "environment": {
+    "python": "3.13.12",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "numpy": "2.4.3",
+    "scipy": "1.17.1",
+    "networkx": "3.6.1",
+    "torch": "2.11.0"
+  },
+  "files": {
+    "angle_labels.json": "797cf594cf2353c1ba49f51d5ab5adccd9612070d48230161246fb597a0fc61d",
+    "legacy_model_state.pt": "5d54e34aac9862f7bbea77cd5734c8c292d750a319a6b8a66214538e02c7a4ee",
+    "non_audit_traces.jsonl": "04849ed4b33e855be45ec1fcbe48ff3eb1e9c06084d4025bcd9135cabdfa19d8",
+    "frozen_decision.json": "3546389898b1ca70b828a1c98398b350094686a447fd3d15cb57d684eb4ceff4",
+    "traces.jsonl": "aa9ea25ce44f4fb9275b310f75df87977328c2b5ddd584f6c405e60bac7eb380",
+    "summary.json": "931c368348f92e5e1ff46aedcac660ffa465973b1c5a4adc2fced0a34b77e5de"
+  }
+}

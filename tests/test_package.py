@@ -26,6 +26,10 @@ from specops_gctr.optimization import (QueryCounter, _project_trust_region,
                                        run_policy)
 from specops_gctr.pipeline import METHOD_ORDER, _capped_score, budget_rule
 from specops_gctr.plots import FIGURE_BUILDERS, build_all
+from specops_gctr.provenance import (
+    artifact_source_bytes,
+    compatible_manifest_fingerprints,
+)
 from specops_gctr.qaoa import (maxcut_cost_diagonal, qaoa_expectation,
                                qaoa_expectation_sampled, qaoa_statevector)
 from specops_gctr.reproduce import (
@@ -257,6 +261,31 @@ def test_config_defaults_match_manuscript():
 
 def test_entrypoint_is_callable():
     assert callable(reproduce_main)
+
+
+def test_artifact_fingerprint_excludes_only_repository_locator(tmp_path):
+    first = tmp_path / "first" / "reproduce.py"
+    second = tmp_path / "second" / "reproduce.py"
+    changed = tmp_path / "changed" / "reproduce.py"
+    for path in (first, second, changed):
+        path.parent.mkdir()
+    first.write_bytes(
+        b"algorithm = 1\n"
+        b"\ndef _default_manuscript_dir():\n    return 'first'\n"
+        b"\ndef _environment():\n    return {}\n")
+    second.write_bytes(
+        b"algorithm = 1\n"
+        b"\ndef _default_manuscript_dir():\n    return 'second'\n"
+        b"\ndef _environment():\n    return {}\n")
+    changed.write_bytes(
+        b"algorithm = 2\n"
+        b"\ndef _default_manuscript_dir():\n    return 'first'\n"
+        b"\ndef _environment():\n    return {}\n")
+    assert artifact_source_bytes(first) == artifact_source_bytes(second)
+    assert artifact_source_bytes(first) != artifact_source_bytes(changed)
+    unknown_core = "0" * 64
+    assert compatible_manifest_fingerprints(unknown_core) == \
+        frozenset((unknown_core,))
 
 
 def test_public_api_and_single_instance_cli(capsys):
@@ -525,7 +554,8 @@ def test_committed_provenance_matches_current_release():
     assert manifest["source_schema_version"] == 2
     assert manifest["package"] == "specops-gctr"
     assert manifest["package_version"] == specops_gctr.__version__
-    assert manifest["replot_implementation_sha256"] == fingerprint
+    assert manifest["replot_implementation_sha256"] in \
+        compatible_manifest_fingerprints(fingerprint)
     assert manifest["score_semantics"] == \
         "capped_cost_to_shared_target"
     assert manifest["target_attainment_recorded"] is True

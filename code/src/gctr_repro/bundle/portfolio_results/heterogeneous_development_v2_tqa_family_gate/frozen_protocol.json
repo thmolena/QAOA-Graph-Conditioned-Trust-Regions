@@ -1,0 +1,2356 @@
+{
+  "schema_version": 1,
+  "networkx_version": "3.6.1",
+  "config_sha256": "d92fb0a097da21fb086c0e69f8aed793f0a0cd714d1cf9bb6f252f835cb26a8a",
+  "splits": {
+    "angle_train": [
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1310000,
+        "maxcut": 19,
+        "edge_hash": "20c3ec2b0718a7ff042fab32fe2442ac632d0603fa105e8be15f47aeeb37262e",
+        "isomorphism_fingerprint": "e627d21137248013cb7907db787db61f6822d2ee7681bd77fdc34590d05eb930",
+        "generator_parameters": {
+          "p": 0.33567490750875895
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1310001,
+        "maxcut": 30,
+        "edge_hash": "1fd409e2936edabb4b4cf4d8bfdafe851d466074055e04ca6bb92bcd9f0e9597",
+        "isomorphism_fingerprint": "9cf7e369ccb236270341d62b136cda2741fe226eca524a2c60659fe563168c9d",
+        "generator_parameters": {
+          "p": 0.6954530313449933
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1310002,
+        "maxcut": 21,
+        "edge_hash": "c48dfa66503c876950717405bf817a8a8287f3b4d14e03afe2e344aae0e417ef",
+        "isomorphism_fingerprint": "cfeeac1d7f3f8a873524f0493051fc2778861a5d7effd81149b54a7df039f469",
+        "generator_parameters": {
+          "p": 0.38582763426228933
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1310003,
+        "maxcut": 30,
+        "edge_hash": "e21bcd96eb66efe81b37e038042dbb0dbcb49a2878c0b82769f5bccad60c44ec",
+        "isomorphism_fingerprint": "757fd2f5f92f1680209f0ba00043096debd84a29883ea7160797d3e62ba7446f",
+        "generator_parameters": {
+          "p": 0.6123917479367583
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1310004,
+        "maxcut": 9,
+        "edge_hash": "b30ca99aa28f7b3bfa497298b3565e3e7f664a0d34a6341134c089c991adf337",
+        "isomorphism_fingerprint": "edd5c96bd59e5f0cf94729885763d95e64ada812807e84ab3b252530d8b0da94",
+        "generator_parameters": {
+          "p": 0.17644262369173783
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1310005,
+        "maxcut": 25,
+        "edge_hash": "882d97185a880751237513c7366b66ccaf6b2fef5dadb2ba07b26bc6bdc342a1",
+        "isomorphism_fingerprint": "ad9cb5826acb59ae6f6399f513b9de59223f0d389ba9ab47aef00aa840c9947a",
+        "generator_parameters": {
+          "p": 0.4231505725061442
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1310006,
+        "maxcut": 20,
+        "edge_hash": "988cfd826935c4cdf02590f7fb58c20fd942e3e612a612f56b7dc68122676473",
+        "isomorphism_fingerprint": "fa0d673a296564575dbb77a89e3a55929733e4b20dac479a8662e21e9d1c7db6",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1310007,
+        "maxcut": 16,
+        "edge_hash": "40ce66446f5fce3644f295b2920a594070a729a19fb45a43453bef4a97405bbd",
+        "isomorphism_fingerprint": "19a819c81fbfc45d756ef0aa9fddb15be895b93503ec9b1f1036d1b73aecffa1",
+        "generator_parameters": {
+          "degree": 3
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1310008,
+        "maxcut": 12,
+        "edge_hash": "9871c324cec9f83763848b4d46392568fe40f74b5e5a23c50f1977b84e0f75a2",
+        "isomorphism_fingerprint": "052e50de153e9ea5462682437638430b6b00aeee9d00828f6a81290029945e58",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1310009,
+        "maxcut": 18,
+        "edge_hash": "ae32e4f427e86da93ccb449ed71c4dfd66998555c267cca5339a51ac777e326c",
+        "isomorphism_fingerprint": "fa0d673a296564575dbb77a89e3a55929733e4b20dac479a8662e21e9d1c7db6",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1310010,
+        "maxcut": 22,
+        "edge_hash": "40947cd83c4749f87a843648416b335ac8a636cba557782a6b9fc82e640751b8",
+        "isomorphism_fingerprint": "1cdc125b8096636a5e509f0f706c9575e424e5ac2864dbb9e990600721aff6b8",
+        "generator_parameters": {
+          "degree": 5
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1310011,
+        "maxcut": 15,
+        "edge_hash": "add2e7596c2bae29c9dee34df0509b14eddb2678a44a1ae01766ece06cef4bca",
+        "isomorphism_fingerprint": "19a819c81fbfc45d756ef0aa9fddb15be895b93503ec9b1f1036d1b73aecffa1",
+        "generator_parameters": {
+          "degree": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1310012,
+        "maxcut": 17,
+        "edge_hash": "6f33dc56194c6360d416069b6daef1b4e9948465b01d2d875beccdbd518062ba",
+        "isomorphism_fingerprint": "8e402dc0b1c007f9705206398f5340716bbd24b6e7312374831418f48d80d90c",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1310013,
+        "maxcut": 16,
+        "edge_hash": "24197626b6980a476ff017bc8aa800f6d1c7cb1159461be8441f9184a6d6ebe4",
+        "isomorphism_fingerprint": "447d198f67d63a0a885a1bfb3bae65f76d170a6fd25a37836b5e4f6026bac2be",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1310014,
+        "maxcut": 22,
+        "edge_hash": "0d7cf032c36af0e3ba59c685d0e5f147bec0b470ed2078692badcf8ed223bfa6",
+        "isomorphism_fingerprint": "996c52d084ce82fab58e666b8aef748f1df6cc0488a49f4a523978536c9216df",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1310015,
+        "maxcut": 21,
+        "edge_hash": "a208b1152e47337d85bcf206ea68db7bd9b9568e4648dbab931632e6c1f91bac",
+        "isomorphism_fingerprint": "30d438332b43105fd845653f96d499574b635ae0a774afcd7b0723ade2a5b879",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1310016,
+        "maxcut": 20,
+        "edge_hash": "a284b9baaa066ee0c68855150ca851f44ad6b81da85066c3c865a6174fb8a238",
+        "isomorphism_fingerprint": "672b0de09047f76b9a55dec0cde71f583afd4f0205288bd2b7056bab111b5700",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1310017,
+        "maxcut": 23,
+        "edge_hash": "8e2aa7810a21f72727876c714f359df9787de8c0b11255f5efe578a45b9caedf",
+        "isomorphism_fingerprint": "69c6dd7a5752d2d6bc70d49fce4be06f8c785c5773a65e1b40be7514ae27ffd0",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1310018,
+        "maxcut": 19,
+        "edge_hash": "68ef41cbbe103cedbbeaec88c9d9e2b0cebc36e5788f7b879d31c0732a8613fc",
+        "isomorphism_fingerprint": "c38864254696147666dd1f5bc75e34d7d2e4b17244d6903ef854e7ff635b92d4",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.7462260570927908
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1310019,
+        "maxcut": 32,
+        "edge_hash": "667b78c71165ced7167bd365bbff0c8222b1b98c6d478c10ab90ae33dffcc8d6",
+        "isomorphism_fingerprint": "0279adf2dedcd38fab0aa71808a59a6f45a971736669220bf39062ba8ce51b36",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.09200181827711175
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1310020,
+        "maxcut": 26,
+        "edge_hash": "0c136c3b4d0900eda03d0fed6bfc675f52f391005640cc2bc61fe3c2263f67a4",
+        "isomorphism_fingerprint": "c9d71d7856aedfb750637c8c155157dc174531b851c4b1919eb435c60862b6a0",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.30351939397773703
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1310021,
+        "maxcut": 25,
+        "edge_hash": "80b44e51f3215a0555da159b8e9ac20e2b90b36dfa37e9d20e80ac354b8ae96e",
+        "isomorphism_fingerprint": "b794be8df393116f66fb18ffd073dddc580ba849ce092c563cb0c4ed8afad8d3",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.8701280467920884
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1310022,
+        "maxcut": 11,
+        "edge_hash": "8f5d2fc20a68e058c00a1875b69915468109727f05d8838844df3a0ae4567b93",
+        "isomorphism_fingerprint": "e8e25006e62c0b883a47544159783121cd5f514a5ca0018512d8988afa478491",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.3986542526964753
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1310023,
+        "maxcut": 31,
+        "edge_hash": "d693d0c2d6f99312901cbf75188dd9dde76e3f026f3f8651e564834dff9cac35",
+        "isomorphism_fingerprint": "82c610e6596fd42849cccf66a8e8bb9b71d92fdff2943f81d752cbbf57cc4503",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.5062652482887736
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1310024,
+        "maxcut": 35,
+        "edge_hash": "16efc285fc2cec88faca81aa4a00691ff1b538f55837e45627b409522a419554",
+        "isomorphism_fingerprint": "41db0f47cf0342d70da3fd2749df4669b3d49979e3bbeeb46faf317e62f4c00e",
+        "generator_parameters": {
+          "p": 0.4916551210430812
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1310025,
+        "maxcut": 32,
+        "edge_hash": "05514be1eb8fd489206e68270cfc4a97d7be8c09c33580d134d2aa8aecd79d3a",
+        "isomorphism_fingerprint": "3be8c46ff9c09e781c7d6da3a8ab8cb529d0bc9d90ea362f4f1fd3211d375888",
+        "generator_parameters": {
+          "p": 0.5852124637185602
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1310026,
+        "maxcut": 30,
+        "edge_hash": "d1572a2f373f19bbf9f2f0699f23357a369e4a954640031b33c3cb88096b61fb",
+        "isomorphism_fingerprint": "b91dda0b4f5679b97c4a85c2720d36ba8403e018b31696f5ef5f696963488f7e",
+        "generator_parameters": {
+          "p": 0.5281593111597449
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1310027,
+        "maxcut": 35,
+        "edge_hash": "b748bdea8385d559b7c27961bbefb7a8df21ab474b2934382739e31a0689321a",
+        "isomorphism_fingerprint": "078e68828d3716e59cd557240419cbeadddaa8c839852520ef3df68aacd24d59",
+        "generator_parameters": {
+          "p": 0.5891967931038428
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1310028,
+        "maxcut": 28,
+        "edge_hash": "3b5d296c2c5fe79bd7b3870250f80bb9de9cba1b19622940d737659c879680fb",
+        "isomorphism_fingerprint": "9c91f8f6c105aced4785cb3883c6e05d3bae825ec516b4e346452a73b3b99973",
+        "generator_parameters": {
+          "p": 0.41391542022001526
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1310029,
+        "maxcut": 32,
+        "edge_hash": "2f441d08c46d6585f19255262a04eace89ebaeda4670ddee3f158274df7df29f",
+        "isomorphism_fingerprint": "c45a7b86231ef0047455d6f7d321c86b5bf5b2a16fc08dc0d1ad36e3f3278233",
+        "generator_parameters": {
+          "p": 0.48028371067612863
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1310030,
+        "maxcut": 22,
+        "edge_hash": "d74d1b3a229d42a93c7714722c4c3fc747d2525b644075400025ebb3d3807138",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1310031,
+        "maxcut": 28,
+        "edge_hash": "511a4d51449b088639ac773b111f15704b53cf6a3d479b9d35648e4189d3d256",
+        "isomorphism_fingerprint": "5f76b409df8538739a831add1b8be54ceb2396e6ac867b6b865543621250ecca",
+        "generator_parameters": {
+          "degree": 5
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1310032,
+        "maxcut": 12,
+        "edge_hash": "9fffa441213ed4b24e9bf8956c50471d09ab0714a24c771a0e3da5916ba46d9f",
+        "isomorphism_fingerprint": "bbecbeccc21aaeaf0b57bde1d72bef5e3178cc86d81b839468d43418755eef4b",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1310033,
+        "maxcut": 14,
+        "edge_hash": "49cfa46ad31d5816023f784342c0f26d8c233b84f8771e5497f32f268f5184f9",
+        "isomorphism_fingerprint": "bbecbeccc21aaeaf0b57bde1d72bef5e3178cc86d81b839468d43418755eef4b",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1310034,
+        "maxcut": 19,
+        "edge_hash": "6f7a8c6bb9b432e54a06f44a8db388f2e547d06406e78494f9f872a5c1a9759d",
+        "isomorphism_fingerprint": "19a40d1f532b284d95f2b06b0f609d2fdf5209007fa2f99b004b78ea3d32e990",
+        "generator_parameters": {
+          "degree": 3
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1310035,
+        "maxcut": 24,
+        "edge_hash": "84df9de81dfc69e96c32647041ba80e02818f434b2a66365cf568c02becf7d89",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1310036,
+        "maxcut": 29,
+        "edge_hash": "033ed353ecc353ec399916e815a55f15c3daebf78b5a49871e5b8b328a108aae",
+        "isomorphism_fingerprint": "61ac37cab046840ac63d63f58bf2ddc311911608dff93bbe5fb8b42ad0a4ae79",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1310037,
+        "maxcut": 30,
+        "edge_hash": "89558bb9fc240a31744da2cbd389edfde8949430fc70c509d3f285a47fd457ae",
+        "isomorphism_fingerprint": "a3ebe1a07bd02c5a2d7d8cd3a483e18df309a86be07dfe6e66b92b7c47804882",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1310038,
+        "maxcut": 13,
+        "edge_hash": "aed287bc172b98e33ddc3e8eea06fa24ebc86b69ec153e902a583ad7f533adca",
+        "isomorphism_fingerprint": "e414eccd40a31bc341f69c0ceee56228f00ec0547f488f88db0cd29afa332242",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1310039,
+        "maxcut": 26,
+        "edge_hash": "09789a9a53453b468268930176de2e8643800209df1b59f6c1b0b0f06f92f8fe",
+        "isomorphism_fingerprint": "382e4ef580b99521e1be15f3c4631566910c25f9857f8038f8ef3502092646df",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1310040,
+        "maxcut": 25,
+        "edge_hash": "24207486140a49104208a57b0ebf16c34ebb91a36ee607100da90cef38ef59ba",
+        "isomorphism_fingerprint": "935966eaa3b47d57008f60eb6f56adf2a00997794dea2bab47640608f4fbee55",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1310041,
+        "maxcut": 20,
+        "edge_hash": "a6e81046a94f5c836fc74b3fb38eb8b2fd43e723ecd98bfcd41b2ba5e958e296",
+        "isomorphism_fingerprint": "8e14f04b5eb4399e8ad1b53dad2f3b81476d0ef4018f09eee710cdf7aabbada1",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1310042,
+        "maxcut": 14,
+        "edge_hash": "3976c299949442c502eb734d3167af2a3f952e831db5abf4d410d2e24aa606e1",
+        "isomorphism_fingerprint": "6eaed31fe67e3c6a9e8cf536420f1f95bb737bcf889a4f0fa21a28c0a0bab0ca",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.849082022980888
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1310043,
+        "maxcut": 38,
+        "edge_hash": "e7a57551a4a52c6adeed1741613e160fc0f120d3fcffbdacf3eeab570cf20a84",
+        "isomorphism_fingerprint": "1da508cbcd2b0e132e52dbf853df418852ca39fa00966a17986a2f4788b4f7fb",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.6019580924663634
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1310044,
+        "maxcut": 22,
+        "edge_hash": "5293323858622c6811c896110f5cf045620cc0fcd6744402138703daf88cc311",
+        "isomorphism_fingerprint": "197ca94001058fb9dfd2f99ccbdf5698390c2e336b646452f2b25297945ff653",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.4767532351429793
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1310045,
+        "maxcut": 22,
+        "edge_hash": "8f2b0a856bb8d285789aaf5d8c7828845d54cfe86a6d20250169e00441b7d876",
+        "isomorphism_fingerprint": "c36d911516f4a7e54eea5b5867a58876bf7f331ed53c78a985025c889fa77360",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.914564085626413
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1310046,
+        "maxcut": 22,
+        "edge_hash": "66f6712485afce517c89a1680a962f749a3c7d10d400b6a0c5084030dff32b66",
+        "isomorphism_fingerprint": "45e05fda2410a85317ea368dce2e1d66fab79ec979ede9f1e4d2c4184feaeab4",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.6686526714480009
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1310047,
+        "maxcut": 13,
+        "edge_hash": "035e41c71267b044a3cffc9211f388387c807f1ebb00b8943dddac3f0269de25",
+        "isomorphism_fingerprint": "4e3f99a7a5253ca9b62cc2189dc35d4075ca17c360ac86e7a4f93d5fbb3a803d",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.36715729073130426
+        }
+      }
+    ],
+    "development": [
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1410000,
+        "maxcut": 29,
+        "edge_hash": "3354cc9aa99fca04db7ae9d03b19f4f37ac77508b6cb08d1ecbd20c090a63a9c",
+        "isomorphism_fingerprint": "74d51abf79cceb8e0907ac1555f4f726c0884ee49e201bab5a673ad8fb7dc062",
+        "generator_parameters": {
+          "p": 0.5726987877493254
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1410001,
+        "maxcut": 31,
+        "edge_hash": "902aed5aaa13ab1acbd47e22c2f02c131bb0aadf5aaa97c62462dd3f20ee1a59",
+        "isomorphism_fingerprint": "86805b2a5db43a27a6063b2717e82ac9aeb489b85be4621d8fa6a8179a092a08",
+        "generator_parameters": {
+          "p": 0.6889127208412894
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1410002,
+        "maxcut": 28,
+        "edge_hash": "714c7500223615d4a7f0acf56ed7d8596272bc1ffb94cac0ea0c5a7a195a0fcd",
+        "isomorphism_fingerprint": "4c06ff9cbd8da22180b9dad10b01c10fb930f0564314c8c4a0b0b87c6e99b632",
+        "generator_parameters": {
+          "p": 0.7085448639868791
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1410003,
+        "maxcut": 12,
+        "edge_hash": "9ae0371aa39021729dac5b5c0a8ca1efbbe5e421d6f2bd51e9574a6ae1e6ba5d",
+        "isomorphism_fingerprint": "c17759feb7ad571e2b502029609a3afc8c19c856f07ad4fee2095ffc26757e5c",
+        "generator_parameters": {
+          "p": 0.19559775519951353
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1410004,
+        "maxcut": 14,
+        "edge_hash": "7d6cb32162649cc79ac4aad06d655ddc76acb6798e59551365efa402e9666692",
+        "isomorphism_fingerprint": "716872343dc0746a28d100e98e6a6cde8cb294a6744d8f44f6cea84b927a8264",
+        "generator_parameters": {
+          "p": 0.25747168105774654
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1410005,
+        "maxcut": 11,
+        "edge_hash": "93ce98f05e5205c1f12bd94dd6d13e66f4bdd53bbdb5978cd9cef9264f8be143",
+        "isomorphism_fingerprint": "4dbec7703738687f5a7b740d325534f9126fd48c8fc18675eaefb7e174166820",
+        "generator_parameters": {
+          "p": 0.25606670251204194
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1410006,
+        "maxcut": 20,
+        "edge_hash": "616312bbbba43bd691b54b4b1b9161a2f155f739045bd7f2fd22b21200f1cc04",
+        "isomorphism_fingerprint": "fa0d673a296564575dbb77a89e3a55929733e4b20dac479a8662e21e9d1c7db6",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1410007,
+        "maxcut": 26,
+        "edge_hash": "18671d9c8e7a8b746c9decb549af3aa909a7d436cae6428f60bc93fd8eb8789c",
+        "isomorphism_fingerprint": "614bec11fe6791aa73b89861d7ceca90ca4ab99ee39bdeb89b5438014f33cb73",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1410008,
+        "maxcut": 16,
+        "edge_hash": "428c2b658d38102ccef5f7e14844a5077f8ec4928d99c05747837504423115c8",
+        "isomorphism_fingerprint": "19a819c81fbfc45d756ef0aa9fddb15be895b93503ec9b1f1036d1b73aecffa1",
+        "generator_parameters": {
+          "degree": 3
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1410009,
+        "maxcut": 15,
+        "edge_hash": "4b7828ad3785d024cc91ab9c57da94a17692b2175e74b42c2dc6bf809fd55b1f",
+        "isomorphism_fingerprint": "19a819c81fbfc45d756ef0aa9fddb15be895b93503ec9b1f1036d1b73aecffa1",
+        "generator_parameters": {
+          "degree": 3
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1410010,
+        "maxcut": 26,
+        "edge_hash": "1ef1a69a1f1353dce0a1e6f917aa9b0440b4ac97e92208618708f572f107cf78",
+        "isomorphism_fingerprint": "614bec11fe6791aa73b89861d7ceca90ca4ab99ee39bdeb89b5438014f33cb73",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1410011,
+        "maxcut": 10,
+        "edge_hash": "bbb4fe7ca5ce3d5eeb4968d469dac74f287815bb4ac193128d155ab138cde3fd",
+        "isomorphism_fingerprint": "052e50de153e9ea5462682437638430b6b00aeee9d00828f6a81290029945e58",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1410012,
+        "maxcut": 17,
+        "edge_hash": "e1d5986ef403ff0efec64722f24260fc1266906f1284d57371254eccde2ad7b9",
+        "isomorphism_fingerprint": "03c1229428fd1532e97516e681cc1c48928aa562daa53cdacd27cc6e14709533",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1410013,
+        "maxcut": 17,
+        "edge_hash": "33eaec814086f0e106722e3a07ac844033f2d923a90e868d7689e229ed2242d9",
+        "isomorphism_fingerprint": "80378414f0b6be149772632f161a59ad1c183b19982caa1296d9c96f2644cd8c",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1410014,
+        "maxcut": 11,
+        "edge_hash": "1a5f06a214cef501b97c6b222adc47636b450d47f8530e5cf177118c8c1e60a5",
+        "isomorphism_fingerprint": "b945d4e897180fd2fa2d049c6ffc986ec13daac3faf01589b261ab7a1cde4efb",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1410015,
+        "maxcut": 11,
+        "edge_hash": "3645bc54f24143b73ca3406dfb429f758b3ba45d35ba670109911337ef273c2b",
+        "isomorphism_fingerprint": "5e1c661198cb178ac401d983b1c8f6727e49993657f132883df2b93ee628ecc1",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1410016,
+        "maxcut": 20,
+        "edge_hash": "6f236f760570fab2944eb0ea0ccc150c3c821c4c456a136f7db2e3be05b22a9b",
+        "isomorphism_fingerprint": "a855a1838b0cac398f6c35a5eb241d97819f3f56dd4a2f0fe7b459de16329897",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1410017,
+        "maxcut": 22,
+        "edge_hash": "25a921926a802f05e76e10af43ca119feec1143af7e878d26db1f200b63a6445",
+        "isomorphism_fingerprint": "063ae624f5219dbb7dae886f5eb019d099511d40a2faf6ebd941c72b03f3bed8",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1410018,
+        "maxcut": 11,
+        "edge_hash": "14869c6590f993afe3570171405926c18b51565984d6c83949fd036badd6ce5b",
+        "isomorphism_fingerprint": "c3154fcb3417255fb411fa9cf87e3d8d54d67454d4ece8f75d9172020a675194",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.8425867380020562
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1410019,
+        "maxcut": 26,
+        "edge_hash": "fdc81b2f93d59bdd14e3b1225321746bb8530495658d4500150fd7fdd71c6295",
+        "isomorphism_fingerprint": "8559968b63c1eda6e12de979411e2d99cfa488e15754364364fed979d3a8bec6",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.5748211253266522
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1410020,
+        "maxcut": 11,
+        "edge_hash": "b7dccae8e28fb87d50805d7847628192e48e754a0527e87542ae13814ab0effe",
+        "isomorphism_fingerprint": "dc09ad71ae64f91fa6822599738d44bd801edb87e1570c0550fdf9d6407d69e9",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.33207515840123825
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1410021,
+        "maxcut": 32,
+        "edge_hash": "a2adcaab2edac00f6c94a19ad81083916b18e24362408f92eb48aed21da78068",
+        "isomorphism_fingerprint": "e96b84741bf584a3c36203a1ae6ecefba6ade28fe50c132287be1a6f172c9981",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.3733642251013609
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1410022,
+        "maxcut": 19,
+        "edge_hash": "8b8c447b5bd86037f65bde77019bb6aa49a6b486bb91649a2e3fc6a83888b673",
+        "isomorphism_fingerprint": "c92e84ea51b915eeff4ce67cd37bfd5f8b9d3fc378dbaf40827dca11411893b3",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.4000423746137891
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1410023,
+        "maxcut": 19,
+        "edge_hash": "25deb26ce649724932eafefdfd87a51a0a831df1c805107672dbd163c170d5cb",
+        "isomorphism_fingerprint": "20adcfbbbaff7e644797da746230d855df54b5286942e82a750209f0d48e9f1a",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.15381112753246454
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1410024,
+        "maxcut": 33,
+        "edge_hash": "956156dc4f8383b9aeb221cd3a459d2d1a7a5f91d1905184910818c87535db3c",
+        "isomorphism_fingerprint": "9131f81a9d4c59b13cc0fea55b07eeafada5fe34ec07ed74bda97978fcae22d7",
+        "generator_parameters": {
+          "p": 0.5007336891121191
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1410025,
+        "maxcut": 21,
+        "edge_hash": "306db68d738de9936c9fba6206b3d0f6cb9f0ee6ea42b6ddcbfd462cbc57ed1f",
+        "isomorphism_fingerprint": "e04647f34d64ae9eab6c90e0d5762bea6d1d4e7a9d9f73faf17a6bc48067e97a",
+        "generator_parameters": {
+          "p": 0.28696692559390347
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1410026,
+        "maxcut": 43,
+        "edge_hash": "db957e94ad07624ee7c896c41d58cbfab171ccfe662e4ac4c6eb6e778c8fa068",
+        "isomorphism_fingerprint": "50a839bb8388f874f789d17292d2529f3e531247d6170d4c4ed9884b9ae4de62",
+        "generator_parameters": {
+          "p": 0.7398623280081303
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1410027,
+        "maxcut": 38,
+        "edge_hash": "244ed854591b633e2932726751a91f139970729fb3bbbd66ec5601a689d654bf",
+        "isomorphism_fingerprint": "b13a236c7a85d7352bb8f9d5cf64b13b6e01c01c049d169138eee27e2cd0eb37",
+        "generator_parameters": {
+          "p": 0.6240965283129121
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1410028,
+        "maxcut": 24,
+        "edge_hash": "d5f4ef6147f11c0ac09a89ba4041753feffaa9180deaf3f1a1e3706571febacd",
+        "isomorphism_fingerprint": "523044a1c51b598b9649e07784a3a7510b26d0026230ce37145217849de58c71",
+        "generator_parameters": {
+          "p": 0.3814889394497701
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1410029,
+        "maxcut": 34,
+        "edge_hash": "e469b10259be0fab9b5fe077c60918bb77c0fd5a9f89800e7a6365e690af6a94",
+        "isomorphism_fingerprint": "dd869aeab342a76ea6d88ddef6078b8e7f2fb39ae65e7ed7dd83eb0b481eada1",
+        "generator_parameters": {
+          "p": 0.6927291327606481
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1410030,
+        "maxcut": 24,
+        "edge_hash": "2bd396e4aa7b0c626753a511a7e98c6deb34e6d360ddaa25c8e789f5d61c2bab",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1410031,
+        "maxcut": 14,
+        "edge_hash": "34f5395ec94ad876d1b6ff30babccc6cab9a6dc1db78844b15ab0dd49bc170e3",
+        "isomorphism_fingerprint": "bbecbeccc21aaeaf0b57bde1d72bef5e3178cc86d81b839468d43418755eef4b",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1410032,
+        "maxcut": 22,
+        "edge_hash": "6061d2a8ba5690756bf24f73683189023fda27baa674d8aa65b5379f71b04100",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1410033,
+        "maxcut": 22,
+        "edge_hash": "9dabef3b44d06135c79ef85801fa57e2bd4bcc0d1232d1505e4e9e9b59ac7bcd",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1410034,
+        "maxcut": 32,
+        "edge_hash": "9a598db985accd5325b0d7c39db106c7bc4e2579c9e8adedcb5022e11c8b9cbb",
+        "isomorphism_fingerprint": "ebfeca423cac2f518d0bfef1f09e5fd43f9f9380e57233c392347056d0424ce4",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1410035,
+        "maxcut": 22,
+        "edge_hash": "7253761bcc7a664da065e3a9171415b6ca1df4b1c3e0e7b652de1e5379620682",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1410036,
+        "maxcut": 19,
+        "edge_hash": "c57d10f1eadb28c0d188db26d1add9b2eb82cffafb45cbf7d32de7589ca7f287",
+        "isomorphism_fingerprint": "544623c432f14ee5ef87fb4a68cbd89aea35d36c4389eee8572f768c395d49f4",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1410037,
+        "maxcut": 21,
+        "edge_hash": "b2cae74da7190700526ccf1a62cfb28b9971e11c4cab0b4a7466169a43bc35df",
+        "isomorphism_fingerprint": "00816ce180e32bde1496cd57815425088bd3c00257b0ccf04a3d829f16583db6",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1410038,
+        "maxcut": 26,
+        "edge_hash": "a15893b8a485c54ad37143c62e66c276abd1d20e10a7bc596e268c9823c1d99b",
+        "isomorphism_fingerprint": "7821d5ed098bfb23cce7601bfab55307a7e05f757aa796d7bb14c24ed0d07cdd",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1410039,
+        "maxcut": 29,
+        "edge_hash": "403c170fe88b3617769066c96a1915e4b2eac678ee147b16622ad5f8e8418c09",
+        "isomorphism_fingerprint": "7892b5d04bbdafedb33f421f028f9d775adc55f3f7feb557c2647f962bb4b867",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1410040,
+        "maxcut": 24,
+        "edge_hash": "758c4bc95104c707025e7a626f1990fac29cf84170f66523216325394da4e5ed",
+        "isomorphism_fingerprint": "c65763a0a412c4ab2c152856e5519510440eb20fdd5de28b8e65abdbad842806",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1410041,
+        "maxcut": 30,
+        "edge_hash": "d13fdb4cecf9d6d1d8833bf099994c6d33aa2c22a2b731685e40090dc4035019",
+        "isomorphism_fingerprint": "7d0696ddcd7345f9ed79681fb2f4782e9547d4b8eefc28966225c6455ae8e60b",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1410042,
+        "maxcut": 21,
+        "edge_hash": "209e4bb42e2c8c368de27843ff19345442ed6482e2fb55ab7ffc04cc8664aff6",
+        "isomorphism_fingerprint": "67a0163859a4e7c24305dfe8bc7c0113116c5825d72efdd61ed70fd5e69a473f",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.4283757628797117
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1410043,
+        "maxcut": 22,
+        "edge_hash": "d5bbc82fc07426190b9457973c9f77e85517c5921eea6e8a133583549fc61a6a",
+        "isomorphism_fingerprint": "73023f7b29c77b1bf3fe3f03dc2f2a42300de409f1d358f4a483524ee9e2d409",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.5965412083730798
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1410044,
+        "maxcut": 12,
+        "edge_hash": "cdf7b549a338d99af60fda1eb03b58967198ed1885d03676229f7e53a95ae00d",
+        "isomorphism_fingerprint": "e86341e0c9250de29b17fc2fbff253b493f140de6af8cbc7e8a0fa7223c57f98",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.6325902825908066
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1410045,
+        "maxcut": 14,
+        "edge_hash": "332fb40f6b51d00a9e1d572adcb9af99e312d47ea16c46535efea367246f3ef3",
+        "isomorphism_fingerprint": "514e4f3a9aee14f8380fb77e76320072c5d2593a77e490208d1d8c54c612acce",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.5460071671205922
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1410046,
+        "maxcut": 37,
+        "edge_hash": "6439d1f5b9dea15935bedfff4932d3d589637d69cfb0b3ccd2421215b4a21b04",
+        "isomorphism_fingerprint": "0a19e2dbbce6e828c85c861e78105b0b718322cec32f99536bde445b2c2fc5fa",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.397694115156965
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1410047,
+        "maxcut": 28,
+        "edge_hash": "2bc199dc67ab1b72b2d917d5fde9f996651d5d58c7edf8979666c7eb15377771",
+        "isomorphism_fingerprint": "1e562c40ff4fbda0c1cadd8d5f0963a56269ed9648490bbc4f10bba0653f6cce",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.6046923347317599
+        }
+      }
+    ],
+    "calibration": [
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1510000,
+        "maxcut": 19,
+        "edge_hash": "62414b0332dbd1dc477126b6cbd0b99eeae5e3b11a9776e6ee32a73ed6b6ec4b",
+        "isomorphism_fingerprint": "8e9741b6418423642da63494bc9803e67dea3719ea2460d07c082d5c741d451e",
+        "generator_parameters": {
+          "p": 0.42121549952383924
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1510001,
+        "maxcut": 31,
+        "edge_hash": "05c733e1406f2b0b40fc1ab2870354e10c6b9d2f51c6a3703d4612fbacbe98a6",
+        "isomorphism_fingerprint": "3152d06f83b58561b3f399d1eed4c4c35618f731523b14ab558848e93b993ad9",
+        "generator_parameters": {
+          "p": 0.6082312284269077
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1510002,
+        "maxcut": 24,
+        "edge_hash": "b9d3ecb4d172ab8580ef935601ed95feb87b0e73d7ac81edd37fd0cf4eca7672",
+        "isomorphism_fingerprint": "76045f7206bdc42af5c85ac802aa4874bbe226ca00a5d2326e358b58dacf3f6c",
+        "generator_parameters": {
+          "p": 0.5758436316232831
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1510003,
+        "maxcut": 15,
+        "edge_hash": "8fe5956a2b64d484db0396b30dfb1bb90792df69f1b047bf46470a63eef9e6dc",
+        "isomorphism_fingerprint": "bba1b37b15a1191a76f81f5c3ba69828b1791104d2b4b4b1ddebf156998f8356",
+        "generator_parameters": {
+          "p": 0.26370682671062046
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1510004,
+        "maxcut": 20,
+        "edge_hash": "c21edf1984ab7fb7372ce6a68650f953a6f9fd0287f90a5c74165dbbd1b8b2e9",
+        "isomorphism_fingerprint": "fa2a48e693096ba818a97f381e812be3021a172ada44f55d7d4380f11d1a1268",
+        "generator_parameters": {
+          "p": 0.3351446522430046
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1510005,
+        "maxcut": 31,
+        "edge_hash": "535802be36327854810a3c916466a2b56a0ba715086a6a1e4427ee786e9ba4d1",
+        "isomorphism_fingerprint": "8d9cd28c32c5e1f212e9eff46c050e225938c2878a81be3ed8c30749aebc7501",
+        "generator_parameters": {
+          "p": 0.683714222506946
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1510006,
+        "maxcut": 26,
+        "edge_hash": "215fd3272de72758405821e78c3740446fc7209b63fb7e619b4ac63ee32457fc",
+        "isomorphism_fingerprint": "614bec11fe6791aa73b89861d7ceca90ca4ab99ee39bdeb89b5438014f33cb73",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1510008,
+        "maxcut": 22,
+        "edge_hash": "a17742ff336ee07ae0f0e0ffa297b68cd7c3dd2fcdd392a59e96d567a39a438c",
+        "isomorphism_fingerprint": "1cdc125b8096636a5e509f0f706c9575e424e5ac2864dbb9e990600721aff6b8",
+        "generator_parameters": {
+          "degree": 5
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1510009,
+        "maxcut": 23,
+        "edge_hash": "4370b10d9797f51b1dec8bb2cfc0ec1274aac42eb3eae6d3de1c6d72400034c8",
+        "isomorphism_fingerprint": "1cdc125b8096636a5e509f0f706c9575e424e5ac2864dbb9e990600721aff6b8",
+        "generator_parameters": {
+          "degree": 5
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1510010,
+        "maxcut": 26,
+        "edge_hash": "ce9827a27a26a12bd5a2a6460a2ef85a878871b7b3e90d887efcb1af4b0e7e99",
+        "isomorphism_fingerprint": "614bec11fe6791aa73b89861d7ceca90ca4ab99ee39bdeb89b5438014f33cb73",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1510011,
+        "maxcut": 26,
+        "edge_hash": "98ad82ec8f91de19fe1c4cab635aec556e02162b4d6d0b6a599047b64a4f9710",
+        "isomorphism_fingerprint": "614bec11fe6791aa73b89861d7ceca90ca4ab99ee39bdeb89b5438014f33cb73",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1510012,
+        "maxcut": 23,
+        "edge_hash": "08ebecdd2bb4adfffc16e70446b6108e6cbc083efd316577a5d48f05bcb3b4d6",
+        "isomorphism_fingerprint": "1cdc125b8096636a5e509f0f706c9575e424e5ac2864dbb9e990600721aff6b8",
+        "generator_parameters": {
+          "degree": 5
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1510013,
+        "maxcut": 20,
+        "edge_hash": "55f47449e042faeeda26556e4d11cf958ecc2f6c34884c542a0700ffd28a7117",
+        "isomorphism_fingerprint": "bd1a96145217a7fefa352ab047320a10b0bad6c17c0893e7621f147b1cbf1354",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1510014,
+        "maxcut": 21,
+        "edge_hash": "5dd2f9e0cc57e792603541f4c524c4ffdd83848dfa603b45f0a47cd1977eed47",
+        "isomorphism_fingerprint": "ebc204ac42d7bddd2ae1ada4b46298522ae6544088cd8d7b1093075475997b2f",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1510015,
+        "maxcut": 11,
+        "edge_hash": "9f8b04206eec25a4b1c3afe2fefdbf7e558b2ba9008638b809ca67814b5d8d8e",
+        "isomorphism_fingerprint": "5cc2d32c3b9aa46204d93db8841612f9618eb1977429f55a41488c7703748d06",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1510016,
+        "maxcut": 23,
+        "edge_hash": "6fbcf3b48015a6e9cd54d9160910e0e4e1249aa8efe71936f10d580f9c581056",
+        "isomorphism_fingerprint": "13ad94ce0b2e7f86cd73b72da688543e24fca2d7ef49fb04201e1527fa5e345f",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1510017,
+        "maxcut": 18,
+        "edge_hash": "f5d30d2385f92f7519845c6214153c33a20037a633a1056fae2f81fae7d4b491",
+        "isomorphism_fingerprint": "95d9fb7233c9018dd9a77180b8dd8b184a2ca2651373d202fda7e70b2fc6a4fc",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1510018,
+        "maxcut": 20,
+        "edge_hash": "9606431446a725f71fe8921c20c1fc723360efcff297d9618c7ddf923221aa9f",
+        "isomorphism_fingerprint": "360a79f57355ee27ba49352d855bbb1208b7982c57bc32b5a6aa2caa9d1178f2",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1510019,
+        "maxcut": 26,
+        "edge_hash": "934a828e48c72cbd81f96ab4ea359398fa39610c95fdc02434045b5bb556eea2",
+        "isomorphism_fingerprint": "db4cbe97ffbd2a94383f490856a5dc824a84b09d5b2611f99caf694e29047bd4",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.4377538050872785
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1510020,
+        "maxcut": 12,
+        "edge_hash": "024bdbb28fdd9abcf065d82e1c1eb7151aae3b3b36c7c9f90df05cec04bcb9aa",
+        "isomorphism_fingerprint": "052e50de153e9ea5462682437638430b6b00aeee9d00828f6a81290029945e58",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.051423906489416575
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1510021,
+        "maxcut": 25,
+        "edge_hash": "5869598747ba881efe3df8f7d4a0ebb5bfd883462ed2b08a6891843755126576",
+        "isomorphism_fingerprint": "d8c4104f981628e0cf690c231c5639652517ccba55bb3ad385481579f0a18811",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.6122901552074305
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1510022,
+        "maxcut": 31,
+        "edge_hash": "ff1f73134f7cce44ee4e0e2d7b28f6ed3d63cdaa88106227b812329a7d2540b5",
+        "isomorphism_fingerprint": "01d6faeb1b7e967281eece982b54057e755a194455d99bb80899f63bef85acb6",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.6731650847164682
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1510023,
+        "maxcut": 26,
+        "edge_hash": "09ea361e3ffe993d468a6908d82deb6f8f2fd738c9f8a8f75f249af4420405e9",
+        "isomorphism_fingerprint": "03a8a0ddfc89ac966024c15c8c95e95ec360b393965c892a6e4b4eb61489096b",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.16274120942022782
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1510024,
+        "maxcut": 32,
+        "edge_hash": "1066b5f7ea3fdddad095a7620a30fecc142709849a47492dd3e4833eff217485",
+        "isomorphism_fingerprint": "9d2b4319e73d561b225a0801353ecb28bf725750a9adccbfec977f9f5c46344b",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.8144250570588638
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1510025,
+        "maxcut": 38,
+        "edge_hash": "4b491165dfefef84d261bab8c0b6b14d8d4bd1f9b723cb66b92f9a56d0892144",
+        "isomorphism_fingerprint": "ffc9bc758c3f54ee6cd9ebe5ad6768d1ff1401e200e994cbaf25cfe6bae449dc",
+        "generator_parameters": {
+          "p": 0.5353543320205099
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1510026,
+        "maxcut": 33,
+        "edge_hash": "ee7d067661ee48a54c0a3c0315531dcb3bf79e4f6aae3ca0dd1a3218d86040ed",
+        "isomorphism_fingerprint": "6d038f64e9db124f60555acb9ad8dd779a413ae7af09cdbb3c7f8809d3689928",
+        "generator_parameters": {
+          "p": 0.47775326418963576
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1510027,
+        "maxcut": 30,
+        "edge_hash": "582906c8322ef33a6fe7eea736bd4f2bc5f77b6d4bf5cac449d89fd898c35d71",
+        "isomorphism_fingerprint": "bfe6734dfd7db98a3cc675654c8527d4d171e36e8931269d379405d0e3fce9ec",
+        "generator_parameters": {
+          "p": 0.462985675521672
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1510028,
+        "maxcut": 35,
+        "edge_hash": "beb83970ab5f4fee25d458927e72bcb6255f0bc8ecc94aaddd0a1ea83e13d6c9",
+        "isomorphism_fingerprint": "8f868c0b93d8b021e548d2af1b58a2c6ad1df7ff6720e693739373e88d9fb39d",
+        "generator_parameters": {
+          "p": 0.5378053090620806
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1510029,
+        "maxcut": 19,
+        "edge_hash": "94777264598b2911890447095960d967618221e0da5fa88b30da3bf84efa5a9b",
+        "isomorphism_fingerprint": "f302972deb93968732d21b4533afb8a0412722c89241be2b12844b8e949b8bfb",
+        "generator_parameters": {
+          "p": 0.24257357245940375
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1510030,
+        "maxcut": 24,
+        "edge_hash": "9f0c25e58e78e08c3615af1689f7a0ea44cc892b06dba3ab63d4e2d35a1d8b3e",
+        "isomorphism_fingerprint": "49ed558effd453d9a91b379aa3ad8b0d99641083e1b44e1482e33dfab8c88aa0",
+        "generator_parameters": {
+          "p": 0.3373581244574194
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1510031,
+        "maxcut": 24,
+        "edge_hash": "b7e88517f2f87823bdca0cc94ff3eb564ea653c0462ec22d61ebeabb14d5f7ab",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1510033,
+        "maxcut": 30,
+        "edge_hash": "cae3635f8fb128726306c03d33b7a9af69863e055766bb405a72140567c62f67",
+        "isomorphism_fingerprint": "ebfeca423cac2f518d0bfef1f09e5fd43f9f9380e57233c392347056d0424ce4",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1510034,
+        "maxcut": 22,
+        "edge_hash": "3cbad103fc8356236f0934474215df470fddba8b0e726487aa66c20b7e559cc2",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1510035,
+        "maxcut": 22,
+        "edge_hash": "e7e68cb3793427d84809ba5ef80e4568b6f5ad6f68dfbc3294f288346801ab3c",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1510036,
+        "maxcut": 32,
+        "edge_hash": "0e635a6a411eb5099a1ea8654f37ec941cd07eb0829dc31ed1bcbcf40f4df9cd",
+        "isomorphism_fingerprint": "ebfeca423cac2f518d0bfef1f09e5fd43f9f9380e57233c392347056d0424ce4",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1510037,
+        "maxcut": 12,
+        "edge_hash": "f0dac6f772fd1756fc6b6795eb7542dc4b999dc81c79bd70de6874eb4e38278d",
+        "isomorphism_fingerprint": "bbecbeccc21aaeaf0b57bde1d72bef5e3178cc86d81b839468d43418755eef4b",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1510038,
+        "maxcut": 20,
+        "edge_hash": "a39bb9760eecb543bf7c85bac9b46470eaf3bdd74fbfb0af76caf36447fce173",
+        "isomorphism_fingerprint": "389795877609d8557cd3527941043ec00c5c257e25104026188099264c75e70c",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1510039,
+        "maxcut": 18,
+        "edge_hash": "ea5f21e73bfc51f654b33ce1e8f9a850755890b07cb523dc5e7e7c9ac59ccf82",
+        "isomorphism_fingerprint": "bd204d32fe73a35d8e2bb4cb3dca99d9e149a84661ab7987c22305bd00493fa7",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1510040,
+        "maxcut": 19,
+        "edge_hash": "d7d303406852e6da7ccd65e9f615de4c558b20fb6ff868915b5b0183ac3b5a96",
+        "isomorphism_fingerprint": "de09b6d0463c02e7b0cce40ccc9410904b9e0150b043dc0d970265fbc400bc38",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1510041,
+        "maxcut": 21,
+        "edge_hash": "61ed3024c34aee4ff6fcf16469fd40cf06dd9111d1fe7293137aa5641d0b2e26",
+        "isomorphism_fingerprint": "fc6b45aa192418f1a5bff8610499706472245d57e20734af0d47410605b5a6f8",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1510042,
+        "maxcut": 26,
+        "edge_hash": "c440d4031c0e0f0266d54c491948d91c15edf6a86f4a9c473ac6cc27478a621f",
+        "isomorphism_fingerprint": "06f6ccadda40e95d0212c016782f55a4c477bdeeed7bea6e7dcff64e43124534",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1510043,
+        "maxcut": 13,
+        "edge_hash": "48ec4d9312d8473a7ba420e5fea0baedd7b60ec3af2c739c1ca30c8314396fb1",
+        "isomorphism_fingerprint": "8cc48485976a50f31307369ab4a266420e4bfc20b2538a54bcf4175ccfe31eac",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1510044,
+        "maxcut": 13,
+        "edge_hash": "fec67d6ba9a073b86a864ddf094ed6db90e494e7053243a6a7dc2951651656c6",
+        "isomorphism_fingerprint": "4568ec2c66bf557b715cefe0916758989706aac4cc05c52eebbd8350967f2d31",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.6607069621442909
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1510045,
+        "maxcut": 38,
+        "edge_hash": "90ac56ab5f07d147a7deeb8c6698eeec01a474fb2586407efcff410249edd1f7",
+        "isomorphism_fingerprint": "767e9fa3786bac98f33cdc14298f0f6603ce4229a283a1d31ab2a2ef8f0e473f",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.1563075133008556
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1510046,
+        "maxcut": 39,
+        "edge_hash": "2cbf4ca3f4d59b688a9eae638e522cb29b440c9da453e9f552d0782b61d6ac07",
+        "isomorphism_fingerprint": "d002506efe150185fab499d3562e415c0d537d1aac9f30076dda171c8879c199",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.6474975632058898
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1510047,
+        "maxcut": 36,
+        "edge_hash": "c7597e1beb90c2c43375e47bbfdb88aeabdfd5ede34e36dd551e41747db712b5",
+        "isomorphism_fingerprint": "a23205fd5d5759fa05803fda5f99add3e74456538c86c14f44ddbf06c8236e97",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.6500763031257948
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1510048,
+        "maxcut": 13,
+        "edge_hash": "0e3686eb57c7987acc0bce37a44e24d9aa822c1f9e03281806ca10174b49ed26",
+        "isomorphism_fingerprint": "3185ec1ba120bac7c9fb248ad21f300e1c0d7a420b06818c4d76a77c585a2c5c",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.543448727425945
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1510049,
+        "maxcut": 13,
+        "edge_hash": "1c61cd3273e764f7bafd030510432bbfe1e446d01f1baf749080947b92c48cf5",
+        "isomorphism_fingerprint": "f6adf9b54e466f6781714fd743e941e08f997be4264442e6c0534b40a441489b",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.5530478237152463
+        }
+      }
+    ],
+    "audit": [
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1610000,
+        "maxcut": 24,
+        "edge_hash": "08ce9beb12619a30af8939a396eeb4fd502a5baf96d691f9b0d59401ab036e49",
+        "isomorphism_fingerprint": "028224af8c27375d77af5c6c94376eaf9d52dc8019d3dfd793b21b8b04f6f5a0",
+        "generator_parameters": {
+          "p": 0.5789466430579218
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1610001,
+        "maxcut": 15,
+        "edge_hash": "2b9e5899567e455183450848343ad8d15cba3ba053c7931fb8bf9e3cc49a1738",
+        "isomorphism_fingerprint": "39dcb39003ad7f4b7dee3b427ef519e8bc9243d15a37db5dda7864a514c80daa",
+        "generator_parameters": {
+          "p": 0.18369426862085206
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1610002,
+        "maxcut": 29,
+        "edge_hash": "e2cb336bbb45d33d2c092c9b9fdea79bccfbdcf4571773035e1b37f3bf05c340",
+        "isomorphism_fingerprint": "08c80343a972d36dc7af3874536968b002978e57903b8fc38c9a8a6a80fdf299",
+        "generator_parameters": {
+          "p": 0.7079542694893932
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1610003,
+        "maxcut": 30,
+        "edge_hash": "1d21554034fb08b8655660d788f8d9c6540c350579b95f1dd8bf4cadaecf42aa",
+        "isomorphism_fingerprint": "6816392a44ad70186bab03a8430afd415ed3726205c53792ef0258338717b19f",
+        "generator_parameters": {
+          "p": 0.6136113032899314
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1610004,
+        "maxcut": 27,
+        "edge_hash": "66deadd708e44111ec83565f3eca4898efdbb454352ac7504dd531780f6064b0",
+        "isomorphism_fingerprint": "1a04ca5b7d612df58014d4679bfdbb017466210bdc663b903593aae0f31136a7",
+        "generator_parameters": {
+          "p": 0.5030495604456175
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1610005,
+        "maxcut": 30,
+        "edge_hash": "c9f3c0d1939ad4d1f85d0f3a5f51b38dc3fd19a884c62250ee7b83ef69493ac9",
+        "isomorphism_fingerprint": "019ab377a3658901dedd60d6afddb0b441dc63b9d42b0a52a732d7bc1e5b6e11",
+        "generator_parameters": {
+          "p": 0.7310589399951621
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1610006,
+        "maxcut": 11,
+        "edge_hash": "adc30343c036c77e535020ea739e3cdce135d9a67e48b5bc679e2efece462b5e",
+        "isomorphism_fingerprint": "d6c14af5fe5a5a9fd6b6ecddc8a11aa83426b9955c0269fb9aeee49c6a5494bc",
+        "generator_parameters": {
+          "p": 0.238633204917321
+        }
+      },
+      {
+        "family": "er",
+        "n": 12,
+        "seed": 1610007,
+        "maxcut": 11,
+        "edge_hash": "9a483c75906857e776add6033296a49f14191889633fc23f74cf3bee6b2b7f07",
+        "isomorphism_fingerprint": "f6e7e92428b05788c457b38f2aa2fe1c528e1b492e9b5a3864eb4a8d920b4dff",
+        "generator_parameters": {
+          "p": 0.15884764403059884
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1610008,
+        "maxcut": 26,
+        "edge_hash": "59a36c1bcd9ce9ddda2df8993b65d83dda8b9f11694e2ad09f210daa3d440c17",
+        "isomorphism_fingerprint": "614bec11fe6791aa73b89861d7ceca90ca4ab99ee39bdeb89b5438014f33cb73",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1610009,
+        "maxcut": 12,
+        "edge_hash": "376b44996b620d3a4db116a0ff1e9c39ab1c2797ff33512ccd8ee0d70c1ae86a",
+        "isomorphism_fingerprint": "052e50de153e9ea5462682437638430b6b00aeee9d00828f6a81290029945e58",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1610010,
+        "maxcut": 18,
+        "edge_hash": "4afda7e082b2cde3f273b5042d8a6925e147065b7cb94dc809039e173c1f7f9b",
+        "isomorphism_fingerprint": "fa0d673a296564575dbb77a89e3a55929733e4b20dac479a8662e21e9d1c7db6",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1610011,
+        "maxcut": 22,
+        "edge_hash": "afa8910039ae307e1587ef67cacd8f245a47a0a6da11f512ce97ec80e8fe70f2",
+        "isomorphism_fingerprint": "1cdc125b8096636a5e509f0f706c9575e424e5ac2864dbb9e990600721aff6b8",
+        "generator_parameters": {
+          "degree": 5
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1610012,
+        "maxcut": 20,
+        "edge_hash": "d69156134b7a22605090e1b13577188128bcf898352a61c0b659c457c2ef6e6d",
+        "isomorphism_fingerprint": "fa0d673a296564575dbb77a89e3a55929733e4b20dac479a8662e21e9d1c7db6",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1610013,
+        "maxcut": 23,
+        "edge_hash": "797f755baf7f11b889000d79aaaebc908742b2a213de7cfc2cf49066ab538c74",
+        "isomorphism_fingerprint": "1cdc125b8096636a5e509f0f706c9575e424e5ac2864dbb9e990600721aff6b8",
+        "generator_parameters": {
+          "degree": 5
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1610014,
+        "maxcut": 18,
+        "edge_hash": "3b1d11a7b3db91385ce9872cf578ea85d20fdde65636815352d190480bb2b9b9",
+        "isomorphism_fingerprint": "fa0d673a296564575dbb77a89e3a55929733e4b20dac479a8662e21e9d1c7db6",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "rr",
+        "n": 12,
+        "seed": 1610015,
+        "maxcut": 16,
+        "edge_hash": "c6339ec33ff2e190836e325088eb9c4f735d27d227c7d41ce78d91a8756bcb85",
+        "isomorphism_fingerprint": "19a819c81fbfc45d756ef0aa9fddb15be895b93503ec9b1f1036d1b73aecffa1",
+        "generator_parameters": {
+          "degree": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1610016,
+        "maxcut": 21,
+        "edge_hash": "80f235a832fe4132726949f959f65de411e565b320b920b80c4df7f2c0ccbff3",
+        "isomorphism_fingerprint": "d7a9b80c93049ce62135e5956c361bbca1878971f4450f215d1420737cdb30a4",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1610017,
+        "maxcut": 22,
+        "edge_hash": "368d2b189b7a803149bf74ac2dd00ee5f311b5db9e6249f87808853a435cc7c9",
+        "isomorphism_fingerprint": "0b51bbadff1df68c09511bc7f54949087ef39cccc700abe78b159e45b2c0f4d5",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1610018,
+        "maxcut": 11,
+        "edge_hash": "c25f04453a5b8d4bff07557f7879bf5a751e8eb1616075df2fe8329550624382",
+        "isomorphism_fingerprint": "7af3706dd042b1975e7c2715a9df41b1ae9bc5297bc52e5d5feb3419fed4c582",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1610019,
+        "maxcut": 20,
+        "edge_hash": "f58f75c9afd68610c2ea445f7a8a0d0c0772d8635d9b35f8103edd8f1c9da4f1",
+        "isomorphism_fingerprint": "ac28c217bc2f2d1e09b64a4802d8c5a842561fcebb5578f0edb46892f8b96ee1",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1610020,
+        "maxcut": 23,
+        "edge_hash": "2f6e5f6ef6d1bc42c5aaec01e501baf7d8cb26491d68c0247a124f88719bf322",
+        "isomorphism_fingerprint": "196ad52aaf9de7b5c337988bbb9081c5dab36a56941fe83e0f1e51f620716567",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1610021,
+        "maxcut": 18,
+        "edge_hash": "6f9c26f83d06f5a23d1f1bc2f1d21eeb051f2ca4bfd226cb81fb066ef75472d0",
+        "isomorphism_fingerprint": "4cb34dca438219a1b5c886c95b9716e37f678672786928b8f3e117e69a4a7a3c",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1610022,
+        "maxcut": 23,
+        "edge_hash": "d9fe85afb238e366f9ddca677b8c99baecabefad251917346b553784f4f419a2",
+        "isomorphism_fingerprint": "70bcb2d04e0be5ca04073d438958b66e1193e0b5ac36eb6c6805565d2cc4062a",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 12,
+        "seed": 1610023,
+        "maxcut": 20,
+        "edge_hash": "50d3b146280bea2b1a30e2ad875473aef892976ee2face7b8b1b860a9a394e98",
+        "isomorphism_fingerprint": "69f2c148077d1f7da486d71766bcac091648c538fe6f290a02c2bdc9b13b1c8a",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1610024,
+        "maxcut": 25,
+        "edge_hash": "d8dfd0126e8742bf4aeacb362c74036101513f34b1739268cbbd156a4f2d30b4",
+        "isomorphism_fingerprint": "20db1c8fd83ab83704bf2cd0cf173df1f59de074f2b1f1856d51bc864b313596",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.2117730911993813
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1610025,
+        "maxcut": 31,
+        "edge_hash": "26c5a0de7db97f3c7be5a0bb4c95abd41242412627595b20e680e1bda821a6d5",
+        "isomorphism_fingerprint": "6881b9c95e0acdf19e7b70c1855e1b738cf4bd3aa006d2d8e34711588fcab44a",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.17413128537613523
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1610026,
+        "maxcut": 31,
+        "edge_hash": "f1832912d1e47381a35335a769dfac89ecef5f33cd01351016d40565b58ea956",
+        "isomorphism_fingerprint": "4b5ea23766f913c570c1e094a542cb7a975cd8043c90de002c16b16e684f728f",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.6137638457818003
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1610027,
+        "maxcut": 32,
+        "edge_hash": "dfaf0ae41962600f358666c621f69e939717292e628d84b51a5ad7eb33090b49",
+        "isomorphism_fingerprint": "bf798f3de58be05493a7396916963cc103fbf2a38a31af7b24d6d46e1bf30980",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.02540300116932678
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1610028,
+        "maxcut": 25,
+        "edge_hash": "4747e4dd943e4998602119a5b1fc7a568e1868ed868934e7ebc02db426eb6851",
+        "isomorphism_fingerprint": "3f97b2c168a9cc73510de1cdfdc0bcef642afc7e384fae5f6022b16a6fb01105",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.3579479880902721
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1610029,
+        "maxcut": 20,
+        "edge_hash": "4c64dc3006f749a2d9f45a9656673af4295fd2e2567a1422c427eeadabb9d8fa",
+        "isomorphism_fingerprint": "68fdb99d848e43121fef0eff29fe633ac50cf85ea9f8adc209fb8bd72a3020a9",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.7446669125016813
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1610030,
+        "maxcut": 25,
+        "edge_hash": "071345b1f758c6fcfa82a91eaab8fcdac29fd3bb9678b72cbdc9a268fd7ed480",
+        "isomorphism_fingerprint": "8a3197640000a988128750e39bdadbba892cb1147ef64c1b6eddaf252a45e111",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.11214937440523658
+        }
+      },
+      {
+        "family": "ws",
+        "n": 12,
+        "seed": 1610031,
+        "maxcut": 26,
+        "edge_hash": "99d7897a67bcbe3aafb519678ac44b74a61a71608afc351b94407b99074c419d",
+        "isomorphism_fingerprint": "a28d94c2eabfdb2ca3bebab5258c8daa9510f764ecd29fe379ac12558af57022",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.4348897489028505
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1610032,
+        "maxcut": 43,
+        "edge_hash": "56d8066b74a797e34dc93638a5eb047d92c4005861995fd260e4b29dd32977e1",
+        "isomorphism_fingerprint": "145312eeaa11e75d98b5edbe83dd5c78f6cb0fba53e9ea73d9e5dc6cf6bed562",
+        "generator_parameters": {
+          "p": 0.6562079707562201
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1610033,
+        "maxcut": 46,
+        "edge_hash": "733f2b003b4c82fa68f418adab2334595e3efcfbff53b4f5b7fa8ff0a61e2263",
+        "isomorphism_fingerprint": "3b71fa5f8f6227f40b6920bff827edddae0480935ca4c6398b7c21d964738776",
+        "generator_parameters": {
+          "p": 0.7167743403253429
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1610034,
+        "maxcut": 17,
+        "edge_hash": "84f185d8e9d848174c1d6ebb4af1b4aa38cb4f560f681c45df4f9bcdb00d3701",
+        "isomorphism_fingerprint": "30ac9295f99faef9afa8d7e630495ae75295395200cd4808892acad24040bc40",
+        "generator_parameters": {
+          "p": 0.2685253242686006
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1610035,
+        "maxcut": 33,
+        "edge_hash": "6264500aafbad8d319db2ee11a99e447878c172adc31beac72026be000cb8ee1",
+        "isomorphism_fingerprint": "42b36e082039295e0d7fa741bf3f3e3edec8de735f7c128077ce262881d2efb9",
+        "generator_parameters": {
+          "p": 0.5315240502695953
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1610036,
+        "maxcut": 31,
+        "edge_hash": "516dac7913d4629909e0f6030a6760cb76456e57e91e5766bd1835058ccf4a7d",
+        "isomorphism_fingerprint": "d39bc1940de1e463313728603eebaa78c98e138c65beddadbaa4fba1c86368c5",
+        "generator_parameters": {
+          "p": 0.4005931123508825
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1610037,
+        "maxcut": 28,
+        "edge_hash": "e65fdd4c833e6f3f11ce3120c52418914cc3b8eb6a4260f9fcf171a40337c6bc",
+        "isomorphism_fingerprint": "a625d4a0aa75f7c79be6d19e899f69bffe20bbcecb51e3aec677e89f1b6d054f",
+        "generator_parameters": {
+          "p": 0.4126205558697937
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1610038,
+        "maxcut": 39,
+        "edge_hash": "84445df3e514f8a36c2e5c9dc4d83f55f6d51a78969f9bca86289e597e5ab935",
+        "isomorphism_fingerprint": "77bc2b4ce0cea7b6fb47a4362aedc7184ab8dcfd185396cb53fc8e85ce67ced9",
+        "generator_parameters": {
+          "p": 0.5891435746303225
+        }
+      },
+      {
+        "family": "er",
+        "n": 14,
+        "seed": 1610039,
+        "maxcut": 38,
+        "edge_hash": "00cdce040b1d4534fda9657e15595252b2dd9679d7c8151487ca042c1aa20608",
+        "isomorphism_fingerprint": "3aa2c1b69f1c92d7c14ffeb25ae2d5ef7bf1928efb561ff85817a01bbf294364",
+        "generator_parameters": {
+          "p": 0.65288404546304
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1610040,
+        "maxcut": 14,
+        "edge_hash": "14d8195466585168a08f11267d2f9bcc4e5d5784acbf94ea5dbe86965229c84d",
+        "isomorphism_fingerprint": "bbecbeccc21aaeaf0b57bde1d72bef5e3178cc86d81b839468d43418755eef4b",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1610041,
+        "maxcut": 12,
+        "edge_hash": "8b8b685cf34acde5876ae55f1d742fc5c5b1b4d436d2391d359b3d2fd567e8b0",
+        "isomorphism_fingerprint": "bbecbeccc21aaeaf0b57bde1d72bef5e3178cc86d81b839468d43418755eef4b",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1610042,
+        "maxcut": 28,
+        "edge_hash": "57cbc819f77d1916104161738b81f9fd7fc29e10472fbfe3bd6c7330be52ad29",
+        "isomorphism_fingerprint": "5f76b409df8538739a831add1b8be54ceb2396e6ac867b6b865543621250ecca",
+        "generator_parameters": {
+          "degree": 5
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1610043,
+        "maxcut": 19,
+        "edge_hash": "b9bdc46699646929105e631e5acf72e2694bd21d380fddc505dcbf695519d56d",
+        "isomorphism_fingerprint": "19a40d1f532b284d95f2b06b0f609d2fdf5209007fa2f99b004b78ea3d32e990",
+        "generator_parameters": {
+          "degree": 3
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1610044,
+        "maxcut": 32,
+        "edge_hash": "0488131700513f7d1325991646ad80c7e1a6ae855fca3ff10bf0123feeb9a09f",
+        "isomorphism_fingerprint": "ebfeca423cac2f518d0bfef1f09e5fd43f9f9380e57233c392347056d0424ce4",
+        "generator_parameters": {
+          "degree": 6
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1610045,
+        "maxcut": 12,
+        "edge_hash": "a3315462951463e72b746e80cf1dae8c13853e1c99dfa4d6d76067efcc9d166a",
+        "isomorphism_fingerprint": "bbecbeccc21aaeaf0b57bde1d72bef5e3178cc86d81b839468d43418755eef4b",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1610046,
+        "maxcut": 14,
+        "edge_hash": "832548a6c229ec1c75577b81cc103a2b9099879b0848e1036fd27ac14d892c95",
+        "isomorphism_fingerprint": "bbecbeccc21aaeaf0b57bde1d72bef5e3178cc86d81b839468d43418755eef4b",
+        "generator_parameters": {
+          "degree": 2
+        }
+      },
+      {
+        "family": "rr",
+        "n": 14,
+        "seed": 1610047,
+        "maxcut": 22,
+        "edge_hash": "f0baa915cd62c9ce0f9378ffdd2a4fc578d31bbe023db7ca7eb8a8b5e9642f91",
+        "isomorphism_fingerprint": "af5f70e4107c881dffab8e51ce23751d07365a771105b9de66b62bb6429d555b",
+        "generator_parameters": {
+          "degree": 4
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1610048,
+        "maxcut": 19,
+        "edge_hash": "a093a69d53c37b4563dfdbf7b1756b312c33d99b2b5192b21a195f3ac4d62588",
+        "isomorphism_fingerprint": "bdc773efca6211c60cc6d94c7462d204560a9d7818f6aedbced3bae60b320a3c",
+        "generator_parameters": {
+          "attachment": 2
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1610049,
+        "maxcut": 26,
+        "edge_hash": "4cbcd16ea321f4db5af102ba06bcc320bcbd1b8e0d13da4fb43dcbf94744d503",
+        "isomorphism_fingerprint": "60f701ff4b44b6391223be42c85cde35c2eef28da9e4e952fc750afe6fce81c0",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1610050,
+        "maxcut": 13,
+        "edge_hash": "8c2202ba957bced44ec92d069523ba118628b05634d32301478be35fdbb0d5eb",
+        "isomorphism_fingerprint": "c669ed59621d9e2ad43ebe68e662ee1f1f2f7bb2aef30f469e1e4e3f6e5b6696",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1610051,
+        "maxcut": 13,
+        "edge_hash": "bebe4a38bd72e4df5fe3057c98d35c524f9343e39adf98f4e3f7e5bd743664e5",
+        "isomorphism_fingerprint": "80faacd5f6e420f44fff0185a41f45e68b1cd768256a7c1dd6e26af4a1d43d04",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1610052,
+        "maxcut": 13,
+        "edge_hash": "82cb9fb96c81e6f9eaccb06e44e8554b2def85fd8454da5db8b891989c76bd94",
+        "isomorphism_fingerprint": "883047862e7f714def3754766a8e52e0aef863379bafafa4541adfce5fe32154",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1610053,
+        "maxcut": 25,
+        "edge_hash": "560a1e747e56ad3063837af9c050cd9312a4935abc13d37d2f6fd2eb912ca13f",
+        "isomorphism_fingerprint": "0d5a2eb522dfa545559c590e684780112b614bb1fd36149ffcd9f3095e600f8f",
+        "generator_parameters": {
+          "attachment": 3
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1610054,
+        "maxcut": 13,
+        "edge_hash": "03c4f324e27b81fcbcf4e69540984b078b9498db76827cc6b45d5df724fbd098",
+        "isomorphism_fingerprint": "6a1c66b47f1be0d063f7b7f29519e99331a6bb4e9b09fd7c0faccd3c332a5c78",
+        "generator_parameters": {
+          "attachment": 1
+        }
+      },
+      {
+        "family": "ba",
+        "n": 14,
+        "seed": 1610055,
+        "maxcut": 28,
+        "edge_hash": "305cd6a2fb58e304045ecbba94e3fdd3fa3e176fab59422fc0ccd68aa3f23266",
+        "isomorphism_fingerprint": "bf7e75f755a9238404af4e33ca4e45f3194ee6b3d7dd3b82c3d0019ce83efb8e",
+        "generator_parameters": {
+          "attachment": 4
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1610056,
+        "maxcut": 13,
+        "edge_hash": "18859054835125b0baaabe78974459fd6f1b6017f395fc387f40e292674c0175",
+        "isomorphism_fingerprint": "68330c987d76cf6e2e39d67f33c2e09f3f70dea21422f6f33af531cd478fce2c",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.7155008787836035
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1610057,
+        "maxcut": 14,
+        "edge_hash": "98cf8f02b96653a405ee2bb5ca199e2d0722783776b686c335495e7061783ff4",
+        "isomorphism_fingerprint": "90c8409c38574e622fda6304a78cdaa59f86bdb1a83cc2f238e7c489823d404b",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.8489788882377641
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1610058,
+        "maxcut": 37,
+        "edge_hash": "61e16a6a7abacc967f3c05b0c6609d79232879f44110e6c149467d1f28348946",
+        "isomorphism_fingerprint": "e0d666a57ef7f166b7ea10a32bf787ea22db208f4dad004cbe1d4fcc156f79d1",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.630467123855599
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1610059,
+        "maxcut": 13,
+        "edge_hash": "946a198f5b63d084827db45dbe636b4063ac62fda41d0a96c36cb38d1edb3e60",
+        "isomorphism_fingerprint": "f6b70e318ead9b3f08c44014a37aee3aded3f6449d0a25b7e471edc80b57a902",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.07572677236516964
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1610060,
+        "maxcut": 29,
+        "edge_hash": "d692733fc401b82728665003047b3cf87cc78b1b4679c0630a131e00416b7010",
+        "isomorphism_fingerprint": "d1ec60edc5a9da8e03072966e772ced5725d027221c1af870dc18d34728b562f",
+        "generator_parameters": {
+          "degree": 6,
+          "rewiring": 0.15424614687615398
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1610061,
+        "maxcut": 23,
+        "edge_hash": "c323b4e2a945e73cfc6325bdee53fac3530e7922bdff1a995d2aa46785ab0a5d",
+        "isomorphism_fingerprint": "5723ee5d9299d4ac0103fdeaa5dbb8f1500961d3c5bd1109f6860761825b6b8b",
+        "generator_parameters": {
+          "degree": 4,
+          "rewiring": 0.7260429501762623
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1610062,
+        "maxcut": 13,
+        "edge_hash": "5541fd8fe674f01bebbb59b36ec339cc02d25c5c77b2116673af9744dc414226",
+        "isomorphism_fingerprint": "3f71cec54ca7cdab3d02ae1ba5fb5f04745c2cd218206893e702617c9d431f07",
+        "generator_parameters": {
+          "degree": 2,
+          "rewiring": 0.6496297072083913
+        }
+      },
+      {
+        "family": "ws",
+        "n": 14,
+        "seed": 1610063,
+        "maxcut": 37,
+        "edge_hash": "a47eba2a600533d0b33074d72c9fee38133f74c034d222c94c6529cc2a42baa1",
+        "isomorphism_fingerprint": "686501893950a499fe51fe6510f5e8fc03ad03122a245d62117f2c2419a5f8f4",
+        "generator_parameters": {
+          "degree": 8,
+          "rewiring": 0.8110529652775837
+        }
+      }
+    ]
+  },
+  "protocol_sha256": "b97cd7ec6137ef1ca5b18016fd126249650a1c35dd72487df5714a9d7fadcfc1"
+}

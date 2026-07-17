@@ -1,0 +1,15 @@
+\begin{tabular}{@{}llllr@{}}
+\toprule
+Arm & Initialization & Search rule & Offline labels & Calls \\
+\midrule
+Concentration & coordinate-wise median label & pattern search & yes & 32 \\
+TQA $d_t=0.25$ & midpoint linear ramp & pattern search & no & 32 \\
+TQA $d_t=0.50$ & midpoint linear ramp & pattern search & no & 32 \\
+TQA $d_t=0.75$ & midpoint linear ramp & pattern search & no & 32 \\
+TQA $d_t=1.00$ & midpoint linear ramp & pattern search & no & 32 \\
+1-NN transfer & nearest standardized training graph & pattern search & yes & 32 \\
+Random multistart & four uniform random starts & four pattern searches & no & 32 \\
+SPSA & concentration angle & $a=0.18,c=0.12,\alpha=0.602,\gamma=0.101$ & yes & 32 \\
+Legacy GCTR & GIN diagonal-Gaussian mean & radius-two covariance-shaped pattern search & yes & 32 \\
+\bottomrule
+\end{tabular}

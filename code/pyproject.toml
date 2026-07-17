@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=77,<82", "wheel>=0.45,<1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "specops-gctr"
+version = "3.2.0"
+description = "Self-contained source, evidence, and reproduction package for SpecOps GCTR"
+readme = "README.md"
+requires-python = ">=3.9,<3.14"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Molena Huynh", email = "molena.huynh@jmp.com" }]
+dependencies = [
+  "numpy>=1.21,<3",
+  "scipy>=1.7,<2",
+  "networkx>=2.6,<4",
+  "matplotlib>=3.5,<4",
+  "pandas>=1.3,<4",
+  "torch>=1.12,<3",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7,<10"]
+release = ["build>=1,<2", "twine>=5,<7"]
+
+[project.scripts]
+gctr-reproduce = "specops_gctr.reproduce:main"
+gctr-optimize = "specops_gctr.cli:main"
+gctr-portfolio = "specops_gctr.portfolio_experiment:main"
+gctr-risk-audit = "specops_gctr.risk_control:main"
+gctr-reproduce-all = "gctr_repro.cli:main"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["specops_gctr", "gctr_repro"]
+
+[tool.setuptools.package-data]
+gctr_repro = ["evidence_manifest.json", "bundle/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["src"]
+
+[tool.uv]
+default-groups = []

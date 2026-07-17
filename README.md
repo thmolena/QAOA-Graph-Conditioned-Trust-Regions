@@ -32,10 +32,10 @@ no hardware, scaling, selective-safety, or journal-readiness claim.
 - [Python package](specops_gctr/) · [Source data](manuscript/source_data/)
 - Preprint: [arXiv:2604.24803](https://arxiv.org/abs/2604.24803)
 
-> **Revision status.** The local manuscript supersedes the target-based claims
-> of arXiv v1. Its hashes enforce an internal execution order, but the frozen
-> protocol, decision, and outcomes first entered public Git history together;
-> this is not independently timestamped preregistration.
+> **Evidence scope.** The current target-free audit is the manuscript's primary
+> evidence. Its hashes enforce internal consistency and execution order, but
+> the frozen protocol, decision, and outcomes first entered public Git history
+> together; this is not independently timestamped preregistration.
 
 ## Current claims and verification paths
 
@@ -46,7 +46,7 @@ no hardware, scaling, selective-safety, or journal-readiness claim.
 | Marginal and conditional harm answer different questions | `4/160` joint harms, `4/12` conditional harms; exact-binomial sensitivity UCBs `0.0563` and `0.6091` | `gctr-risk-audit portfolio_results/heterogeneous_confirmatory_v1/summary.json` | Binomial bounds are not formal for the locked dependent design |
 | Legacy GCTR is not competitive in this regime | GCTR AURC `0.28577`; TQA-0.75 AURC `0.17277` | Confirmatory traces and summary | Exact simulation only, `p=2`, `n in {12,14}` |
 
-## Superseded target-hitting case study
+## Legacy target-hitting case study
 
 The schema-2 target-hitting artifacts remain available to audit the first
 release. They are not evidence for the current reliability-routing claim, and
@@ -61,8 +61,8 @@ their offline reference target is unavailable in deployment.
 | LOFO shift exposes mixed method ordering | GCTR `39/48`, cost `89.3`; heuristic `40/48`, `86.5`, `p = 0.832`; point `38/48`, `125.0`, `p = 0.00509`; two-seed/full-cap control `41/48`, `73.75`, `p = 0.0355` | `LOFO_InstanceLevel.csv`; `results.json` | Four fitted family clusters and a composite control make the paired tests exploratory, not causal evidence for allocation |
 | The ranking penalty is not supported by this run | Full ECE/rank correlation `0.101/0.671`; without ranking penalty `0.026/0.854` | `Figure5_Ablation.csv`; `results.json` | One component-removal run is diagnostic, not a causal estimate or a new confirmatory test |
 | Returned exact quality is protected by best-so-far seed selection when the budget admits the mandatory seeds | Monotone implementation and `test_seeded_policy_never_worse_than_best_seed` | `specops_gctr/optimization.py`; focused test | The guarantee is conditional on enough effective budget to evaluate the required seed set and compares with evaluated seed values, not a separately refined baseline |
-| Early truncation cannot improve shared-cap cost on a fixed trajectory | Pointwise target-hit/miss argument in the early-cap monotonicity proposition | manuscript Sec. V; `score_semantics` in `meta.json` | The two-seed/full-cap control also changes seeds, so its empirical difference cannot be assigned to the cap |
-| If a policy uses fewer fixed evaluation locations, a sufficient uniform-shot upper bound decreases | Concentration bounds plus finite-shot stress tests | manuscript Sec. V and Extended Data Fig. 2 | GCTR does not use fewer locations than the heuristic/control here; this is not an end-to-end hardware-cost identity |
+| Early truncation cannot improve shared-cap cost on a fixed trajectory | Pointwise target-hit/miss argument in the early-cap monotonicity proposition | arXiv v1, Sec. V; `score_semantics` in `meta.json` | The two-seed/full-cap control also changes seeds, so its empirical difference cannot be assigned to the cap |
+| If a policy uses fewer fixed evaluation locations, a sufficient uniform-shot upper bound decreases | Concentration bounds plus finite-shot stress tests | arXiv v1, Sec. V and Extended Data Fig. 2 | GCTR does not use fewer locations than the heuristic/control here; this is not an end-to-end hardware-cost identity |
 
 ### Legacy cross-size transfer with attainment accounting
 
@@ -258,6 +258,15 @@ benchmark cap; the reproduction pipeline does this explicitly.
 
 ## Reproduce the paper
 
+For the recorded CPU software stack, create the pinned environment before
+installing the checkout:
+
+```bash
+conda env create -f reproduction-environment.yml
+conda activate specops-gctr-reproduction
+python -m pip install -e .
+```
+
 The artifact exposes four verification levels:
 
 ```bash
@@ -270,7 +279,9 @@ gctr-reproduce                # canonical training and evaluation run
 The wheel contains the complete executable algorithm but does not duplicate the
 repository's committed manuscript source data. Run `--replot-only` from a
 checkout (or pass `--source-data-dir`); clean wheel installs can run
-`gctr-optimize`, the Python APIs, and new `--quick` or full experiments.
+`gctr-optimize`, the Python APIs, and new `--quick` or full experiments. The
+source distribution includes the manuscript, configurations, committed
+portfolio results, and pinned reproduction environment.
 
 The committed source data use schema 2. They record the generator and package
 versions, implementation fingerprint, raw evaluations, capped benchmark cost,
@@ -278,8 +289,9 @@ target attainment, primary and LOFO instance rows, and hashes of generated
 artifacts. `gctr-reproduce --validate-only` checks this provenance chain. The
 default seed is `20260424`; trained-model values can vary slightly across
 PyTorch, BLAS, and platform builds. The recorded environment is stored in
-[`manuscript/source_data/meta.json`](manuscript/source_data/meta.json), and
-wall-clock columns are machine-dependent.
+[`manuscript/source_data/meta.json`](manuscript/source_data/meta.json) and
+[`reproduction-environment.yml`](reproduction-environment.yml); wall-clock
+columns are machine-dependent.
 
 ## Target-free optimizer portfolio (development and confirmatory evidence)
 

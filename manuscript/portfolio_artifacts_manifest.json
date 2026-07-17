@@ -1,6 +1,40 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "generator": "manuscript/generate_portfolio_artifacts.py",
+  "asset_contract": {
+    "figure_count": 13,
+    "figure_formats": [
+      "pdf",
+      "png"
+    ],
+    "figure_stems": [
+      "Figure1_PortfolioProtocol",
+      "Figure2_ConfirmatoryAudit",
+      "Figure3_DevelopmentToConfirmation",
+      "Figure4_ArmOpportunityRanking",
+      "Figure5_ResidualOrderStatistic",
+      "Figure6_PredictedVsRealizedRoutes",
+      "Figure7_AnytimeByFamily",
+      "Figure8_FamilyEffects",
+      "Figure9_RiskSensitivity",
+      "Figure10_ArmTransitions",
+      "Figure11_SplitDiagnostics",
+      "Figure12_ResourceLedger",
+      "Figure13_InferenceThresholdSensitivity"
+    ],
+    "table_count": 5,
+    "table_files": [
+      "manuscript/tables/table_portfolio_protocol.tex",
+      "manuscript/tables/table_portfolio_arms.tex",
+      "manuscript/tables/table_confirmatory_results.tex",
+      "manuscript/tables/table_confirmatory_gate.tex",
+      "manuscript/tables/table_resource_accounting.tex"
+    ],
+    "all_quantitative_figures_derive_from_validated_locked_evidence": true,
+    "exploratory_sensitivity_panels": [
+      "Figure13_InferenceThresholdSensitivity"
+    ]
+  },
   "confirmatory_decision_sha256": "962f63d71dc20efa5896a949a2d4869bb1c691395b65ecb1d079302e4805bbe6",
   "source_manifests": {
     "regular_development": "e8a5e34effefc20627681745469ac923b541409e19d8de30b6c4db42d1343363",
@@ -8,16 +42,38 @@
     "confirmatory": "962f63d71dc20efa5896a949a2d4869bb1c691395b65ecb1d079302e4805bbe6"
   },
   "files": {
+    "manuscript/figures/Figure10_ArmTransitions.pdf": "4639bd7cce1e9c42d149448757cbcb42d1e64912882ca601895d53cd8779bdd9",
+    "manuscript/figures/Figure10_ArmTransitions.png": "e6df2004da18225ebea33d1b06be66c83f4b3503459d2ed36ff15b46cb4b3875",
+    "manuscript/figures/Figure11_SplitDiagnostics.pdf": "53c17c8a5e4a063a9e4b5925adc51aeb77feabc3c215b2ed180967f0970ade37",
+    "manuscript/figures/Figure11_SplitDiagnostics.png": "435e0a89de6ab38c2eb2e36249b8c3fe2626789c07e688a4b43ada37d1865ac5",
+    "manuscript/figures/Figure12_ResourceLedger.pdf": "cf4760c51f822ea5caec995aeae1eb893fed89256611a58a8d7186037d29af7d",
+    "manuscript/figures/Figure12_ResourceLedger.png": "79f8ce1062bdbc1944a009f90d6ae1a8fa8c4f6f4da225c0bd23e6fb03b322b6",
+    "manuscript/figures/Figure13_InferenceThresholdSensitivity.pdf": "214b4bb06939b7e4273c5c6f4da1fe75feac1c9882880afea929a8a83bfc4d52",
+    "manuscript/figures/Figure13_InferenceThresholdSensitivity.png": "bc03918b5867706a2a9bafd5077d95ae3638e6f3f4856d7b447912bc33db6740",
     "manuscript/figures/Figure1_PortfolioProtocol.pdf": "5c509b1171db0a722b994f0df1b33ff6d2d99ffd415269162d0fd119b17bc812",
     "manuscript/figures/Figure1_PortfolioProtocol.png": "08bdd92a4b0d843e968c9aaf122d7e352020b7ed4efe38a43a0437ab6fa2ffbb",
     "manuscript/figures/Figure2_ConfirmatoryAudit.pdf": "2561714c7cd84cbaedbf29c0dd0c01cae44d6a5e88fc60af475cb8a18b481431",
     "manuscript/figures/Figure2_ConfirmatoryAudit.png": "483efb02a76bf401f7d246cc30a03d86ed50078f76af59ae5ba286d9ad883c52",
     "manuscript/figures/Figure3_DevelopmentToConfirmation.pdf": "645daaf6948186a4a9c69495c9a6cb0205ad4057321c44bc1ada88956196e436",
     "manuscript/figures/Figure3_DevelopmentToConfirmation.png": "45d68f660a896f8f1a5ab562ea2915ea73a962647f982a49df1718841764a59a",
-    "manuscript/tables/portfolio_numbers.tex": "0fa8fa8547bdecbbf442d3b956d3da0212d9c2708e1ee353da65f517ab1b4a3c",
+    "manuscript/figures/Figure4_ArmOpportunityRanking.pdf": "f9c60383e501b1411d3ad4aca242d851828bf4d8ced32a5bb8bd3a8f35f9e628",
+    "manuscript/figures/Figure4_ArmOpportunityRanking.png": "ae9b6262c08e45abae10bdcc3bc87420a8e718f2219c1ab936f5c82f1dba4baf",
+    "manuscript/figures/Figure5_ResidualOrderStatistic.pdf": "c307cb12ffcdaeb43005eb3f27b3b17ca6918125976126fd3a3991ff2121ffd7",
+    "manuscript/figures/Figure5_ResidualOrderStatistic.png": "2b0473022b836de03516b0739f9d37de64fa92b6bd4071baaf1e342b2b07cc28",
+    "manuscript/figures/Figure6_PredictedVsRealizedRoutes.pdf": "199c4a8db9a74b76d1c5096f1c0ec15b13ec147a219522e677e354025fb24907",
+    "manuscript/figures/Figure6_PredictedVsRealizedRoutes.png": "185e9ae9a953cb0f4c08e71f6c0c6a61d6ac02a82fba737d74da406d18543ad3",
+    "manuscript/figures/Figure7_AnytimeByFamily.pdf": "c09ebb164e90e407c1aed1bcce9237841abb8a3cdb5bb632e82c1eafe621c8d2",
+    "manuscript/figures/Figure7_AnytimeByFamily.png": "e8a12116c48f582d7ba994e66d5ad86fcfec3e508e381bbdb7d3bd741f1168ee",
+    "manuscript/figures/Figure8_FamilyEffects.pdf": "42e0e4d6241a66ee145cb0fc4182157cd130b37e1d6d5fb427f2d77a3a797f44",
+    "manuscript/figures/Figure8_FamilyEffects.png": "03dcc4a3d10f8eb1acdc6b1e5920625f840b2cee0224e57255884fd0a2e82b49",
+    "manuscript/figures/Figure9_RiskSensitivity.pdf": "f9fe28892cb573fd4a3a4a8551135dcbb13a3d7ed59d8561f2daf146a048c13f",
+    "manuscript/figures/Figure9_RiskSensitivity.png": "8d248a0a160e6714bbaf9cf5e2d2713921930045c673536b2e2c1de2c65664b9",
+    "manuscript/tables/portfolio_numbers.tex": "a9f1e04c8bee78d477bfaa8a415498ff97022f8185345a8df50d0c49ef71e7c2",
     "manuscript/tables/table_confirmatory_gate.tex": "807d5ee0fd00b37844b9e91dae984f8cf2f8120b004c8565f03d505c2caa79ec",
-    "manuscript/tables/table_confirmatory_results.tex": "0d39ffc186d590e9370b55aeaffa65c55a4e5170284d648bc2e161688f5d1f39",
-    "manuscript/tables/table_portfolio_protocol.tex": "bba977786de0eeef19d4b7995ca2ea8b59d57a65597f14272b7d4b62f1cf035b"
+    "manuscript/tables/table_confirmatory_results.tex": "a56470a6516bbf885281f95b2e20e2060e3cb8b3d379261b230ef4c9d2e0fb48",
+    "manuscript/tables/table_portfolio_arms.tex": "639641f62cc227381be053a489a760a64872d4d46a81ee80464c7292717c682e",
+    "manuscript/tables/table_portfolio_protocol.tex": "bba977786de0eeef19d4b7995ca2ea8b59d57a65597f14272b7d4b62f1cf035b",
+    "manuscript/tables/table_resource_accounting.tex": "708bc4bf5080c4daff0a7e70d83233152d4ff3010ee090ad7057c6ce69ab895b"
   },
-  "manifest_sha256": "633888729fad664766db1061a3fe6df9ff8336530ee63289bde573c9d1ed012d"
+  "manifest_sha256": "f5e0d65ff67c313162a3d9d389730755df0473cbeed410b0c637fc13c47932c5"
 }

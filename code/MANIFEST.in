@@ -1,0 +1,8 @@
+include README.md
+include LICENSE
+include source_manifest.json
+include uv.lock
+recursive-include src/gctr_repro/bundle *
+include src/gctr_repro/evidence_manifest.json
+recursive-include tests *.py
+recursive-include tools *.py

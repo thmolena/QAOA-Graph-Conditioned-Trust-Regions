@@ -21,6 +21,7 @@ from specops_gctr.protocol import (
     load_and_verify_protocol,
     write_frozen_protocol,
 )
+from specops_gctr.provenance import compatible_portfolio_fingerprints
 
 
 def _tiny_config():
@@ -126,6 +127,14 @@ def test_ridge_selector_and_one_sided_abstention():
     assert deployed.shape == accepted.shape == upper.shape == (4,)
     assert np.all((deployed == "baseline") | accepted)
     assert finite_sample_upper_quantile(np.arange(4.0), 0.25) == 3.0
+
+
+def test_finite_sample_quantile_returns_infinity_when_rank_exceeds_sample():
+    assert finite_sample_upper_quantile(
+        np.asarray([0.1, 0.2]), alpha=0.1) == float("inf")
+    unknown_core = "0" * 64
+    assert compatible_portfolio_fingerprints(unknown_core) == \
+        frozenset((unknown_core,))
 
 
 def test_tqa_variants_are_explicit_and_family_baselines_are_row_specific():
