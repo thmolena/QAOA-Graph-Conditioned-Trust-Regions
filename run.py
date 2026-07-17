@@ -5,11 +5,12 @@ from __future__ import annotations
 import sys
 
 
-USAGE = """usage: python run.py {optimize,reproduce} [arguments]
+USAGE = """usage: python run.py {optimize,reproduce,portfolio} [arguments]
 
 commands:
   optimize   run one configurable GCTR optimization
   reproduce  run, replot, or validate the manuscript experiment
+  portfolio  run the target-free, fixed-budget optimizer portfolio
 """
 
 
@@ -26,6 +27,9 @@ def main(argv=None) -> int:
     if command == "reproduce":
         from specops_gctr.reproduce import main as reproduce_main
         return reproduce_main(forwarded)
+    if command == "portfolio":
+        from specops_gctr.portfolio_experiment import main as portfolio_main
+        return portfolio_main(forwarded)
 
     print(f"unknown command: {command!r}\n\n{USAGE}", file=sys.stderr,
           end="")

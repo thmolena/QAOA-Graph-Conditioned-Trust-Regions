@@ -1,40 +1,56 @@
-# Graph-Conditioned Trust Regions for Query-Efficient QAOA
+# Reliability Auditing for Structural Routing of QAOA Optimizers
 
 [![Package CI](https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions/actions/workflows/ci.yml/badge.svg)](https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
 
-QAOA objective values are statistical queries: every optimizer evaluation costs
-repeated circuit preparation and measurement. This project learns a complete
-search policy from graph structure—a center, anisotropic step geometry,
-Mahalanobis trust region, seed set, and validation-fit per-instance budget—rather
-than learning only one warm-start vector.
+QAOA objective values are costly statistical queries, and a learned optimizer
+router can be worse than a simple fixed schedule. This repository now studies
+that reliability problem directly. Nine optimizer arms receive the same
+target-free 32-call ceiling; a structural ridge selector proposes an arm; and
+an order-statistic rule abstains to the strongest development-selected graph
+family control.
 
-The released exact-statevector study is deliberately bounded. At depth `p=2`
-on 48 held-out `n=14` MaxCut instances, GCTR reaches the shared target on
-`48/48` graphs with capped target cost `15.0 +/- 7.8` objective calls and mean
-exact expectation ratio `0.858`. The fixed concentration heuristic also reaches
-`48/48` and is cheaper (`12.33 +/- 6.45`, paired Wilcoxon
-`p = 2.6488e-4`). TQA reaches `48/48` at `18.48 +/- 13.48` calls and is not
-distinguishable from GCTR on this comparison (`p = 0.0683`). Random restarts,
-k-NN, and the GNN point initializer reach `37/48`, `42/48`, and `20/48`, with
-capped costs `203.9 +/- 152.9`, `52.94 +/- 131.93`, and
-`264.42 +/- 164.02`, respectively. A miss is scored at the common 400-call cap
-while its raw work and attainment flag remain recorded. The evidence supports
-a simulated low-depth case study, not hardware or asymptotic advantage.
-The heuristic is cheap only online: its fixed angles are the coordinate-wise
-median of 240 expensive training targets.
+On the internally locked 160-graph exact-statevector audit, deployment achieved
+mean AURC `0.16930` versus `0.17207` for the matched family fallback. Only
+`12/160` graphs were routed away from fallback, and `4/12` accepted routes were
+harmful. Descriptive one-sided coverage was `141/160 = 0.88125`, below the
+frozen `0.90` gate, so the reliability decision failed. Under an explicitly
+hypothetical iid-binomial sensitivity model, the point miss is compatible with
+nominal variation (`P[X <= 141 | p=0.90] = 0.249`), but 95% one-sided exact
+upper bounds do not certify coverage-failure risk (`0.169`) or harm conditional
+on acceptance (`0.609`) below `0.10`. Fixed quotas and sequential cross-split
+de-duplication mean these are diagnostics, not formal iid guarantees.
+
+The legacy graph-conditioned trust-region arm is retained for reproducibility,
+but it is not competitive in the current audit: mean AURC is `0.28577` versus
+`0.17277` for the strongest fixed TQA schedule. The repository therefore makes
+no hardware, scaling, selective-safety, or journal-readiness claim.
 
 - [Manuscript](manuscript/main.pdf) · [LaTeX source](manuscript/main.tex)
 - [Project page](https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/)
 - [Python package](specops_gctr/) · [Source data](manuscript/source_data/)
 - Preprint: [arXiv:2604.24803](https://arxiv.org/abs/2604.24803)
 
-> **Revision status.** The repository manuscript, package, and schema-2
-> numerical artifacts are newer than arXiv v1. Treat the local PDF as the
-> working revision until the updated preprint is uploaded.
+> **Revision status.** The local manuscript supersedes the target-based claims
+> of arXiv v1. Its hashes enforce an internal execution order, but the frozen
+> protocol, decision, and outcomes first entered public Git history together;
+> this is not independently timestamped preregistration.
 
-## Claims and verification paths
+## Current claims and verification paths
+
+| Supported statement | Evidence | Reproduction path | Boundary |
+| --- | --- | --- | --- |
+| The matched family fallback is stronger than a single global arm | Mean audit AURC `0.17207` versus `0.17277` | `portfolio_results/heterogeneous_confirmatory_v1/summary.json` | Synthetic family labels are known and used at deployment |
+| Routing lowers the observed mean but fails the reliability gate | Gated AURC `0.16930`; paired delta `-0.00277`; coverage `0.88125` | `gctr-portfolio --validate-only`; manuscript Tables I–II | Bootstrap endpoint is inference-sensitive; coverage gate fails |
+| Marginal and conditional harm answer different questions | `4/160` joint harms, `4/12` conditional harms; exact-binomial sensitivity UCBs `0.0563` and `0.6091` | `gctr-risk-audit portfolio_results/heterogeneous_confirmatory_v1/summary.json` | Binomial bounds are not formal for the locked dependent design |
+| Legacy GCTR is not competitive in this regime | GCTR AURC `0.28577`; TQA-0.75 AURC `0.17277` | Confirmatory traces and summary | Exact simulation only, `p=2`, `n in {12,14}` |
+
+## Superseded target-hitting case study
+
+The schema-2 target-hitting artifacts remain available to audit the first
+release. They are not evidence for the current reliability-routing claim, and
+their offline reference target is unavailable in deployment.
 
 | Supported statement | Evidence | Reproduction path | Boundary |
 | --- | --- | --- | --- |
@@ -48,7 +64,7 @@ median of 240 expensive training targets.
 | Early truncation cannot improve shared-cap cost on a fixed trajectory | Pointwise target-hit/miss argument in the early-cap monotonicity proposition | manuscript Sec. V; `score_semantics` in `meta.json` | The two-seed/full-cap control also changes seeds, so its empirical difference cannot be assigned to the cap |
 | If a policy uses fewer fixed evaluation locations, a sufficient uniform-shot upper bound decreases | Concentration bounds plus finite-shot stress tests | manuscript Sec. V and Extended Data Fig. 2 | GCTR does not use fewer locations than the heuristic/control here; this is not an end-to-end hardware-cost identity |
 
-### Cross-size transfer with attainment accounting
+### Legacy cross-size transfer with attainment accounting
 
 One model trained at `n=14` is evaluated from `n=8` through `n=16`. The final
 column is the arithmetic ratio of random-restart to GCTR mean capped cost; it is
@@ -92,12 +108,15 @@ The distribution name is `specops-gctr` and the import name is
 that the index upload has already happened.
 
 The installed console commands remain the primary interface. From a checkout,
-the root dispatcher offers the same two entry points without path-specific
-shell wrappers:
+the root dispatcher offers the three experiment entry points without
+path-specific shell wrappers; the risk diagnostic is a separate installed
+command:
 
 ```bash
 python run.py optimize --help
 python run.py reproduce --validate-only
+python run.py portfolio --help
+gctr-risk-audit --help
 ```
 
 ## Fit and use the complete learned policy
@@ -262,6 +281,88 @@ PyTorch, BLAS, and platform builds. The recorded environment is stored in
 [`manuscript/source_data/meta.json`](manuscript/source_data/meta.json), and
 wall-clock columns are machine-dependent.
 
+## Target-free optimizer portfolio (development and confirmatory evidence)
+
+The current manuscript studies this internally locked redesign. It compares
+concentration, four fixed TQA
+schedules (`dt = 0.25, 0.50, 0.75, 1.00`), k-NN, random multistart, SPSA, and
+legacy GCTR under the same 32-call ceiling. Every arm records a best-so-far
+trace at calls `1, 2, 4, 8, 16, 32`; selection uses equal-weight area under
+normalized-regret checkpoints (AURC). Exact MaxCut normalizes the offline
+analysis only and is never an optimizer stopping signal.
+
+A relabelling-invariant ridge selector is fit on development graphs. For each
+family, the strongest development arm is then frozen as the deployment
+fallback. A separate calibration split supplies a one-sided residual order
+statistic for selected-arm minus family-fallback AURC. Fixed stratum quotas and
+sequential cross-split de-duplication prevent exact pooled exchangeability, so
+it is a conformal-motivated heuristic rather than a finite-sample certificate.
+Even under idealized exchangeability, the motivation is marginal rather than
+acceptance-conditional, distribution-shift, or hardware assurance.
+
+Two new-seed `p=2`, `n in {12, 14}` development studies were run once after
+freezing their protocols. Lower AURC is better.
+
+| Development study | Audit graphs | Global baseline | Global / gated / family AURC | Gated - family (stratified 95% bootstrap interval) | Accepted; harms | Coverage | Frozen gate |
+| --- | ---: | --- | --- | --- | --- | ---: | --- |
+| Regular generator grid | 48 | k-NN | 0.17236 / 0.16317 / 0.16224 | +0.00094 (-0.00209, +0.00401) | 13; 9 | 0.771 | fail |
+| Heterogeneous parameters | 64 | TQA `dt=0.75` | 0.17659 / 0.16714 / 0.17651 | -0.00937 (-0.01645, -0.00250) | 10; 1 | 0.938 | follow-up triggered |
+
+The regular-grid result fails both nominal coverage and harm-rate checks. The
+heterogeneous development result cleared every frozen mechanical criterion, so
+it triggered one separately frozen confirmatory audit with 20 new graphs per
+family-size stratum (160 total), unchanged non-audit seeds and hyperparameters,
+and no post-audit tuning:
+
+| Confirmatory audit | Global / gated / family AURC | Gated - family (stratified 95% bootstrap interval) | Accepted; harms | Coverage | Decision |
+| --- | --- | --- | --- | ---: | --- |
+| Heterogeneous parameters | 0.17277 / 0.16930 / 0.17207 | -0.00277 (-0.00570, -0.00008) | 12; 4 | 0.881 | **no-go** |
+
+The mean improvement replicated, but the frozen gate failed because
+one-sided coverage was below its nominal `0.90` requirement. Four of 12
+accepted deployments were harmful relative to their family fallback; all four
+were Barabasi-Albert cases, whose family mean worsened by `+0.00376`. The
+confirmed gain was concentrated in random-regular graphs (`-0.01327`, five
+acceptances, no harms). Both `confirmatory_followup_ready` and
+`nmi_claim_ready` are therefore false. This remains exact-statevector evidence
+with zero device shots; it does not support a reliability or NMI-readiness
+claim.
+
+Retrospective exact-binomial sensitivity diagnostics are available separately:
+
+```bash
+gctr-risk-audit \
+  portfolio_results/heterogeneous_confirmatory_v1/summary.json
+```
+
+They leave the locked decision unchanged. The design-only
+`configs/prospective_risk_control_v2.design.json` specifies what a future
+externally timestamped, matched-control, shift-aware audit would require; it is
+explicitly unregistered, incomplete, and unrun.
+
+Freeze, run once, and validate an evidence directory with:
+
+```bash
+python run.py portfolio \
+  --config configs/portfolio_heterogeneous_confirmatory.json \
+  --output-dir portfolio_results/heterogeneous_confirmatory_v1 \
+  --freeze-only
+python run.py portfolio \
+  --config configs/portfolio_heterogeneous_confirmatory.json \
+  --output-dir portfolio_results/heterogeneous_confirmatory_v1 \
+  --run-only
+python run.py portfolio \
+  --config configs/portfolio_heterogeneous_confirmatory.json \
+  --output-dir portfolio_results/heterogeneous_confirmatory_v1 \
+  --validate-only
+```
+
+`--run-only` refuses to overwrite an existing audit trace. Each directory
+retains the frozen protocol and decision, generator parameters, model
+checkpoint, per-query traces, exact resource ledger, summary, and content
+hashes. The two development configurations and their evidence directories are
+retained alongside the confirmatory audit.
+
 ## Distribution checks
 
 ```bash
@@ -284,6 +385,8 @@ replot or validation commands.
 | `model`, `losses`, `estimator` | GIN Gaussian, training objectives, serializable high-level policy |
 | `calibration` | Reliability and uncertainty diagnostics |
 | `optimization`, `baselines` | Query-counted search, callback adapter, comparisons |
+| `fixed_budget`, `portfolio`, `protocol` | Target-free traces, optimizer arms, invariant routing, conformal abstention, frozen splits |
+| `portfolio_experiment` | Single-use runner, analyzer, resource ledger, and hash validation |
 | `pipeline` | Data, training, calibration, allocation, evaluations |
 | `plots`, `tables` | Source data to publication artifacts |
 | `cli`, `reproduce` | User command and full artifact command |
@@ -291,9 +394,11 @@ replot or validation commands.
 ## Repository map
 
 ```text
-specops_gctr/            canonical package, estimator, and two console commands
+specops_gctr/            canonical package, estimator, and three console commands
+configs/                 frozen-protocol portfolio configurations
+portfolio_results/       hashed development and confirmatory evidence
 tests/                    mathematical-contract, API, CLI, and reproduction tests
-run.py                    root dispatcher for optimize and reproduce commands
+run.py                    root dispatcher for optimize, reproduce, and portfolio
 pyproject.toml            single package and build definition
 manuscript/main.tex      article source
 manuscript/main.pdf      compiled article

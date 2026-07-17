@@ -1,0 +1,3458 @@
+{
+  "schema_version": 1,
+  "experiment_name": "target-free-portfolio-heterogeneous-confirmatory-v1",
+  "target_free": true,
+  "backend": "exact_statevector",
+  "environment": {
+    "python": "3.13.12",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "numpy": "2.4.3",
+    "scipy": "1.17.1",
+    "networkx": "3.6.1",
+    "torch": "2.11.0"
+  },
+  "primary_metric": "equal_weight_checkpointed_normalized_regret_aurc",
+  "checkpoints": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32
+  ],
+  "fixed_budget": 32,
+  "arms": [
+    "concentration",
+    "tqa_dt_0p25",
+    "tqa_dt_0p50",
+    "tqa_dt_0p75",
+    "tqa_dt_1p00",
+    "knn",
+    "random_multistart",
+    "spsa",
+    "legacy_gctr"
+  ],
+  "decision_sha256": "962f63d71dc20efa5896a949a2d4869bb1c691395b65ecb1d079302e4805bbe6",
+  "conformal": {
+    "alpha": 0.1,
+    "margin": 0.0,
+    "residual_quantile": 0.03581849777555429,
+    "baseline_arm": null
+  },
+  "splits": {
+    "development": {
+      "n_graphs": 48,
+      "mean_aurc_by_arm": {
+        "concentration": 0.30039778572901144,
+        "tqa_dt_0p25": 0.21914473301378637,
+        "tqa_dt_0p50": 0.17780860879948676,
+        "tqa_dt_0p75": 0.17665152871592285,
+        "tqa_dt_1p00": 0.21113816719595357,
+        "knn": 0.19667624926064683,
+        "random_multistart": 0.29679286695530466,
+        "spsa": 0.3110579572107311,
+        "legacy_gctr": 0.28513580703657065
+      }
+    },
+    "calibration": {
+      "n_graphs": 48,
+      "mean_aurc_by_arm": {
+        "concentration": 0.2930977792816797,
+        "tqa_dt_0p25": 0.21108959938811267,
+        "tqa_dt_0p50": 0.17319381405466916,
+        "tqa_dt_0p75": 0.17175835462898503,
+        "tqa_dt_1p00": 0.21511847669022366,
+        "knn": 0.20488085702132816,
+        "random_multistart": 0.2906099746633763,
+        "spsa": 0.30341361897188274,
+        "legacy_gctr": 0.28722516273703874
+      }
+    },
+    "audit": {
+      "n_graphs": 160,
+      "mean_aurc_by_arm": {
+        "concentration": 0.2949640651712303,
+        "tqa_dt_0p25": 0.21198292718636988,
+        "tqa_dt_0p50": 0.17380563136070343,
+        "tqa_dt_0p75": 0.17277326824865152,
+        "tqa_dt_1p00": 0.2145768827998565,
+        "knn": 0.20295792685773595,
+        "random_multistart": 0.3062896160530155,
+        "spsa": 0.30698680233951514,
+        "legacy_gctr": 0.28576889728991944
+      },
+      "baseline_arm": "tqa_dt_0p75",
+      "baseline_mean_aurc": 0.17277326824865152,
+      "ungated_selector_mean_aurc": 0.17050122584093183,
+      "gated_selector_mean_aurc": 0.16930175990747423,
+      "family_label_control_mean_aurc": 0.17206964049206924,
+      "mean_delta_gated_minus_family_label_control": -0.0027678805845950307,
+      "family_control_delta_bootstrap_95_interval": [
+        -0.005696202639811258,
+        -8.178003630676599e-05
+      ],
+      "oracle_mean_aurc": 0.16048016341052873,
+      "mean_delta_gated_minus_baseline": -0.0034715083411772673,
+      "delta_bootstrap_95_interval": [
+        -0.0065603152070208524,
+        -0.0006459871298045292
+      ],
+      "median_delta_gated_minus_baseline": 0.0,
+      "accepted_count": 12,
+      "accepted_rate": 0.075,
+      "joint_harm_count": 4,
+      "joint_harm_rate": 0.025,
+      "conditional_harm_rate": 0.3333333333333333,
+      "empirical_one_sided_coverage": 0.88125,
+      "oracle_gap_captured_fraction": 0.28239475599456504,
+      "selected_arm_counts": {
+        "concentration": 0,
+        "tqa_dt_0p25": 0,
+        "tqa_dt_0p50": 36,
+        "tqa_dt_0p75": 78,
+        "tqa_dt_1p00": 4,
+        "knn": 42,
+        "random_multistart": 0,
+        "spsa": 0,
+        "legacy_gctr": 0
+      },
+      "deployed_arm_counts": {
+        "concentration": 0,
+        "tqa_dt_0p25": 0,
+        "tqa_dt_0p50": 79,
+        "tqa_dt_0p75": 69,
+        "tqa_dt_1p00": 0,
+        "knn": 12,
+        "random_multistart": 0,
+        "spsa": 0,
+        "legacy_gctr": 0
+      },
+      "family_control_arm_by_family": {
+        "ba": "tqa_dt_0p75",
+        "er": "tqa_dt_0p50",
+        "rr": "tqa_dt_0p75",
+        "ws": "tqa_dt_0p50"
+      },
+      "deployment_baseline_policy": "development_selected_per_family_arm",
+      "mean_conformal_upper_bound": 0.02797269048726425,
+      "portfolio_opportunity_fraction": 0.0711516599919313,
+      "per_family": {
+        "ba": {
+          "n_graphs": 40,
+          "baseline_mean_aurc": 0.1877463979388123,
+          "gated_selector_mean_aurc": 0.19151041690448495,
+          "family_label_control_mean_aurc": 0.1877463979388123,
+          "family_control_arm": "tqa_dt_0p75",
+          "oracle_mean_aurc": 0.1842096942784004,
+          "mean_delta_gated_minus_baseline": 0.00376401896567264,
+          "mean_delta_gated_minus_family_control": 0.00376401896567264,
+          "accepted_count": 6,
+          "joint_harm_count": 4
+        },
+        "er": {
+          "n_graphs": 40,
+          "baseline_mean_aurc": 0.16617513093083916,
+          "gated_selector_mean_aurc": 0.16439395553765007,
+          "family_label_control_mean_aurc": 0.16439395553765007,
+          "family_control_arm": "tqa_dt_0p50",
+          "oracle_mean_aurc": 0.15758836503450155,
+          "mean_delta_gated_minus_baseline": -0.0017811753931891046,
+          "mean_delta_gated_minus_family_control": 0.0,
+          "accepted_count": 0,
+          "joint_harm_count": 0
+        },
+        "rr": {
+          "n_graphs": 40,
+          "baseline_mean_aurc": 0.1722309094802506,
+          "gated_selector_mean_aurc": 0.15896232440169294,
+          "family_label_control_mean_aurc": 0.1722309094802506,
+          "family_control_arm": "tqa_dt_0p75",
+          "oracle_mean_aurc": 0.14866839522501094,
+          "mean_delta_gated_minus_baseline": -0.013268585078557655,
+          "mean_delta_gated_minus_family_control": -0.013268585078557655,
+          "accepted_count": 5,
+          "joint_harm_count": 0
+        },
+        "ws": {
+          "n_graphs": 40,
+          "baseline_mean_aurc": 0.16494063464470393,
+          "gated_selector_mean_aurc": 0.162340342786069,
+          "family_label_control_mean_aurc": 0.16390729901156412,
+          "family_control_arm": "tqa_dt_0p50",
+          "oracle_mean_aurc": 0.151454199104202,
+          "mean_delta_gated_minus_baseline": -0.002600291858634951,
+          "mean_delta_gated_minus_family_control": -0.0015669562254951093,
+          "accepted_count": 1,
+          "joint_harm_count": 0
+        }
+      },
+      "go_no_go": {
+        "portfolio_opportunity_at_least_5pct": true,
+        "gated_beats_global_baseline_95pct": true,
+        "gated_beats_family_label_control_mean": true,
+        "gated_beats_family_label_control_95pct": true,
+        "minimum_accepted_graphs_met": true,
+        "empirical_coverage_at_least_nominal": false,
+        "joint_harm_rate_within_alpha": true,
+        "confirmatory_followup_ready": false,
+        "nmi_claim_ready": false
+      },
+      "per_graph": [
+        {
+          "graph_id": "ba:n12:s1810042",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810042,
+          "maxcut": 11,
+          "generator_parameters": {
+            "attachment": 1
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.0036933819282126135,
+          "baseline_aurc": 0.2476396183137576,
+          "family_control_aurc": 0.2476396183137576,
+          "deployed_aurc": 0.31713904204178484,
+          "delta": 0.06949942372802723,
+          "delta_vs_family_control": 0.06949942372802723
+        },
+        {
+          "graph_id": "ba:n12:s1810043",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810043,
+          "maxcut": 16,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.17851401230121952,
+          "family_control_aurc": 0.17851401230121952,
+          "deployed_aurc": 0.17851401230121952,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810044",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810044,
+          "maxcut": 11,
+          "generator_parameters": {
+            "attachment": 1
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.0004291523482881643,
+          "baseline_aurc": 0.26237236454934365,
+          "family_control_aurc": 0.26237236454934365,
+          "deployed_aurc": 0.24747135610545942,
+          "delta": -0.014901008443884228,
+          "delta_vs_family_control": -0.014901008443884228
+        },
+        {
+          "graph_id": "ba:n12:s1810045",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810045,
+          "maxcut": 20,
+          "generator_parameters": {
+            "attachment": 3
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1549326721113332,
+          "family_control_aurc": 0.1549326721113332,
+          "deployed_aurc": 0.1549326721113332,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810046",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810046,
+          "maxcut": 11,
+          "generator_parameters": {
+            "attachment": 1
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.026677896414824154,
+          "baseline_aurc": 0.257456515740413,
+          "family_control_aurc": 0.257456515740413,
+          "deployed_aurc": 0.257456515740413,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810047",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810047,
+          "maxcut": 24,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.19026428685987448,
+          "family_control_aurc": 0.19026428685987448,
+          "deployed_aurc": 0.19026428685987448,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810048",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810048,
+          "maxcut": 22,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.11334926152011078,
+          "family_control_aurc": 0.11334926152011078,
+          "deployed_aurc": 0.11334926152011078,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810049",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810049,
+          "maxcut": 16,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14927317459349224,
+          "family_control_aurc": 0.14927317459349224,
+          "deployed_aurc": 0.14927317459349224,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810050",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810050,
+          "maxcut": 11,
+          "generator_parameters": {
+            "attachment": 1
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.009493397277463345,
+          "baseline_aurc": 0.257936764641487,
+          "family_control_aurc": 0.257936764641487,
+          "deployed_aurc": 0.257936764641487,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810051",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810051,
+          "maxcut": 15,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.13578267072562866,
+          "family_control_aurc": 0.13578267072562866,
+          "deployed_aurc": 0.13578267072562866,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810052",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810052,
+          "maxcut": 24,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.178698324638631,
+          "family_control_aurc": 0.178698324638631,
+          "deployed_aurc": 0.178698324638631,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810053",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810053,
+          "maxcut": 20,
+          "generator_parameters": {
+            "attachment": 3
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.16555013648602135,
+          "family_control_aurc": 0.16555013648602135,
+          "deployed_aurc": 0.16555013648602135,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810054",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810054,
+          "maxcut": 22,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.11761271633999028,
+          "family_control_aurc": 0.11761271633999028,
+          "deployed_aurc": 0.11761271633999028,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810055",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810055,
+          "maxcut": 24,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.17397054962583744,
+          "family_control_aurc": 0.17397054962583744,
+          "deployed_aurc": 0.17397054962583744,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810056",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810056,
+          "maxcut": 23,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1511640504486624,
+          "family_control_aurc": 0.1511640504486624,
+          "deployed_aurc": 0.1511640504486624,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810057",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810057,
+          "maxcut": 21,
+          "generator_parameters": {
+            "attachment": 3
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.18466445081288732,
+          "family_control_aurc": 0.18466445081288732,
+          "deployed_aurc": 0.18466445081288732,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810058",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810058,
+          "maxcut": 20,
+          "generator_parameters": {
+            "attachment": 3
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1541409868733073,
+          "family_control_aurc": 0.1541409868733073,
+          "deployed_aurc": 0.1541409868733073,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810059",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810059,
+          "maxcut": 16,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.17301441703472328,
+          "family_control_aurc": 0.17301441703472328,
+          "deployed_aurc": 0.17301441703472328,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810060",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810060,
+          "maxcut": 11,
+          "generator_parameters": {
+            "attachment": 1
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.021579891649275124,
+          "baseline_aurc": 0.25486835351956244,
+          "family_control_aurc": 0.25486835351956244,
+          "deployed_aurc": 0.25486835351956244,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n12:s1810061",
+          "family": "ba",
+          "n": 12,
+          "graph_seed": 1810061,
+          "maxcut": 24,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1730245635664205,
+          "family_control_aurc": 0.1730245635664205,
+          "deployed_aurc": 0.1730245635664205,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810124",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810124,
+          "maxcut": 19,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.16041443144166742,
+          "family_control_aurc": 0.16041443144166742,
+          "deployed_aurc": 0.16041443144166742,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810125",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810125,
+          "maxcut": 13,
+          "generator_parameters": {
+            "attachment": 1
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.017084901249007245,
+          "baseline_aurc": 0.2578282126695839,
+          "family_control_aurc": 0.2578282126695839,
+          "deployed_aurc": 0.2631360142744256,
+          "delta": 0.005307801604841733,
+          "delta_vs_family_control": 0.005307801604841733
+        },
+        {
+          "graph_id": "ba:n14:s1810126",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810126,
+          "maxcut": 26,
+          "generator_parameters": {
+            "attachment": 3
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.19561823165268252,
+          "family_control_aurc": 0.19561823165268252,
+          "deployed_aurc": 0.19561823165268252,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810127",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810127,
+          "maxcut": 25,
+          "generator_parameters": {
+            "attachment": 3
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1816280602032171,
+          "family_control_aurc": 0.1816280602032171,
+          "deployed_aurc": 0.1816280602032171,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810128",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810128,
+          "maxcut": 19,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.021150898037890026,
+          "baseline_aurc": 0.17113707532762865,
+          "family_control_aurc": 0.17113707532762865,
+          "deployed_aurc": 0.17113707532762865,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810129",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810129,
+          "maxcut": 20,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.027824374481298292,
+          "baseline_aurc": 0.19905144725094015,
+          "family_control_aurc": 0.19905144725094015,
+          "deployed_aurc": 0.19905144725094015,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810130",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810130,
+          "maxcut": 13,
+          "generator_parameters": {
+            "attachment": 1
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.01774290803533718,
+          "baseline_aurc": 0.2645368308603784,
+          "family_control_aurc": 0.2645368308603784,
+          "deployed_aurc": 0.31936550926043217,
+          "delta": 0.05482867840005379,
+          "delta_vs_family_control": 0.05482867840005379
+        },
+        {
+          "graph_id": "ba:n14:s1810131",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810131,
+          "maxcut": 24,
+          "generator_parameters": {
+            "attachment": 3
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14599159197128922,
+          "family_control_aurc": 0.14599159197128922,
+          "deployed_aurc": 0.14599159197128922,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810132",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810132,
+          "maxcut": 20,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.00845101712819879,
+          "baseline_aurc": 0.18817033465908736,
+          "family_control_aurc": 0.18817033465908736,
+          "deployed_aurc": 0.18817033465908736,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810133",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810133,
+          "maxcut": 13,
+          "generator_parameters": {
+            "attachment": 1
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.008522022654282396,
+          "baseline_aurc": 0.2611905055708937,
+          "family_control_aurc": 0.2611905055708937,
+          "deployed_aurc": 0.2994276955809475,
+          "delta": 0.03823719001005382,
+          "delta_vs_family_control": 0.03823719001005382
+        },
+        {
+          "graph_id": "ba:n14:s1810134",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810134,
+          "maxcut": 19,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.001178959474600061,
+          "baseline_aurc": 0.18226540656424706,
+          "family_control_aurc": 0.18226540656424706,
+          "deployed_aurc": 0.18226540656424706,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810135",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810135,
+          "maxcut": 27,
+          "generator_parameters": {
+            "attachment": 3
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.21428051393733302,
+          "family_control_aurc": 0.21428051393733302,
+          "deployed_aurc": 0.21428051393733302,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810136",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810136,
+          "maxcut": 17,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.018005156358091995,
+          "baseline_aurc": 0.09107845437535945,
+          "family_control_aurc": 0.09107845437535945,
+          "deployed_aurc": 0.09107845437535945,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810137",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810137,
+          "maxcut": 19,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.029878657984801577,
+          "baseline_aurc": 0.16858093947979713,
+          "family_control_aurc": 0.16858093947979713,
+          "deployed_aurc": 0.16858093947979713,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810138",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810138,
+          "maxcut": 13,
+          "generator_parameters": {
+            "attachment": 1
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.02855789837889708,
+          "baseline_aurc": 0.2589706971225516,
+          "family_control_aurc": 0.2589706971225516,
+          "deployed_aurc": 0.25655937045036487,
+          "delta": -0.002411326672186742,
+          "delta_vs_family_control": -0.002411326672186742
+        },
+        {
+          "graph_id": "ba:n14:s1810139",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810139,
+          "maxcut": 28,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14099046302847182,
+          "family_control_aurc": 0.14099046302847182,
+          "deployed_aurc": 0.14099046302847182,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810140",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810140,
+          "maxcut": 29,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.16003692715903495,
+          "family_control_aurc": 0.16003692715903495,
+          "deployed_aurc": 0.16003692715903495,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810141",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810141,
+          "maxcut": 30,
+          "generator_parameters": {
+            "attachment": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.18299755139225993,
+          "family_control_aurc": 0.18299755139225993,
+          "deployed_aurc": 0.18299755139225993,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810142",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810142,
+          "maxcut": 20,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.017196131264727493,
+          "baseline_aurc": 0.2066637922369932,
+          "family_control_aurc": 0.2066637922369932,
+          "deployed_aurc": 0.2066637922369932,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ba:n14:s1810143",
+          "family": "ba",
+          "n": 14,
+          "graph_seed": 1810143,
+          "maxcut": 20,
+          "generator_parameters": {
+            "attachment": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.014984278076945079,
+          "baseline_aurc": 0.20419455994637178,
+          "family_control_aurc": 0.20419455994637178,
+          "deployed_aurc": 0.20419455994637178,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810000",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810000,
+          "maxcut": 27,
+          "generator_parameters": {
+            "p": 0.5676202797054798
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.028423641813057093,
+          "baseline_aurc": 0.20075042515973587,
+          "family_control_aurc": 0.20462892226951893,
+          "deployed_aurc": 0.20462892226951893,
+          "delta": 0.0038784971097830523,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810001",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810001,
+          "maxcut": 11,
+          "generator_parameters": {
+            "p": 0.16705833628472563
+          },
+          "selected_arm": "tqa_dt_1p00",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03305160457709114,
+          "baseline_aurc": 0.2121831748976272,
+          "family_control_aurc": 0.2158305185706473,
+          "deployed_aurc": 0.2158305185706473,
+          "delta": 0.003647343673020109,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810002",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810002,
+          "maxcut": 29,
+          "generator_parameters": {
+            "p": 0.5934934582210383
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1558482745927142,
+          "family_control_aurc": 0.15965189807025454,
+          "deployed_aurc": 0.15965189807025454,
+          "delta": 0.0038036234775403466,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810003",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810003,
+          "maxcut": 15,
+          "generator_parameters": {
+            "p": 0.2381140172781289
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.030635368424627635,
+          "baseline_aurc": 0.17181951417157307,
+          "family_control_aurc": 0.17265053586731127,
+          "deployed_aurc": 0.17265053586731127,
+          "delta": 0.0008310216957382044,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810004",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810004,
+          "maxcut": 19,
+          "generator_parameters": {
+            "p": 0.36703527838881217
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.028112047608976454,
+          "baseline_aurc": 0.23329413353370568,
+          "family_control_aurc": 0.2334924996383171,
+          "deployed_aurc": 0.2334924996383171,
+          "delta": 0.000198366104611436,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810005",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810005,
+          "maxcut": 22,
+          "generator_parameters": {
+            "p": 0.46805961764520504
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.026978470006851052,
+          "baseline_aurc": 0.18199379577503463,
+          "family_control_aurc": 0.19037687895570246,
+          "deployed_aurc": 0.19037687895570246,
+          "delta": 0.008383083180667827,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810006",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810006,
+          "maxcut": 8,
+          "generator_parameters": {
+            "p": 0.15626023302531622
+          },
+          "selected_arm": "tqa_dt_1p00",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.02251207376460923,
+          "baseline_aurc": 0.2565304828176991,
+          "family_control_aurc": 0.25624601886747844,
+          "deployed_aurc": 0.25624601886747844,
+          "delta": -0.000284463950220637,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810007",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810007,
+          "maxcut": 32,
+          "generator_parameters": {
+            "p": 0.6078235038829581
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.11659801125042617,
+          "family_control_aurc": 0.11049412965476031,
+          "deployed_aurc": 0.11049412965476031,
+          "delta": -0.006103881595665855,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810008",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810008,
+          "maxcut": 23,
+          "generator_parameters": {
+            "p": 0.460525998464002
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.028822331668157758,
+          "baseline_aurc": 0.2041021111601465,
+          "family_control_aurc": 0.20443727845818735,
+          "deployed_aurc": 0.20443727845818735,
+          "delta": 0.00033516729804083933,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810009",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810009,
+          "maxcut": 11,
+          "generator_parameters": {
+            "p": 0.1779312497381566
+          },
+          "selected_arm": "tqa_dt_1p00",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03519270928116741,
+          "baseline_aurc": 0.19136570629787242,
+          "family_control_aurc": 0.17920953531873432,
+          "deployed_aurc": 0.17920953531873432,
+          "delta": -0.012156170979138098,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810010",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810010,
+          "maxcut": 23,
+          "generator_parameters": {
+            "p": 0.5544264569629099
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03003568234311979,
+          "baseline_aurc": 0.18870209072372454,
+          "family_control_aurc": 0.1902390851525787,
+          "deployed_aurc": 0.1902390851525787,
+          "delta": 0.0015369944288541604,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810011",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810011,
+          "maxcut": 28,
+          "generator_parameters": {
+            "p": 0.5932144434166757
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03486562816912098,
+          "baseline_aurc": 0.13650332726552522,
+          "family_control_aurc": 0.14294714434550404,
+          "deployed_aurc": 0.14294714434550404,
+          "delta": 0.00644381707997882,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810012",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810012,
+          "maxcut": 28,
+          "generator_parameters": {
+            "p": 0.6710073437901739
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03193254427391498,
+          "baseline_aurc": 0.15187386809879114,
+          "family_control_aurc": 0.15502373054924937,
+          "deployed_aurc": 0.15502373054924937,
+          "delta": 0.0031498624504582295,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810013",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810013,
+          "maxcut": 21,
+          "generator_parameters": {
+            "p": 0.4661496122004928
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.157112386476501,
+          "family_control_aurc": 0.16135142772292352,
+          "deployed_aurc": 0.16135142772292352,
+          "delta": 0.00423904124642252,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810014",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810014,
+          "maxcut": 26,
+          "generator_parameters": {
+            "p": 0.6121409543905802
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.034103208219503134,
+          "baseline_aurc": 0.11173430705438005,
+          "family_control_aurc": 0.11946266115887037,
+          "deployed_aurc": 0.11946266115887037,
+          "delta": 0.007728354104490326,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810015",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810015,
+          "maxcut": 20,
+          "generator_parameters": {
+            "p": 0.4315703314685287
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.026859771794181336,
+          "baseline_aurc": 0.15401952637077945,
+          "family_control_aurc": 0.15604829601167888,
+          "deployed_aurc": 0.15604829601167888,
+          "delta": 0.0020287696408994305,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810016",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810016,
+          "maxcut": 20,
+          "generator_parameters": {
+            "p": 0.4111698715463619
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03255691281796588,
+          "baseline_aurc": 0.14810385407010537,
+          "family_control_aurc": 0.14655514977861492,
+          "deployed_aurc": 0.14655514977861492,
+          "delta": -0.0015487042914904547,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810017",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810017,
+          "maxcut": 12,
+          "generator_parameters": {
+            "p": 0.17535448174732893
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.25741774620101915,
+          "family_control_aurc": 0.26036930571469363,
+          "deployed_aurc": 0.26036930571469363,
+          "delta": 0.0029515595136744843,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810018",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810018,
+          "maxcut": 13,
+          "generator_parameters": {
+            "p": 0.15609379352209657
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.027835696317946884,
+          "baseline_aurc": 0.1642260788250496,
+          "family_control_aurc": 0.16444049163671093,
+          "deployed_aurc": 0.16444049163671093,
+          "delta": 0.00021441281166131865,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n12:s1810019",
+          "family": "er",
+          "n": 12,
+          "graph_seed": 1810019,
+          "maxcut": 32,
+          "generator_parameters": {
+            "p": 0.5955648225866759
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03546430061587694,
+          "baseline_aurc": 0.15866528181929182,
+          "family_control_aurc": 0.1555863475660504,
+          "deployed_aurc": 0.1555863475660504,
+          "delta": -0.003078934253241433,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810082",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810082,
+          "maxcut": 39,
+          "generator_parameters": {
+            "p": 0.7149497365847891
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.12641076544562058,
+          "family_control_aurc": 0.11940316355686757,
+          "deployed_aurc": 0.11940316355686757,
+          "delta": -0.007007601888753004,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810083",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810083,
+          "maxcut": 17,
+          "generator_parameters": {
+            "p": 0.21737433401229675
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03350488956723538,
+          "baseline_aurc": 0.13642543861225567,
+          "family_control_aurc": 0.13354654550822234,
+          "deployed_aurc": 0.13354654550822234,
+          "delta": -0.002878893104033331,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810084",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810084,
+          "maxcut": 37,
+          "generator_parameters": {
+            "p": 0.5306159689440442
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.15776316053952882,
+          "family_control_aurc": 0.15485816439928715,
+          "deployed_aurc": 0.15485816439928715,
+          "delta": -0.0029049961402416724,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810085",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810085,
+          "maxcut": 15,
+          "generator_parameters": {
+            "p": 0.22372833951910495
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.003695464193917003,
+          "baseline_aurc": 0.17933725310010193,
+          "family_control_aurc": 0.1780916117946173,
+          "deployed_aurc": 0.1780916117946173,
+          "delta": -0.0012456413054846294,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810086",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810086,
+          "maxcut": 39,
+          "generator_parameters": {
+            "p": 0.683108920798725
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.12383128772848699,
+          "family_control_aurc": 0.11710232328602949,
+          "deployed_aurc": 0.11710232328602949,
+          "delta": -0.006728964442457505,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810087",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810087,
+          "maxcut": 40,
+          "generator_parameters": {
+            "p": 0.7045944495417792
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.15035672940544845,
+          "family_control_aurc": 0.14031407525312944,
+          "deployed_aurc": 0.14031407525312944,
+          "delta": -0.010042654152319003,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810088",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810088,
+          "maxcut": 16,
+          "generator_parameters": {
+            "p": 0.2458490886506788
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.034176911155903045,
+          "baseline_aurc": 0.17970962811102145,
+          "family_control_aurc": 0.18080916978623598,
+          "deployed_aurc": 0.18080916978623598,
+          "delta": 0.0010995416752145326,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810089",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810089,
+          "maxcut": 35,
+          "generator_parameters": {
+            "p": 0.49316804679597864
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03507737072572395,
+          "baseline_aurc": 0.16354097592236458,
+          "family_control_aurc": 0.1685903399118387,
+          "deployed_aurc": 0.1685903399118387,
+          "delta": 0.005049363989474115,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810090",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810090,
+          "maxcut": 36,
+          "generator_parameters": {
+            "p": 0.6480386092508672
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.11632887160965615,
+          "family_control_aurc": 0.1153459344070501,
+          "deployed_aurc": 0.1153459344070501,
+          "delta": -0.0009829372026060462,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810091",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810091,
+          "maxcut": 28,
+          "generator_parameters": {
+            "p": 0.4396223882579541
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03307335286506932,
+          "baseline_aurc": 0.1787070188873928,
+          "family_control_aurc": 0.17854155189018017,
+          "deployed_aurc": 0.17854155189018017,
+          "delta": -0.00016546699721262104,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810092",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810092,
+          "maxcut": 43,
+          "generator_parameters": {
+            "p": 0.7415562097537852
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14767933241439793,
+          "family_control_aurc": 0.13053410078223684,
+          "deployed_aurc": 0.13053410078223684,
+          "delta": -0.017145231632161084,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810093",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810093,
+          "maxcut": 21,
+          "generator_parameters": {
+            "p": 0.34571869640045705
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.029249873102061313,
+          "baseline_aurc": 0.19323980473585614,
+          "family_control_aurc": 0.18712406295092524,
+          "deployed_aurc": 0.18712406295092524,
+          "delta": -0.006115741784930906,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810094",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810094,
+          "maxcut": 15,
+          "generator_parameters": {
+            "p": 0.23224844151835633
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.023528400517898423,
+          "baseline_aurc": 0.15724356749803384,
+          "family_control_aurc": 0.15110738021961054,
+          "deployed_aurc": 0.15110738021961054,
+          "delta": -0.0061361872784233,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810095",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810095,
+          "maxcut": 37,
+          "generator_parameters": {
+            "p": 0.49648669553638153
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.15351770670398165,
+          "family_control_aurc": 0.148234177017345,
+          "deployed_aurc": 0.148234177017345,
+          "delta": -0.0052835296866366455,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810096",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810096,
+          "maxcut": 37,
+          "generator_parameters": {
+            "p": 0.5621480026071203
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.17834113505667828,
+          "family_control_aurc": 0.1763916793541853,
+          "deployed_aurc": 0.1763916793541853,
+          "delta": -0.001949455702492997,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810097",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810097,
+          "maxcut": 33,
+          "generator_parameters": {
+            "p": 0.5932113061859865
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14794866923565475,
+          "family_control_aurc": 0.15230264676372993,
+          "deployed_aurc": 0.15230264676372993,
+          "delta": 0.004353977528075176,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810098",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810098,
+          "maxcut": 14,
+          "generator_parameters": {
+            "p": 0.2153611040083464
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.021897046414834115,
+          "baseline_aurc": 0.1916637148062709,
+          "family_control_aurc": 0.18039857871697182,
+          "deployed_aurc": 0.18039857871697182,
+          "delta": -0.011265136089299077,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810099",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810099,
+          "maxcut": 43,
+          "generator_parameters": {
+            "p": 0.7022227340924561
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.12538183913202156,
+          "family_control_aurc": 0.1061206433276699,
+          "deployed_aurc": 0.1061206433276699,
+          "delta": -0.01926119580435165,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810100",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810100,
+          "maxcut": 27,
+          "generator_parameters": {
+            "p": 0.44119653592148683
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.022441373950423393,
+          "baseline_aurc": 0.15516090693991277,
+          "family_control_aurc": 0.15569962660846334,
+          "deployed_aurc": 0.15569962660846334,
+          "delta": 0.0005387196685505691,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "er:n14:s1810101",
+          "family": "er",
+          "n": 14,
+          "graph_seed": 1810101,
+          "maxcut": 39,
+          "generator_parameters": {
+            "p": 0.631497959831793
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.13157333478717906,
+          "family_control_aurc": 0.12220059066361932,
+          "deployed_aurc": 0.12220059066361932,
+          "delta": -0.009372744123559734,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810020",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810020,
+          "maxcut": 10,
+          "generator_parameters": {
+            "degree": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.0015950751299797505,
+          "baseline_aurc": 0.1595293440281258,
+          "family_control_aurc": 0.1595293440281258,
+          "deployed_aurc": 0.1595293440281258,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810021",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810021,
+          "maxcut": 16,
+          "generator_parameters": {
+            "degree": 3
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.029234756639174075,
+          "baseline_aurc": 0.22716911053189637,
+          "family_control_aurc": 0.22716911053189637,
+          "deployed_aurc": 0.22716911053189637,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810022",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810022,
+          "maxcut": 20,
+          "generator_parameters": {
+            "degree": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.20376522890973134,
+          "family_control_aurc": 0.20376522890973134,
+          "deployed_aurc": 0.20376522890973134,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810023",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810023,
+          "maxcut": 23,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.17509358552028179,
+          "family_control_aurc": 0.17509358552028179,
+          "deployed_aurc": 0.17509358552028179,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810024",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810024,
+          "maxcut": 22,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.13361782102874287,
+          "family_control_aurc": 0.13361782102874287,
+          "deployed_aurc": 0.13361782102874287,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810025",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810025,
+          "maxcut": 23,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.17424491303683134,
+          "family_control_aurc": 0.17424491303683134,
+          "deployed_aurc": 0.17424491303683134,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810026",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810026,
+          "maxcut": 22,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.15492695307745075,
+          "family_control_aurc": 0.15492695307745075,
+          "deployed_aurc": 0.15492695307745075,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810027",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810027,
+          "maxcut": 12,
+          "generator_parameters": {
+            "degree": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.0025482268093061644,
+          "baseline_aurc": 0.26465806280234294,
+          "family_control_aurc": 0.26465806280234294,
+          "deployed_aurc": 0.26465806280234294,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810028",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810028,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.13219796471948517,
+          "family_control_aurc": 0.13219796471948517,
+          "deployed_aurc": 0.13219796471948517,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810029",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810029,
+          "maxcut": 18,
+          "generator_parameters": {
+            "degree": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.12853012079254164,
+          "family_control_aurc": 0.12853012079254164,
+          "deployed_aurc": 0.12853012079254164,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810030",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810030,
+          "maxcut": 20,
+          "generator_parameters": {
+            "degree": 4
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.17924368923031953,
+          "family_control_aurc": 0.17924368923031953,
+          "deployed_aurc": 0.17924368923031953,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810031",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810031,
+          "maxcut": 23,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.16307519660128247,
+          "family_control_aurc": 0.16307519660128247,
+          "deployed_aurc": 0.16307519660128247,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810033",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810033,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.13335262838848605,
+          "family_control_aurc": 0.13335262838848605,
+          "deployed_aurc": 0.13335262838848605,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810034",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810034,
+          "maxcut": 22,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.13424789642169213,
+          "family_control_aurc": 0.13424789642169213,
+          "deployed_aurc": 0.13424789642169213,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810036",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810036,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1537294840848191,
+          "family_control_aurc": 0.1537294840848191,
+          "deployed_aurc": 0.1537294840848191,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810037",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810037,
+          "maxcut": 24,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.08626650976287113,
+          "family_control_aurc": 0.08626650976287113,
+          "deployed_aurc": 0.08626650976287113,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810038",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810038,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14454839725076518,
+          "family_control_aurc": 0.14454839725076518,
+          "deployed_aurc": 0.14454839725076518,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810039",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810039,
+          "maxcut": 16,
+          "generator_parameters": {
+            "degree": 3
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.025190207482608085,
+          "baseline_aurc": 0.22333302668017954,
+          "family_control_aurc": 0.22333302668017954,
+          "deployed_aurc": 0.22333302668017954,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810040",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810040,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14569692524196676,
+          "family_control_aurc": 0.14569692524196676,
+          "deployed_aurc": 0.14569692524196676,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n12:s1810041",
+          "family": "rr",
+          "n": 12,
+          "graph_seed": 1810041,
+          "maxcut": 28,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.19120968451572054,
+          "family_control_aurc": 0.19120968451572054,
+          "deployed_aurc": 0.19120968451572054,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810102",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810102,
+          "maxcut": 25,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.11075030412103586,
+          "family_control_aurc": 0.11075030412103586,
+          "deployed_aurc": 0.11075030412103586,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810103",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810103,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1421725919935606,
+          "family_control_aurc": 0.1421725919935606,
+          "deployed_aurc": 0.1421725919935606,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810104",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810104,
+          "maxcut": 12,
+          "generator_parameters": {
+            "degree": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.017416128490539667,
+          "baseline_aurc": 0.1637041407837595,
+          "family_control_aurc": 0.1637041407837595,
+          "deployed_aurc": 0.03904205063114138,
+          "delta": -0.12466209015261812,
+          "delta_vs_family_control": -0.12466209015261812
+        },
+        {
+          "graph_id": "rr:n14:s1810105",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810105,
+          "maxcut": 19,
+          "generator_parameters": {
+            "degree": 3
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.004624852518003819,
+          "baseline_aurc": 0.22167934477734952,
+          "family_control_aurc": 0.22167934477734952,
+          "deployed_aurc": 0.22167934477734952,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810106",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810106,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.13217783413174328,
+          "family_control_aurc": 0.13217783413174328,
+          "deployed_aurc": 0.13217783413174328,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810107",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810107,
+          "maxcut": 30,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1258726759828444,
+          "family_control_aurc": 0.1258726759828444,
+          "deployed_aurc": 0.1258726759828444,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810108",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810108,
+          "maxcut": 14,
+          "generator_parameters": {
+            "degree": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.022410212786715428,
+          "baseline_aurc": 0.26465806280234294,
+          "family_control_aurc": 0.26465806280234294,
+          "deployed_aurc": 0.17168358067608716,
+          "delta": -0.09297448212625578,
+          "delta_vs_family_control": -0.09297448212625578
+        },
+        {
+          "graph_id": "rr:n14:s1810109",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810109,
+          "maxcut": 14,
+          "generator_parameters": {
+            "degree": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.027807687258993935,
+          "baseline_aurc": 0.25680338402452146,
+          "family_control_aurc": 0.25680338402452146,
+          "deployed_aurc": 0.14103746968461892,
+          "delta": -0.11576591433990255,
+          "delta_vs_family_control": -0.11576591433990255
+        },
+        {
+          "graph_id": "rr:n14:s1810110",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810110,
+          "maxcut": 30,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.032738292862297624,
+          "baseline_aurc": 0.15273140647036434,
+          "family_control_aurc": 0.15273140647036434,
+          "deployed_aurc": 0.15273140647036434,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810111",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810111,
+          "maxcut": 27,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.035171230430441236,
+          "baseline_aurc": 0.18026676979019793,
+          "family_control_aurc": 0.18026676979019793,
+          "deployed_aurc": 0.18026676979019793,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810112",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810112,
+          "maxcut": 32,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.17389045787387034,
+          "family_control_aurc": 0.17389045787387034,
+          "deployed_aurc": 0.17389045787387034,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810113",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810113,
+          "maxcut": 14,
+          "generator_parameters": {
+            "degree": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.0224102127867154,
+          "baseline_aurc": 0.2646580628023429,
+          "family_control_aurc": 0.2646580628023429,
+          "deployed_aurc": 0.17168358067608713,
+          "delta": -0.09297448212625575,
+          "delta_vs_family_control": -0.09297448212625575
+        },
+        {
+          "graph_id": "rr:n14:s1810114",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810114,
+          "maxcut": 28,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.19099356817995516,
+          "family_control_aurc": 0.19099356817995516,
+          "deployed_aurc": 0.19099356817995516,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810115",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810115,
+          "maxcut": 34,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.21270120308791088,
+          "family_control_aurc": 0.21270120308791088,
+          "deployed_aurc": 0.21270120308791088,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810116",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810116,
+          "maxcut": 32,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.18104695906225832,
+          "family_control_aurc": 0.18104695906225832,
+          "deployed_aurc": 0.18104695906225832,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810117",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810117,
+          "maxcut": 30,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.12860681020981354,
+          "family_control_aurc": 0.12860681020981354,
+          "deployed_aurc": 0.12860681020981354,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810120",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810120,
+          "maxcut": 12,
+          "generator_parameters": {
+            "degree": 2
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": true,
+          "upper_bound": -0.019875086891148697,
+          "baseline_aurc": 0.17970994758603975,
+          "family_control_aurc": 0.17970994758603975,
+          "deployed_aurc": 0.07534351318876586,
+          "delta": -0.10436643439727389,
+          "delta_vs_family_control": -0.10436643439727389
+        },
+        {
+          "graph_id": "rr:n14:s1810121",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810121,
+          "maxcut": 24,
+          "generator_parameters": {
+            "degree": 4
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03188099159375987,
+          "baseline_aurc": 0.20566922741222213,
+          "family_control_aurc": 0.20566922741222213,
+          "deployed_aurc": 0.20566922741222213,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810122",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810122,
+          "maxcut": 27,
+          "generator_parameters": {
+            "degree": 5
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.16411251663579782,
+          "family_control_aurc": 0.16411251663579782,
+          "deployed_aurc": 0.16411251663579782,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "rr:n14:s1810123",
+          "family": "rr",
+          "n": 14,
+          "graph_seed": 1810123,
+          "maxcut": 30,
+          "generator_parameters": {
+            "degree": 6
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p75",
+          "family_control_arm": "tqa_dt_0p75",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1285945688565596,
+          "family_control_aurc": 0.1285945688565596,
+          "deployed_aurc": 0.1285945688565596,
+          "delta": 0.0,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810062",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810062,
+          "maxcut": 31,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.8506735045399951
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.11425044833906307,
+          "family_control_aurc": 0.11064762130502222,
+          "deployed_aurc": 0.11064762130502222,
+          "delta": -0.0036028270340408564,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810063",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810063,
+          "maxcut": 10,
+          "generator_parameters": {
+            "degree": 2,
+            "rewiring": 0.8540039159391593
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.17176773728332964,
+          "family_control_aurc": 0.16227408631260137,
+          "deployed_aurc": 0.16227408631260137,
+          "delta": -0.009493650970728268,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810064",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810064,
+          "maxcut": 34,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.15936290582951257
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.18715262723392312,
+          "family_control_aurc": 0.1858886483484076,
+          "deployed_aurc": 0.1858886483484076,
+          "delta": -0.001263978885515521,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810065",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810065,
+          "maxcut": 33,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.16605590293054076
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.16231368031976107,
+          "family_control_aurc": 0.1603394075397421,
+          "deployed_aurc": 0.1603394075397421,
+          "delta": -0.0019742727800189652,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810066",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810066,
+          "maxcut": 31,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.2650468964482131
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.11466071698545148,
+          "family_control_aurc": 0.11108083133977366,
+          "deployed_aurc": 0.11108083133977366,
+          "delta": -0.0035798856456778216,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810067",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810067,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 6,
+            "rewiring": 0.4626323755227464
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.032477359599705824,
+          "baseline_aurc": 0.1640995047343191,
+          "family_control_aurc": 0.16966879031775986,
+          "deployed_aurc": 0.16966879031775986,
+          "delta": 0.005569285583440747,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810068",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810068,
+          "maxcut": 20,
+          "generator_parameters": {
+            "degree": 4,
+            "rewiring": 0.8120471306542657
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.030367099124155472,
+          "baseline_aurc": 0.21769970793153404,
+          "family_control_aurc": 0.2169069211982372,
+          "deployed_aurc": 0.2169069211982372,
+          "delta": -0.0007927867332968297,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810069",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810069,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 6,
+            "rewiring": 0.4009704898768886
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.030267799839430815,
+          "baseline_aurc": 0.1587454857760997,
+          "family_control_aurc": 0.163158613232146,
+          "deployed_aurc": 0.163158613232146,
+          "delta": 0.004413127456046301,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810070",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810070,
+          "maxcut": 11,
+          "generator_parameters": {
+            "degree": 2,
+            "rewiring": 0.7402713791813436
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.025524820916719315,
+          "baseline_aurc": 0.22083340418328842,
+          "family_control_aurc": 0.21673363095075768,
+          "deployed_aurc": 0.21673363095075768,
+          "delta": -0.004099773232530746,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810071",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810071,
+          "maxcut": 32,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.5466412917200297
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14177186847755066,
+          "family_control_aurc": 0.13851756370445864,
+          "deployed_aurc": 0.13851756370445864,
+          "delta": -0.0032543047730920205,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810072",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810072,
+          "maxcut": 25,
+          "generator_parameters": {
+            "degree": 6,
+            "rewiring": 0.1745734386509031
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.035538585637081954,
+          "baseline_aurc": 0.1375111681346227,
+          "family_control_aurc": 0.14797744123279846,
+          "deployed_aurc": 0.14797744123279846,
+          "delta": 0.010466273098175771,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810073",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810073,
+          "maxcut": 19,
+          "generator_parameters": {
+            "degree": 4,
+            "rewiring": 0.2270972895574102
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.032116566802706636,
+          "baseline_aurc": 0.17267122545649127,
+          "family_control_aurc": 0.16903097200631323,
+          "deployed_aurc": 0.16903097200631323,
+          "delta": -0.0036402534501780437,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810074",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810074,
+          "maxcut": 31,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.7013470322908916
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.11748023331019188,
+          "family_control_aurc": 0.11406970429704223,
+          "deployed_aurc": 0.11406970429704223,
+          "delta": -0.0034105290131496435,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810075",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810075,
+          "maxcut": 19,
+          "generator_parameters": {
+            "degree": 4,
+            "rewiring": 0.4826050540345422
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.034741194697572225,
+          "baseline_aurc": 0.18889967532646004,
+          "family_control_aurc": 0.1851404469975416,
+          "deployed_aurc": 0.1851404469975416,
+          "delta": -0.0037592283289184514,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810076",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810076,
+          "maxcut": 11,
+          "generator_parameters": {
+            "degree": 2,
+            "rewiring": 0.1880964644314829
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.022117262827872852,
+          "baseline_aurc": 0.22764116031936665,
+          "family_control_aurc": 0.22097468860261107,
+          "deployed_aurc": 0.22097468860261107,
+          "delta": -0.006666471716755579,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810077",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810077,
+          "maxcut": 31,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.3046302441793311
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.11883496953520223,
+          "family_control_aurc": 0.11582155883256977,
+          "deployed_aurc": 0.11582155883256977,
+          "delta": -0.0030134107026324602,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810078",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810078,
+          "maxcut": 11,
+          "generator_parameters": {
+            "degree": 2,
+            "rewiring": 0.43888016261670054
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.01497804395875596,
+          "baseline_aurc": 0.19775430592774965,
+          "family_control_aurc": 0.2010584258780952,
+          "deployed_aurc": 0.2010584258780952,
+          "delta": 0.0033041199503455465,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810079",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810079,
+          "maxcut": 31,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.664790020973818
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.12137245992857948,
+          "family_control_aurc": 0.11852551899854764,
+          "deployed_aurc": 0.11852551899854764,
+          "delta": -0.0028469409300318355,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810080",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810080,
+          "maxcut": 12,
+          "generator_parameters": {
+            "degree": 2,
+            "rewiring": 0.9247371724054324
+          },
+          "selected_arm": "tqa_dt_1p00",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.0252779557694581,
+          "baseline_aurc": 0.26649974146997213,
+          "family_control_aurc": 0.26761753907087554,
+          "deployed_aurc": 0.26761753907087554,
+          "delta": 0.001117797600903414,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n12:s1810081",
+          "family": "ws",
+          "n": 12,
+          "graph_seed": 1810081,
+          "maxcut": 26,
+          "generator_parameters": {
+            "degree": 6,
+            "rewiring": 0.12698359233737783
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03437962419538701,
+          "baseline_aurc": 0.16403622725628178,
+          "family_control_aurc": 0.16951150843958382,
+          "deployed_aurc": 0.16951150843958382,
+          "delta": 0.005475281183302039,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810144",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810144,
+          "maxcut": 14,
+          "generator_parameters": {
+            "degree": 2,
+            "rewiring": 0.3482052273685257
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "knn",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": true,
+          "upper_bound": -0.019961826805884958,
+          "baseline_aurc": 0.2581492594832882,
+          "family_control_aurc": 0.2561987424115055,
+          "deployed_aurc": 0.1935204933917011,
+          "delta": -0.0646287660915871,
+          "delta_vs_family_control": -0.06267824901980437
+        },
+        {
+          "graph_id": "ws:n14:s1810145",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810145,
+          "maxcut": 38,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.17254655329013713
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14980123987832292,
+          "family_control_aurc": 0.14865835274779796,
+          "deployed_aurc": 0.14865835274779796,
+          "delta": -0.001142887130524961,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810146",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810146,
+          "maxcut": 37,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.12436812112683684
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.12829051158647412,
+          "family_control_aurc": 0.1270124447413097,
+          "deployed_aurc": 0.1270124447413097,
+          "delta": -0.001278066845164405,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810147",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810147,
+          "maxcut": 22,
+          "generator_parameters": {
+            "degree": 4,
+            "rewiring": 0.846202898606135
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03448668826021439,
+          "baseline_aurc": 0.17619854510423463,
+          "family_control_aurc": 0.17082226121546507,
+          "deployed_aurc": 0.17082226121546507,
+          "delta": -0.005376283888769567,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810148",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810148,
+          "maxcut": 30,
+          "generator_parameters": {
+            "degree": 6,
+            "rewiring": 0.27533873156525546
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14719668028723285,
+          "family_control_aurc": 0.1507222825152193,
+          "deployed_aurc": 0.1507222825152193,
+          "delta": 0.003525602227986452,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810149",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810149,
+          "maxcut": 38,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.6878166747916361
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14854815226367388,
+          "family_control_aurc": 0.14162688148319028,
+          "deployed_aurc": 0.14162688148319028,
+          "delta": -0.0069212707804836016,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810150",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810150,
+          "maxcut": 37,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.22657567207201001
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.12231709967518177,
+          "family_control_aurc": 0.11640301480611041,
+          "deployed_aurc": 0.11640301480611041,
+          "delta": -0.0059140848690713566,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810151",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810151,
+          "maxcut": 13,
+          "generator_parameters": {
+            "degree": 2,
+            "rewiring": 0.8888421122613437
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.02044581511549476,
+          "baseline_aurc": 0.2218559839848396,
+          "family_control_aurc": 0.22131050943986733,
+          "deployed_aurc": 0.22131050943986733,
+          "delta": -0.0005454745449722798,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810152",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810152,
+          "maxcut": 38,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.9159783728715482
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.14626811559805328,
+          "family_control_aurc": 0.14086173079962716,
+          "deployed_aurc": 0.14086173079962716,
+          "delta": -0.005406384798426117,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810153",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810153,
+          "maxcut": 29,
+          "generator_parameters": {
+            "degree": 6,
+            "rewiring": 0.9191893767147274
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03502369995152521,
+          "baseline_aurc": 0.11914089258188161,
+          "family_control_aurc": 0.12242184222330948,
+          "deployed_aurc": 0.12242184222330948,
+          "delta": 0.0032809496414278744,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810154",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810154,
+          "maxcut": 33,
+          "generator_parameters": {
+            "degree": 6,
+            "rewiring": 0.0943359430396184
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03396996270997349,
+          "baseline_aurc": 0.21123507972384217,
+          "family_control_aurc": 0.2211545155648996,
+          "deployed_aurc": 0.2211545155648996,
+          "delta": 0.009919435841057422,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810155",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810155,
+          "maxcut": 22,
+          "generator_parameters": {
+            "degree": 4,
+            "rewiring": 0.4583408349061965
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.0328225529143257,
+          "baseline_aurc": 0.16853612330118817,
+          "family_control_aurc": 0.164210115139516,
+          "deployed_aurc": 0.164210115139516,
+          "delta": -0.004326008161672168,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810156",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810156,
+          "maxcut": 30,
+          "generator_parameters": {
+            "degree": 6,
+            "rewiring": 0.07948375160837237
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.15949746957634872,
+          "family_control_aurc": 0.1721500692445229,
+          "deployed_aurc": 0.1721500692445229,
+          "delta": 0.01265259966817417,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810157",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810157,
+          "maxcut": 37,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.08316418098409956
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.1254465992511892,
+          "family_control_aurc": 0.12462178738989331,
+          "deployed_aurc": 0.12462178738989331,
+          "delta": -0.0008248118612958905,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810158",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810158,
+          "maxcut": 21,
+          "generator_parameters": {
+            "degree": 4,
+            "rewiring": 0.17130647817353245
+          },
+          "selected_arm": "knn",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.016081364866901177,
+          "baseline_aurc": 0.1502536748356182,
+          "family_control_aurc": 0.14782676080922455,
+          "deployed_aurc": 0.14782676080922455,
+          "delta": -0.0024269140263936395,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810159",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810159,
+          "maxcut": 29,
+          "generator_parameters": {
+            "degree": 6,
+            "rewiring": 0.40231516900928743
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03467813248617613,
+          "baseline_aurc": 0.11919986462678213,
+          "family_control_aurc": 0.12252381047700772,
+          "deployed_aurc": 0.12252381047700772,
+          "delta": 0.003323945850225593,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810160",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810160,
+          "maxcut": 22,
+          "generator_parameters": {
+            "degree": 4,
+            "rewiring": 0.5709893886748804
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.033748426305330564,
+          "baseline_aurc": 0.16916550441518274,
+          "family_control_aurc": 0.1664790970206458,
+          "deployed_aurc": 0.1664790970206458,
+          "delta": -0.0026864073945369327,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810161",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810161,
+          "maxcut": 23,
+          "generator_parameters": {
+            "degree": 4,
+            "rewiring": 0.9009031046458547
+          },
+          "selected_arm": "tqa_dt_0p75",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.030314162648034354,
+          "baseline_aurc": 0.1993346924014527,
+          "family_control_aurc": 0.1970059020355778,
+          "deployed_aurc": 0.1970059020355778,
+          "delta": -0.002328790365874911,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810162",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810162,
+          "maxcut": 37,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.4948771582574502
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.12472149429094692,
+          "family_control_aurc": 0.11921102612674257,
+          "deployed_aurc": 0.11921102612674257,
+          "delta": -0.005510468164204349,
+          "delta_vs_family_control": 0.0
+        },
+        {
+          "graph_id": "ws:n14:s1810163",
+          "family": "ws",
+          "n": 14,
+          "graph_seed": 1810163,
+          "maxcut": 40,
+          "generator_parameters": {
+            "degree": 8,
+            "rewiring": 0.6150962391097204
+          },
+          "selected_arm": "tqa_dt_0p50",
+          "deployed_arm": "tqa_dt_0p50",
+          "family_control_arm": "tqa_dt_0p50",
+          "accepted": false,
+          "upper_bound": 0.03581849777555429,
+          "baseline_aurc": 0.186472054993186,
+          "family_control_aurc": 0.18012689566624696,
+          "deployed_aurc": 0.18012689566624696,
+          "delta": -0.006345159326939048,
+          "delta_vs_family_control": 0.0
+        }
+      ]
+    }
+  },
+  "resource_accounting": {
+    "trace_objective_queries_by_split": {
+      "development": 13824,
+      "calibration": 13824,
+      "audit": 46080
+    },
+    "shots_used": 0,
+    "deployment_objective_query_ceiling": 32,
+    "audit_maxcut_used_for_analysis_only": true,
+    "angle_label_objective_queries": 5760
+  },
+  "protocol_sha256": "58692d57df9cb489ab22fa0cc672924d5b3888d107aee0a88b856c726ac5dcf1",
+  "implementation_sha256": "42aa34816315126b4519d92da86a24120443cdee6a654cf92c932c7b91ce9f3d"
+}

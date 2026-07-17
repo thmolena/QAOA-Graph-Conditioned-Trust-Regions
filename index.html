@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Query-Efficient Quantum Approximate Optimization via Graph-Conditioned Trust Regions</title>
-  <meta name="description" content="Graph-conditioned trust-region search for query-limited QAOA, with schema-2 source data, target-attainment accounting, an installable package, and exact-statevector evidence through 16 qubits." />
+  <title>Reliability Auditing for Structural Routing of QAOA Optimizers</title>
+  <meta name="description" content="A target-free fixed-budget audit of structural QAOA optimizer routing, with matched family controls, selective-risk diagnostics, and reproducible exact-statevector evidence." />
   <meta name="robots" content="index,follow" />
   <meta name="color-scheme" content="light" />
   <meta name="theme-color" content="#f7f7f4" />
   <link rel="canonical" href="https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Query-Efficient Quantum Approximate Optimization via Graph-Conditioned Trust Regions" />
-  <meta property="og:description" content="A graph-conditioned QAOA search policy with verified target-attainment accounting, marginal angle-coverage diagnostics, and a separate validation-fit difficulty score." />
+  <meta property="og:title" content="Reliability Auditing for Structural Routing of QAOA Optimizers" />
+  <meta property="og:description" content="A learned QAOA optimizer router lowers the observed mean but fails its frozen reliability gate." />
   <meta property="og:url" content="https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/" />
-  <meta property="og:image" content="https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure1_ConceptualPipeline.png" />
+  <meta property="og:image" content="https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure2_ConfirmatoryAudit.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Graph-Conditioned Trust Regions for QAOA" />
-  <meta name="twitter:description" content="Schema-2 evidence, installable code, and source data for query-budgeted QAOA search." />
-  <meta name="twitter:image" content="https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure1_ConceptualPipeline.png" />
-  <meta name="citation_title" content="Query-Efficient Quantum Approximate Optimization via Graph-Conditioned Trust Regions" />
+  <meta name="twitter:title" content="Reliability Auditing for QAOA Optimizer Routing" />
+  <meta name="twitter:description" content="Matched controls, target-free accounting, and a failed selective-reliability gate." />
+  <meta name="twitter:image" content="https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/manuscript/figures/Figure2_ConfirmatoryAudit.png" />
+  <meta name="citation_title" content="Reliability Auditing for Structural Routing of QAOA Optimizers" />
   <meta name="citation_author" content="Molena Huynh" />
   <meta name="citation_publication_date" content="2026" />
   <meta name="citation_pdf_url" content="https://thmolena.github.io/QAOA-Graph-Conditioned-Trust-Regions/manuscript/main.pdf" />
@@ -46,19 +46,16 @@
   </nav>
   <header class="hero">
     <section class="hero-content fade-in">
-      <h1><span class="nowrap">Query&#8209;Efficient</span> Quantum Approximate Optimization via <span class="nowrap">Graph&#8209;Conditioned</span> Trust Regions</h1>
+      <h1>Reliability Auditing for Structural Routing of QAOA Optimizers</h1>
       <p class="authors">Molena Huynh</p>
       <p class="venue">Preprint · 2026</p>
       <p class="summary">
-        Every objective evaluation in a variational quantum algorithm is purchased
-        with repeated circuit executions. Graph&#8209;Conditioned Trust Regions turn a
-        learned Gaussian over QAOA angles into a complete search policy: a warm
-        start, a step geometry, a feasible region, and a validation&#8209;fit per&#8209;instance
-        budget, all fixed before the first query. When the effective budget can
-        evaluate both mandatory seeds, the policy includes the strongest
-        online&#8209;cheap prior as a counted seed and, under exact evaluation,
-        best&#8209;so&#8209;far selection protects its value. That prior is derived from supervised training targets;
-        it is not free of offline label cost.
+        A learned router can lower average QAOA regret while harming the few
+        instances on which it intervenes. This project compares nine optimizer
+        arms under the same target&#8209;free 32&#8209;call ceiling, routes from invariant
+        graph summaries, and abstains to a strong family&#8209;matched control. The
+        observed mean improves slightly, but the frozen reliability gate fails:
+        only 12 of 160 graphs are routed and four accepted routes are harmful.
       </p>
       <div class="button-row">
         <a class="button primary" href="manuscript/main.pdf">Read the paper</a>
@@ -73,7 +70,7 @@
     <section class="section teaser fade-in">
       <div class="teaser-panel">
         <div class="teaser-copy">
-          <h2>QAOA Optimization as a <span class="nowrap">Query&#8209;Limited</span> Problem</h2>
+          <h2>A <span class="nowrap">Target&#8209;Free</span> Fixed&#8209;Budget Test</h2>
           <p>
             Depth&#8209;\(p\) QAOA prepares \(|\gamma,\beta\rangle\) from a cost
             Hamiltonian \(C\) and mixer \(B\), and a classical loop maximizes
@@ -88,14 +85,12 @@
         </div>
         <div class="text-block">
           <p>
-            Every method is scored against the same offline 98% reference target.
-            Reaching the target costs the number of objective evaluations used; a
-            miss costs the common 400&#8209;call benchmark cap. Raw work and an explicit
-            attainment flag are retained alongside that capped score, so an early
-            stop cannot make a failed run appear cheap. On a fixed trajectory,
-            truncation can only tie or worsen this shared&#8209;cap score. The reference
-            is privileged evaluation information, not a deployable stopping oracle,
-            and its construction is excluded from online counts.
+            Every arm receives exactly 32 objective calls and records best&#8209;so&#8209;far
+            quality at calls 1, 2, 4, 8, 16, and 32. The primary score is
+            equal&#8209;weight area under normalized checkpoint regret (AURC), with exact
+            MaxCut used only after optimization for small&#8209;instance analysis. No
+            target or exact optimum controls stopping. All seeds and signed SPSA
+            evaluations are counted.
           </p>
         </div>
       </div>
@@ -103,156 +98,129 @@
 
     <section class="section fade-in" id="method">
       <div class="section-heading">
-        <h2>A <span class="nowrap">Graph&#8209;Conditioned</span> Gaussian as a Search Policy</h2>
+        <h2>Structural Routing with a Matched Fallback</h2>
       </div>
       <div class="text-block">
         <p>
-          A graph isomorphism network with Laplacian spectral encodings maps each
-          graph to a diagonal Gaussian over QAOA angles,
+          Sixteen relabelling&#8209;invariant summaries encode graph size, density,
+          degree distribution, clustering, triangles, and Laplacian spectrum. A
+          low&#8209;capacity multi&#8209;output ridge model fitted on development graphs
+          predicts the AURC of nine arms,
           \[
-            p(\theta\mid G)=\mathcal{N}\!\bigl(\mu(G),\Sigma(G)\bigr),
-            \qquad \Sigma(G)=\operatorname{diag}\!\bigl(\sigma^2(G)\bigr).
+            s(x)=\arg\min_m \widehat u_m(x).
           \]
-          The mean initializes search. The standard deviations precondition its
-          coordinate steps and define the Mahalanobis trust region
-          \[
-            \mathcal{T}(G)=\{\theta:\|\Sigma^{-1/2}(\theta-c)\|_2\leq2\}.
-          \]
-          Every proposal is retracted onto this region in whitened coordinates.
+          The portfolio contains concentration, four fixed TQA schedules, nearest
+          neighbour transfer, random multistart, SPSA, and the legacy
+          graph&#8209;conditioned trust&#8209;region policy.
         </p>
         <p>
-          The seed set contains the predicted mean, the parameter&#8209;concentration
-          angles, and score&#8209;allocated Gaussian draws. Each evaluated seed costs one
-          query, the region re&#8209;centers on the best seed, and best&#8209;so&#8209;far selection
-          preserves the best evaluated exact value. Comparison with both mandatory
-          seeds requires enough effective budget to evaluate them. This distinguishes
-          a learned search policy from a learned point initializer.
+          For each synthetic graph family, the arm with lowest development AURC
+          is frozen as fallback \(b(f)\). A separate 48&#8209;graph calibration split
+          supplies an upper residual order statistic,
+          \[
+            U(x)=\widehat u_{s(x)}(x)-\widehat u_{b(f)}(x)+q.
+          \]
+          Routing occurs only when \(s(x)\neq b(f)\) and \(U(x)&lt;0\); otherwise
+          the family fallback runs. Fixed quotas and sequential cross&#8209;split
+          de&#8209;duplication prevent exact exchangeability, so this is a
+          conformal&#8209;motivated abstention heuristic, not a finite&#8209;sample
+          coverage certificate.
         </p>
       </div>
     </section>
 
     <section class="section fade-in" id="allocation">
       <div class="section-heading">
-        <h2>A <span class="nowrap">Held&#8209;Out</span> Difficulty Score Prices Each Instance</h2>
+        <h2>Internal Locking Is Not External Preregistration</h2>
       </div>
       <div class="text-block">
         <p>
-          The covariance sizes the search geometry. A separate linear calibrator
-          is fit on held&#8209;out validation residuals, never on test outcomes, and
-          produces the difficulty score used for allocation. On the 48 test graphs,
-          that score has Spearman \(\rho=0.671\) with realized warm&#8209;start error
-          (\(p=1.76\times10^{-7}\)). Separately, the Gaussian angle head has
-          marginal per&#8209;coordinate coverage ECE 0.101 over 192 residuals and
-          observed coverage 0.901 at nominal 0.95; ECE does not calibrate the
-          difficulty score. Removing the ranking penalty improves ECE to 0.026
-          and score correlation to 0.854 in the released ablation, so that loss
-          term is not supported by this run.
+          The runner hashes the graph protocol, implementation, non&#8209;audit traces,
+          trained legacy model, selector, calibration threshold, decision, and
+          outcomes. It writes the decision before evaluating audit outcomes and
+          refuses to overwrite an existing audit directory. Those controls provide
+          tamper evidence and enforce execution order.
         </p>
         <p>
-          Validation statistics standardize the score and map it monotonically to
-          a seed count and evaluation cap before the first query. The mandatory
-          mean and concentration seeds are protected only when the effective budget
-          can evaluate them. The released two&#8209;seed/full&#8209;cap control changes both
-          Gaussian seeding and the cap, so it cannot identify either component's
-          causal contribution.
+          They do not provide an independent timestamp: protocol, frozen decision,
+          and audit outcomes first entered public Git history together. The current
+          study is therefore described as internally locked, not externally
+          preregistered. A future confirmatory run must publish the executable
+          protocol and trained decision rule to an immutable registry before
+          generating any audit outcome.
         </p>
       </div>
     </section>
 
     <section class="section fade-in" id="results">
       <div class="section-heading">
-        <h2>Benchmarking <span class="nowrap">Graph&#8209;Conditioned</span> Trust Regions</h2>
+        <h2>The Mean Improves, but the Reliability Gate Fails</h2>
         <p>
-          The released run studies unweighted MaxCut at \(n=14\), depth \(p=2\),
-          with 240/80/48 train/validation/test graphs from four random&#8209;graph
-          families. Schema&#8209;2 source data retain capped cost, raw evaluations,
-          attainment, primary and leave&#8209;one&#8209;family&#8209;out instance rows, an
-          implementation fingerprint, and artifact hashes. The exact&#8209;statevector
-          evidence stops at \(n=16\); no device result or larger&#8209;scale claim is made.
-          Because this revision inspected the test results while correcting the
-          protocol and claims, confirmation requires a new prospectively untouched
-          audit set.
+          The audit contains 160 new \(p=2\), \(n\in\{12,14\}\) MaxCut graphs,
+          balanced across four generator families and two sizes. The global TQA
+          schedule has mean AURC 0.17277, the family&#8209;matched fallback 0.17207,
+          and the abstaining router 0.16930. The paired mean difference is
+          \(-0.00277\), but its locked percentile endpoint is close to zero and is
+          not robust to reasonable alternative inference.
         </p>
       </div>
 
       <div class="result-stack">
         <article class="result-block">
           <div class="result-copy">
-            <h3><span class="nowrap">In&#8209;Distribution</span> Cost and Attainment</h3>
+            <h3>Twelve Interventions, Four Harms</h3>
             <p>
-              GCTR reaches \(48/48\) targets at capped cost \(15.0\pm7.8\) calls
-              and mean exact expectation ratio 0.858. The supervised concentration
-              heuristic is online&#8209;cheaper, also reaches \(48/48\), and records
-              \(12.33\pm6.45\)
-              (paired \(p=2.6488\times10^{-4}\)). TQA reaches \(48/48\) at
-              \(18.48\pm13.48\), with no established cost difference from GCTR
-              (\(p=0.0683\)). Random restarts, k-NN, and the GNN point initializer
-              reach \(37/48\), \(42/48\), and \(20/48\), with capped costs
-              \(203.9\pm152.9\), \(52.94\pm131.93\), and
-              \(264.42\pm164.02\), respectively.
+              The router accepts only \(12/160\) proposed departures from the
+              family control. Four are harmful, all in the Barabási&#8209;Albert
+              family; random&#8209;regular graphs supply most of the aggregate gain.
+              Descriptive coverage is \(141/160=0.88125\), below the frozen 0.90
+              gate. The mechanical decision is therefore no&#8209;go even though the
+              observed joint harm rate is only \(4/160=0.025\).
             </p>
           </div>
           <figure class="result-figure">
-            <img src="manuscript/figures/Figure2_QueryEfficiency.png" alt="Capped objective-call cost and exact expectation ratio across six QAOA optimization methods" width="1964" height="1153" loading="lazy" decoding="async" />
-            <figcaption>Capped shared-target cost, attainment, and returned exact expectation quality.</figcaption>
+            <img src="manuscript/figures/Figure2_ConfirmatoryAudit.png" alt="Confirmatory QAOA optimizer-routing audit showing accepted-route differences, anytime regret, family effects, coverage, and harm" width="2177" height="1787" loading="lazy" decoding="async" />
+            <figcaption>Accepted interventions, anytime regret, family heterogeneity, and the failed reliability gate.</figcaption>
           </figure>
         </article>
 
         <article class="result-block">
           <div class="result-copy">
-            <h3>Angle Coverage and Difficulty Ranking</h3>
+            <h3>Marginal Harm Is Not Accepted&#8209;Route Safety</h3>
             <p>
-              The Gaussian heads attain coverage ECE 0.101 over 192 standardized
-              residuals. The validation&#8209;fit difficulty score ranks realized
-              warm&#8209;start error with \(\rho=0.671\) (\(p=1.76\times10^{-7}\),
-              \(n=48\)). Coverage calibration and difficulty ranking are distinct
-              diagnostics; neither is a calibrated probability of target attainment.
+              Under an explicitly hypothetical iid&#8209;binomial model, observing at
+              most 141 covered graphs has probability 0.249 when true coverage is
+              0.90. The point miss is therefore compatible with nominal variation.
+              One&#8209;sided 95% exact upper bounds are 0.169 for coverage failure,
+              0.056 for joint harm, and 0.609 for harm conditional on acceptance.
+              The locked design is not iid, so these are sensitivity diagnostics,
+              not formal risk certificates.
             </p>
           </div>
           <figure class="result-figure">
-            <img src="manuscript/figures/Figure3_CalibrationAndUncertainty.png" alt="Marginal angle reliability curve and separate difficulty-score rank association" width="1458" height="1457" loading="lazy" decoding="async" />
-            <figcaption>Marginal Gaussian angle coverage and a separate held&#8209;out score's association with realized warm&#8209;start error.</figcaption>
+            <img src="manuscript/figures/Figure3_DevelopmentToConfirmation.png" alt="Development-to-confirmation changes in mean QAOA regret difference, descriptive coverage, acceptance, and harm" width="2303" height="1017" loading="lazy" decoding="async" />
+            <figcaption>The favorable development result does not carry its coverage gate into confirmation.</figcaption>
           </figure>
         </article>
 
         <article class="result-block">
           <div class="result-copy">
-            <h3><span class="nowrap">Leave&#8209;One&#8209;Family&#8209;Out</span> Shift</h3>
+            <h3>The Legacy Learned Policy Is a Negative Control</h3>
             <p>
-              Pooled across four held-out graph families, GCTR reaches \(39/48\)
-              targets at capped cost 89.3. The heuristic reaches \(40/48\) at
-              86.5 (\(p=0.832\) versus GCTR), while the point initializer reaches
-              \(38/48\) at 125.0 (\(p=0.00509\)). The two&#8209;seed/full&#8209;cap control
-              reaches \(41/48\) at 73.75 (\(p=0.0355\)). These exploratory paired
-              tests share four fitted family clusters, and the composite control
-              does not isolate learned allocation from its coupled policy changes.
+              The legacy graph&#8209;conditioned trust&#8209;region arm records mean AURC
+              0.28577. Fixed TQA schedules at \(d_t=0.75\) and \(d_t=0.50\)
+              record 0.17277 and 0.17381. Concentration, random multistart, and
+              SPSA are also weaker in this exact low&#8209;depth regime. The study
+              therefore does not claim that learned angle geometry is an
+              operational advantage.
             </p>
           </div>
           <figure class="result-figure">
-            <img src="manuscript/figures/Figure6_QualityCostFrontier.png" alt="In-distribution capped target cost and exact expectation quality across QAOA policies" width="1769" height="1273" loading="lazy" decoding="async" />
-            <figcaption>In-distribution endpoints shown for context; LOFO values are reported above and released as instance rows.</figcaption>
+            <img src="manuscript/figures/Figure1_PortfolioProtocol.png" alt="Internally locked target-free QAOA optimizer portfolio and resource-accounting protocol" width="1989" height="1018" loading="lazy" decoding="async" />
+            <figcaption>Nine matched-budget arms, a family fallback, an abstention rule, and a separately reported failure decision.</figcaption>
           </figure>
         </article>
 
-        <article class="result-block">
-          <div class="result-copy">
-            <h3><span class="nowrap">Cross&#8209;Size</span> Transfer Through 16 Qubits</h3>
-            <p>
-              A model trained at \(n=14\) has an 8.47--13.95\(\times\) lower mean
-              capped cost than random restarts for \(n=8,10,12,14,16\). GCTR costs
-              are 11.6, 20.1, 13.4, 15.4, and 15.2; heuristic costs are 10.9, 21.8,
-              12.1, 12.5, and 10.5, with identical attainment at every size. Thus
-              the heuristic is cheaper at four of five sizes; GCTR is slightly
-              cheaper only at \(n=10\). The random/GCTR ratio is arithmetic benchmark
-              cost, not wall&#8209;clock or hardware speedup, and the exact&#8209;statevector
-              boundary prevents extrapolation beyond \(n=16\).
-            </p>
-          </div>
-          <figure class="result-figure">
-            <img src="manuscript/figures/Figure4_Generalization.png" alt="Cross-size capped target cost and attainment for graph-conditioned, heuristic, point, and random QAOA policies" width="1817" height="1202" loading="lazy" decoding="async" />
-            <figcaption>Cross-size capped costs and explicit success counts using a fixed training size.</figcaption>
-          </figure>
-        </article>
       </div>
     </section>
 
@@ -261,25 +229,23 @@
         <h2>Reproducible Research Package</h2>
         <p>
           The repository root is the single installable source for the
-          <code>specops-gctr</code> distribution. The release contains the
-          exact&#8209;statevector objective, graph generator, trainable predictor,
-          held&#8209;out error head, search policies, statistics, source data, figure
-          and table generators, and a release test suite. Schema&#8209;2 validation checks
-          the implementation fingerprint and artifact hashes. The package does not ship a pretrained
-          checkpoint. Fitting currently requires exact&#8209;simulation calibration
-          instances and graph&#8209;only prediction still uses dense linear algebra.
-          A backend&#8209;neutral callback API applies the
-          same counted policy to QPU runtimes, emulators, or external scalar
-          objectives without treating that integration path as hardware evidence.
+          <code>specops-gctr</code> distribution. It contains fixed&#8209;budget arm
+          runners, exact query accounting, protocol and decision hashing,
+          invariant structural features, ridge routing, abstention, manifest
+          validation, the legacy GCTR implementation, and exact risk diagnostics.
+          The 160&#8209;graph evidence directory is immutable to the runner. The
+          design&#8209;only v2 specification is unregistered and unrun; it contains no
+          future outcome.
         </p>
       </div>
       <div class="bibtex-box install-box">
         <pre><code>python -m pip install "specops-gctr @ git+https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions.git"
 gctr-optimize --family er --n 10 --budget 100 --json
 
-# Replot and tests require a repository checkout:
-gctr-reproduce --replot-only --source-data-dir manuscript/source_data
-gctr-reproduce --validate-only --manuscript-dir manuscript
+# Audit validation and sensitivity diagnostics require a checkout:
+gctr-portfolio --config configs/portfolio_heterogeneous_confirmatory.json \
+  --output-dir portfolio_results/heterogeneous_confirmatory_v1 --validate-only
+gctr-risk-audit portfolio_results/heterogeneous_confirmatory_v1/summary.json
 python -m pytest tests -q</code></pre>
       </div>
     </section>
@@ -293,8 +259,7 @@ python -m pytest tests -q</code></pre>
         <button class="copy-button" id="copyBibtex" type="button" aria-describedby="copyStatus">Copy</button>
         <span class="sr-only" id="copyStatus" role="status" aria-live="polite"></span>
         <pre><code id="bibtexCode">@article{huynh2026gctr,
-  title   = {Query-Efficient Quantum Approximate Optimization via
-             Graph-Conditioned Trust Regions},
+  title   = {Reliability Auditing for Structural Routing of QAOA Optimizers},
   author  = {Huynh, Molena},
   journal = {arXiv preprint arXiv:2604.24803},
   year    = {2026}
@@ -304,7 +269,7 @@ python -m pytest tests -q</code></pre>
   </main>
 
   <footer class="footer">
-    <p>Graph&#8209;Conditioned Trust Regions · <a href="https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions">GitHub</a></p>
+    <p>Reliability Auditing for QAOA Optimizer Routing · <a href="https://github.com/thmolena/QAOA-Graph-Conditioned-Trust-Regions">GitHub</a></p>
   </footer>
   <script src="script.js?v=20260716"></script>
 </body>

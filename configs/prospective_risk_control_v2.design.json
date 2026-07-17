@@ -1,0 +1,481 @@
+{
+  "schema_version": 2,
+  "design_revision": "v2_iid_primary_draft",
+  "status": "design_only_not_registered_not_run",
+  "scientific_role": "future_confirmatory_protocol",
+  "current_audit_may_be_used_for": [
+    "motivation",
+    "method development",
+    "sample-size planning"
+  ],
+  "current_audit_may_not_be_used_for": [
+    "confirmatory evidence for this protocol",
+    "hyperparameter selection after registration",
+    "claiming that a future risk gate passed"
+  ],
+  "registration_requirements": {
+    "external_timestamp_required": true,
+    "two_stage_external_timestamp": {
+      "stage_1_before_primary_calibration": [
+        "complete source-code archive",
+        "environment lock",
+        "iid graph-mixture sampler and random-number-generator pin",
+        "all optimizer and noise hyperparameters",
+        "exact 17-arm registry",
+        "trained selector",
+        "eight primary-support fallback arm identifiers",
+        "pooled order-statistic rule",
+        "primary and secondary analysis code",
+        "alpha allocation and decision rule"
+      ],
+      "stage_2_after_calibration_before_primary_audit": [
+        "stage-1 receipt hash",
+        "primary calibration graph and outcome hashes",
+        "pooled calibration threshold",
+        "complete frozen audit decision object"
+      ]
+    },
+    "runner_must_require_stage_1_receipt_before_calibration": true,
+    "runner_must_require_stage_2_receipt_before_audit": true,
+    "registration_blocked_while_any_arm_or_policy_pin_is_unresolved": true
+  },
+  "primary_target_mixture": {
+    "unit": "graph",
+    "sampling_mode": "iid_draws_from_declared_categorical_mixture",
+    "calibration_and_audit_use_identical_mixture": true,
+    "fixed_stratum_quotas": false,
+    "cross_split_isomorphism_rejection": false,
+    "duplicate_graphs": "retain_and_report_without_resampling",
+    "calibration_draws": 400,
+    "audit_draws": 1600,
+    "random_number_generator_pin": "registration_blocking_until algorithm, library version, master seeds and substream construction are externally timestamped",
+    "generator_implementation_pin": "registration_blocking_until generator source hash and networkx version are externally timestamped",
+    "generators": {
+      "erdos_renyi": {
+        "model": "G(n,p)",
+        "parameter_distribution": {
+          "p": "Uniform[0.15,0.75]"
+        }
+      },
+      "random_regular": {
+        "model": "uniform random d-regular graph",
+        "parameter_distribution": {
+          "degree": "DiscreteUniform{2,3,4,5,6}"
+        }
+      },
+      "barabasi_albert": {
+        "model": "Barabasi-Albert",
+        "parameter_distribution": {
+          "attachment": "DiscreteUniform{1,2,3,4}"
+        }
+      },
+      "watts_strogatz": {
+        "model": "Watts-Strogatz",
+        "parameter_distribution": {
+          "degree": "DiscreteUniform{2,4,6,8}",
+          "rewiring": "Uniform[0.02,0.95]"
+        }
+      }
+    },
+    "support": [
+      {
+        "support_id": "er_n12_p2",
+        "graph_family": "erdos_renyi",
+        "vertex_count": 12,
+        "qaoa_depth": 2,
+        "mixture_weight": 0.125
+      },
+      {
+        "support_id": "er_n14_p2",
+        "graph_family": "erdos_renyi",
+        "vertex_count": 14,
+        "qaoa_depth": 2,
+        "mixture_weight": 0.125
+      },
+      {
+        "support_id": "rr_n12_p2",
+        "graph_family": "random_regular",
+        "vertex_count": 12,
+        "qaoa_depth": 2,
+        "mixture_weight": 0.125
+      },
+      {
+        "support_id": "rr_n14_p2",
+        "graph_family": "random_regular",
+        "vertex_count": 14,
+        "qaoa_depth": 2,
+        "mixture_weight": 0.125
+      },
+      {
+        "support_id": "ba_n12_p2",
+        "graph_family": "barabasi_albert",
+        "vertex_count": 12,
+        "qaoa_depth": 2,
+        "mixture_weight": 0.125
+      },
+      {
+        "support_id": "ba_n14_p2",
+        "graph_family": "barabasi_albert",
+        "vertex_count": 14,
+        "qaoa_depth": 2,
+        "mixture_weight": 0.125
+      },
+      {
+        "support_id": "ws_n12_p2",
+        "graph_family": "watts_strogatz",
+        "vertex_count": 12,
+        "qaoa_depth": 2,
+        "mixture_weight": 0.125
+      },
+      {
+        "support_id": "ws_n14_p2",
+        "graph_family": "watts_strogatz",
+        "vertex_count": 14,
+        "qaoa_depth": 2,
+        "mixture_weight": 0.125
+      }
+    ]
+  },
+  "primary_policy": {
+    "selector": "fit on development outcomes only and externally timestamp its coefficients before primary calibration and audit outcomes",
+    "calibration": {
+      "population": "400 iid draws from primary_target_mixture",
+      "nominal_miscoverage": 0.1,
+      "threshold": "single pooled one-sided order statistic at rank ceil((n_calibration+1)*(1-nominal_miscoverage))",
+      "decision_function_fixed_before_calibration_outcomes": true,
+      "audit_reuses_no_calibration_outcome_except_the_frozen_threshold": true
+    },
+    "fallback_selection_rule": "within each support point, choose the arm with minimum development-only mean AURC; break exact ties by arm_registry order; freeze the selected arm id before primary calibration",
+    "fallback_registry": [
+      {
+        "support_id": "er_n12_p2",
+        "registered_arm_id": null,
+        "registration_blocker": "populate from development-only fallback rule before external registration"
+      },
+      {
+        "support_id": "er_n14_p2",
+        "registered_arm_id": null,
+        "registration_blocker": "populate from development-only fallback rule before external registration"
+      },
+      {
+        "support_id": "rr_n12_p2",
+        "registered_arm_id": null,
+        "registration_blocker": "populate from development-only fallback rule before external registration"
+      },
+      {
+        "support_id": "rr_n14_p2",
+        "registered_arm_id": null,
+        "registration_blocker": "populate from development-only fallback rule before external registration"
+      },
+      {
+        "support_id": "ba_n12_p2",
+        "registered_arm_id": null,
+        "registration_blocker": "populate from development-only fallback rule before external registration"
+      },
+      {
+        "support_id": "ba_n14_p2",
+        "registered_arm_id": null,
+        "registration_blocker": "populate from development-only fallback rule before external registration"
+      },
+      {
+        "support_id": "ws_n12_p2",
+        "registered_arm_id": null,
+        "registration_blocker": "populate from development-only fallback rule before external registration"
+      },
+      {
+        "support_id": "ws_n14_p2",
+        "registered_arm_id": null,
+        "registration_blocker": "populate from development-only fallback rule before external registration"
+      }
+    ]
+  },
+  "arm_registry": {
+    "objective_query_ceiling_per_arm": 64,
+    "count_every_seed_gradient_pair_restart_and_initial_objective": true,
+    "exact_arm_count": 17,
+    "arms": [
+      {
+        "arm_id": "coord_concentration",
+        "initializer": "training_concentration",
+        "backend": "coordinate_pattern_search",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "initial_step": 0.3,
+          "minimum_step": 0.001,
+          "signed_coordinate_proposals": true,
+          "restart_after_minimum_step": true
+        }
+      },
+      {
+        "arm_id": "coord_tqa_025",
+        "initializer": "midpoint_tqa_dt_0.25",
+        "backend": "coordinate_pattern_search",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "initial_step": 0.3,
+          "minimum_step": 0.001,
+          "schedule_scale": 0.25
+        }
+      },
+      {
+        "arm_id": "coord_tqa_050",
+        "initializer": "midpoint_tqa_dt_0.50",
+        "backend": "coordinate_pattern_search",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "initial_step": 0.3,
+          "minimum_step": 0.001,
+          "schedule_scale": 0.5
+        }
+      },
+      {
+        "arm_id": "coord_tqa_075",
+        "initializer": "midpoint_tqa_dt_0.75",
+        "backend": "coordinate_pattern_search",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "initial_step": 0.3,
+          "minimum_step": 0.001,
+          "schedule_scale": 0.75
+        }
+      },
+      {
+        "arm_id": "coord_tqa_100",
+        "initializer": "midpoint_tqa_dt_1.00",
+        "backend": "coordinate_pattern_search",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "initial_step": 0.3,
+          "minimum_step": 0.001,
+          "schedule_scale": 1.0
+        }
+      },
+      {
+        "arm_id": "coord_nearest_neighbor",
+        "initializer": "nearest_neighbour_transfer",
+        "backend": "coordinate_pattern_search",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "distance": "Euclidean on registration-frozen standardized invariant features",
+          "neighbors": 1,
+          "initial_step": 0.3,
+          "minimum_step": 0.001
+        }
+      },
+      {
+        "arm_id": "coord_legacy_gctr",
+        "initializer": "legacy_graph_conditioned_mean_plus_concentration_seed",
+        "backend": "coordinate_pattern_search_with_mahalanobis_region",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "initial_step": 0.3,
+          "minimum_step": 0.001,
+          "mahalanobis_radius": 2.0,
+          "model_state": "registration-blocking until trained state hash is externally timestamped"
+        }
+      },
+      {
+        "arm_id": "coord_random_multistart_four",
+        "initializer": "four_registration_seeded_uniform_qaoa_starts",
+        "backend": "coordinate_pattern_search",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "starts": 4,
+          "initial_step": 0.3,
+          "minimum_step": 0.001,
+          "random_substream": "registration-blocking until externally timestamped"
+        }
+      },
+      {
+        "arm_id": "cobyla_concentration",
+        "initializer": "training_concentration",
+        "backend": "scipy_cobyla",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "rhobeg": 0.3,
+          "tol": 0.001,
+          "catol": 0.000001,
+          "library_version": "registration-blocking until externally timestamped"
+        }
+      },
+      {
+        "arm_id": "cobyla_tqa_075",
+        "initializer": "midpoint_tqa_dt_0.75",
+        "backend": "scipy_cobyla",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "rhobeg": 0.3,
+          "tol": 0.001,
+          "catol": 0.000001,
+          "library_version": "registration-blocking until externally timestamped"
+        }
+      },
+      {
+        "arm_id": "spsa_concentration",
+        "initializer": "training_concentration",
+        "backend": "spsa",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "a": 0.18,
+          "c": 0.12,
+          "A": 0.0,
+          "alpha": 0.602,
+          "gamma": 0.101,
+          "count_both_signed_evaluations": true
+        }
+      },
+      {
+        "arm_id": "spsa_tqa_075",
+        "initializer": "midpoint_tqa_dt_0.75",
+        "backend": "spsa",
+        "objective_query_ceiling": 64,
+        "hyperparameters": {
+          "a": 0.18,
+          "c": 0.12,
+          "A": 0.0,
+          "alpha": 0.602,
+          "gamma": 0.101,
+          "count_both_signed_evaluations": true
+        }
+      },
+      {
+        "arm_id": "fourier_schedule_optimizer",
+        "initializer": "registration_frozen_fourier_coefficients",
+        "backend": "fourier_parameterization_optimizer",
+        "objective_query_ceiling": 64,
+        "registration_blocker": "implementation, coefficient dimension, bounds, optimizer and source hash must be externally timestamped"
+      },
+      {
+        "arm_id": "interpolation_depth_transfer",
+        "initializer": "registered_lower_depth_solution",
+        "backend": "interpolation_then_coordinate_pattern_search",
+        "objective_query_ceiling": 64,
+        "registration_blocker": "source depth, interpolation map, lower-depth cost accounting and source hash must be externally timestamped"
+      },
+      {
+        "arm_id": "tqa_schedule_optimizer",
+        "initializer": "midpoint_tqa_dt_0.75",
+        "backend": "direct_schedule_parameter_optimization",
+        "objective_query_ceiling": 64,
+        "registration_blocker": "schedule parameterization, bounds, optimizer and source hash must be externally timestamped"
+      },
+      {
+        "arm_id": "darbo_tqa_075",
+        "initializer": "midpoint_tqa_dt_0.75",
+        "backend": "darbo",
+        "objective_query_ceiling": 64,
+        "registration_blocker": "kernel, priors, trust-region updates, restarts, candidate set, library version and source hash must be externally timestamped"
+      },
+      {
+        "arm_id": "turbo_tqa_075",
+        "initializer": "midpoint_tqa_dt_0.75",
+        "backend": "turbo",
+        "objective_query_ceiling": 64,
+        "registration_blocker": "kernel, priors, trust-region updates, restarts, candidate set, library version and source hash must be externally timestamped"
+      }
+    ]
+  },
+  "primary_estimands_and_fwer": {
+    "fwer_budget": 0.05,
+    "maximum_harm_risk": 0.1,
+    "multiplicity_scope": "only the three named primary endpoints below",
+    "alpha_allocation": [
+      {
+        "endpoint_id": "mean_paired_aurc",
+        "alpha": 0.02,
+        "one_sided_confidence": 0.98,
+        "estimand": "mean deployed-minus-support-fallback AURC over primary_target_mixture",
+        "method": "one-sided 98% studentized iid bootstrap upper bound with 100000 resamples and a registration-pinned RNG substream",
+        "pass_rule": "upper bound below zero"
+      },
+      {
+        "endpoint_id": "joint_harm",
+        "alpha": 0.015,
+        "one_sided_confidence": 0.985,
+        "estimand": "probability over primary_target_mixture of accepting and underperforming the registered support fallback",
+        "method": "one-sided 98.5% Clopper-Pearson upper bound on all primary audit draws",
+        "pass_rule": "upper bound at most 0.10"
+      },
+      {
+        "endpoint_id": "conditional_harm",
+        "alpha": 0.015,
+        "one_sided_confidence": 0.985,
+        "estimand": "probability of underperforming the registered support fallback conditional on acceptance",
+        "method": "one-sided 98.5% Clopper-Pearson upper bound conditional on the realized accepted count",
+        "pass_rule": "at least 100 accepted draws and upper bound at most 0.10"
+      }
+    ],
+    "allocated_alpha_sum": 0.05,
+    "minimum_accepted_draws": 100,
+    "zero_harm_minimum_accepted_needed_to_make_conditional_pass_possible": 40,
+    "all_three_primary_endpoints_must_pass": true,
+    "no_subgroup_or_secondary_endpoint_is_in_this_fwer_family": true
+  },
+  "secondary_descriptive_stress_policies": {
+    "inferential_status": "mandatory_directional_or_stress_gates_not_separate_95pct_fwer_claims",
+    "cannot_authorize_primary_claim": true,
+    "n16_p2_known_families": {
+      "policy": "apply the registration-frozen p2 selector; use the registered global p2 development arm as fallback; transfer the pooled primary threshold",
+      "interpretation": "descriptive extrapolation only; no exchangeability or coverage claim"
+    },
+    "p3_known_families": {
+      "policy": "use a separately implemented p3 selector, global p3 fallback and p3 calibration threshold, all frozen before any p3 stress outcome",
+      "registration_blocker": "p3 development/calibration source, arm compatibility and policy hash are not yet implemented",
+      "interpretation": "descriptive stress endpoint outside primary FWER"
+    },
+    "unseen_families": {
+      "families": [
+        "random_geometric",
+        "powerlaw_cluster",
+        "stochastic_block"
+      ],
+      "policy": "use the registration-frozen family-agnostic selector, registered global p2 fallback and pooled primary threshold without refitting",
+      "interpretation": "distribution-shift stress endpoint with no coverage guarantee"
+    },
+    "shot_regimes": {
+      "shots_per_objective": [
+        256,
+        1024,
+        4096
+      ],
+      "realizations_per_graph_arm": 20,
+      "policy": "reuse the frozen primary policy and fallback without noisy-outcome refitting",
+      "mandatory_gate": "observed mean direction must not reverse in any registered shot regime",
+      "interpretation": "directional robustness gate, not an additional confidence claim"
+    },
+    "hardware": {
+      "qpu_holdout_graphs": 16,
+      "objective_query_ceiling": 32,
+      "shots_per_objective": 1024,
+      "policy": "device, compilation, graph list, selector and fallback frozen at registration",
+      "mandatory_gate": "report every registered graph and job failure; no hardware superiority claim from this endpoint alone",
+      "interpretation": "descriptive hardware stress endpoint outside primary FWER"
+    }
+  },
+  "execution_status": {
+    "code_complete": false,
+    "externally_registered": false,
+    "primary_calibration_outcomes_generated": false,
+    "primary_audit_outcomes_generated": false,
+    "secondary_outcomes_generated": false,
+    "hardware_outcomes_generated": false,
+    "claim_authorized": false
+  },
+  "feasibility_ledger": {
+    "primary_calibration_graphs": 400,
+    "primary_audit_graphs": 1600,
+    "counterfactual_arms": 17,
+    "objective_queries_per_graph_arm": 64,
+    "primary_calibration_exact_objective_queries": 435200,
+    "primary_audit_exact_objective_queries": 1740800,
+    "primary_total_exact_objective_queries": 2176000,
+    "estimate_excludes": [
+      "development and angle-label generation completed before registration",
+      "secondary stress endpoints pending implementation pins",
+      "classical feature computation",
+      "queue time",
+      "failed device jobs"
+    ],
+    "execution_bound": "registration is invalid unless named compute and QPU allocations cover the finalized primary and secondary ledgers"
+  }
+}
