@@ -3,7 +3,7 @@
   "package": "specops-gctr",
   "package_version": "3.2.0",
   "bib_key": "huynh2026gctr",
-  "replot_implementation_sha256": "db75eccfdb600b3b59da4f35e6d74fc9e7a294b9c085d63b04d994de4b2ffecd",
+  "replot_implementation_sha256": "620d13e5dd7a685e0e391284e54a19c382f7cf41a6c40c54d2030803b024221f",
   "source_schema_version": 2,
   "score_semantics": "capped_cost_to_shared_target",
   "target_attainment_recorded": true,

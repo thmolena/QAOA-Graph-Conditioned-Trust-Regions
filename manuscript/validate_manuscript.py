@@ -26,17 +26,17 @@ EXPECTED_SECTIONS = [
     "Introduction",
     "Background",
     "Related Work",
-    "Shortcomings of Unconditional Structural Routing",
-    "Graph-Conditioned Trust Regions",
+    "Failure Modes of Structural Optimizer Routing",
+    "Risk-Controlled Graph-Conditioned Trust Regions",
     "Experiments",
     "Conclusion",
 ]
 EXPECTED_SUBSECTIONS = [0, 3, 0, 3, 4, 3, 0]
 EXPECTED_FIGURES = 13
-EXPECTED_TABLES = 5
+EXPECTED_TABLES = 6
 EXPECTED_PROOFS = 5
-EXPECTED_BIBLIOGRAPHY_ENTRIES = 65
-EXPECTED_ARCHIVE_MEMBERS = 21
+EXPECTED_BIBLIOGRAPHY_ENTRIES = 66
+EXPECTED_ARCHIVE_MEMBERS = 22
 EXPECTED_SOURCE_MANIFESTS = {
     "regular_development": (
         ROOT
@@ -202,7 +202,7 @@ def structural_report(source: str) -> dict[str, object]:
     )
     require(
         len(table_inputs) == len(set(table_inputs)) == EXPECTED_TABLES,
-        "expected five distinct table inputs",
+        "expected six distinct table inputs",
     )
     require(
         table_floats == EXPECTED_TABLES,

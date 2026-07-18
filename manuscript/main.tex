@@ -83,96 +83,96 @@ North Carolina State University\\
 \maketitle
 
 \begin{abstract}
-Classical optimization can dominate the measurement cost of variational
-quantum algorithms, yet optimizer routing may be less reliable than a fixed
-schedule.  We formulate graph-conditioned trust regions as a target-free,
-fixed-budget portfolio for depth-two MaxCut QAOA.  Nine arms receive identical
-32-call ceilings.  A ridge model predicts regret, a family control supplies a
-fallback, and a residual order statistic abstains when evidence is
-insufficient.  After a 64-graph development audit, the selector is trained on
-48 graphs, calibrated on 48 disjoint graphs, and locked before evaluation on
-160 instances.  Gated deployment yields mean regret $0.16930$ versus
-$0.17207$ for the fallback, but accepts only 12 routes, four harmful.
-One-sided coverage is $0.88125$, below the frozen $0.90$ criterion; the
-reliability claim therefore fails.  Fixed family quotas also preclude pooled
-exchangeability.  The result is a reproducible exact-statevector failure
-analysis, not evidence of hardware, scaling, or quantum advantage.
+Classical optimization can dominate the measurement cost of a variational
+quantum algorithm, yet learned optimizer routing may be less reliable than a
+fixed schedule.  We cast graph-conditioned trust regions as a target-free,
+fixed-budget portfolio for depth-two MaxCut QAOA in which nine arms share a
+$32$-call ceiling.  A ridge model predicts each arm's anytime regret, a known
+graph family supplies a strong fallback, and a one-sided residual order
+statistic abstains whenever the predicted improvement is not certified.  After a
+$64$-graph development audit, the selector is fit on $48$ graphs, calibrated on
+$48$ disjoint graphs, and locked before a single evaluation on $160$ instances.
+Gated deployment attains mean regret $\ConfirmGatedAURC$ against
+$\ConfirmFamilyAURC$ for the fallback, but accepts only $\ConfirmAccepted$
+routes, four of them harmful.  One-sided empirical coverage is
+$\ConfirmCoverage$, below the frozen $\ConfirmNominal$ requirement, so the
+reliability claim fails; fixed family quotas also preclude a pooled
+exchangeability certificate.  The contribution is a reproducible
+exact-statevector failure analysis, not evidence of hardware, scaling, or
+quantum advantage.
 \end{abstract}
 
 \section{Introduction}
 
-Variational quantum algorithms combine a parameterized circuit with a
-classical optimizer \citep{peruzzo2014variational,mcclean2016theory}.  Their
-near-term appeal comes with a basic cost problem: every black-box objective
-query can require many circuit preparations and measurements
-\citep{preskill2018quantum,bharti2022noisy}.  The optimizer is therefore part
-of the physical resource model rather than an interchangeable software detail
+A variational quantum algorithm pairs a parameterized circuit with a classical
+optimizer \citep{peruzzo2014variational,mcclean2016theory}.  Its near-term
+appeal comes with a stubborn cost problem: each black-box objective query can
+demand many circuit preparations and measurements
+\citep{preskill2018quantum,bharti2022noisy}, so the optimizer belongs to the
+physical resource model rather than to interchangeable software
 \citep{cerezo2021variational}.
 
-The quantum approximate optimization algorithm (QAOA) makes the interaction
-explicit by alternating cost and mixer unitaries before optimizing a small
-angle vector \citep{farhi2014qaoa,hadfield2019alternating}.  Its empirical
-behavior depends on graph structure, depth, initialization, and search budget
-\citep{zhou2020qaoa}.  Parameter concentration can make fixed schedules
-competitive on typical instances \citep{brandao2018fixed,
-akshay2021concentration}; warm starts can inject classical solutions
-\citep{egger2021warm}; and transferred parameters can exploit similarity
-across weighted graphs \citep{shaydulin2023weighted}.
+The quantum approximate optimization algorithm (QAOA) makes the coupling
+concrete by alternating cost and mixer unitaries before optimizing a small angle
+vector \citep{farhi2014qaoa,hadfield2019alternating}, with combinatorial
+objectives encoded as Ising Hamiltonians \citep{lucas2014ising}.  Its empirical
+behavior turns on graph structure, depth, initialization, and search budget
+\citep{zhou2020qaoa}.  Angle concentration can make fixed schedules competitive
+on typical instances \citep{brandao2018fixed,akshay2021concentration}, warm
+starts can inject classical solutions \citep{egger2021warm}, and transferred
+parameters can exploit similarity across weighted graphs
+\citep{shaydulin2023weighted}.
 
-Graph-conditioned optimization attempts to use this shared structure before
-or during search.  A predictor can propose angles, a local covariance, a trust
-region, or an optimizer choice.  Graph neural initialization demonstrates the
-broader opportunity \citep{jain2022gnn}, and learned variational optimizers
-show that trajectories themselves may be predicted \citep{khairy2020learning}.
-The statistical question is less often made explicit: when should a learned
-recommendation replace a strong, cheap control?
+Graph-conditioned optimization tries to use this shared structure before or
+during search: a predictor can propose angles, a local covariance, a trust
+region, or an optimizer choice.  Learned graph initializers demonstrate the
+opportunity \citep{jain2022gnn}, and learned variational optimizers show that
+trajectories themselves can be predicted \citep{khairy2020learning}.  The
+statistical question is rarely stated: when should a learned recommendation
+displace a strong, cheap control?
 
-That question cannot be answered by average terminal quality alone.
-Hyperparameter and model selection on the same benchmark used for evaluation
-can introduce substantial optimism \citep{cawley2010overfitting}.  A router
-can improve a pooled average by helping one family while harming another, and
-a target-based stopping rule can depend on an oracle unavailable in deployment.
-The classical algorithm-selection problem already separates instance features,
-candidate algorithms, and performance measures \citep{rice1976selection}; the
-quantum setting adds an unusually costly response surface.
+That question cannot be settled by average terminal quality.  Tuning and
+selection on the same benchmark used for evaluation introduce substantial
+optimism \citep{cawley2010overfitting}, a router can raise a pooled mean by
+helping one family while harming another, and a target-based stopping rule can
+depend on an oracle unavailable in deployment.  The classical algorithm-selection
+problem already separates instance features, candidate algorithms, and
+performance measures \citep{rice1976selection}; the quantum setting merely adds
+an unusually expensive response surface.
 
 We therefore replace privileged target hitting with a fixed-query anytime
-metric.  Every arm receives 32 objective calls, and utility is the average
-normalized regret over checkpoints $\{1,2,4,8,16,32\}$.  A relabeling-invariant
-structural model predicts each arm's utility.  The strongest development arm
-within the known graph family remains the fallback.  Routing is accepted only
-when an upper residual order statistic indicates that the predicted selected
-arm should beat that fallback.
+metric.  Every arm receives $32$ objective calls, and utility is the average
+normalized regret over the checkpoints $\{1,2,4,8,16,32\}$.  A
+relabeling-invariant structural model predicts each arm's utility, the strongest
+development arm within the known graph family is the fallback, and routing is
+accepted only when an upper residual order statistic indicates that the selected
+arm should beat that fallback.  The abstention rule borrows split-conformal
+reasoning \citep{vovk2005algorithmic,angelopoulos2021gentle}, whose finite-sample
+guarantee needs exchangeability; because our confirmatory design uses fixed
+family quotas with sequential non-isomorphism filtering, we report the frozen
+rule together with the limits of its coverage interpretation
+\citep{barber2022exchangeability}.
 
-This abstention mechanism is inspired by split-conformal reasoning
-\citep{vovk2005algorithmic,angelopoulos2021gentle}.  Its finite-sample
-interpretation requires exchangeability, however, and the released
-confirmatory design uses fixed family-size quotas with sequential
-non-isomorphism filtering.  We therefore report both the frozen rule and the
-limits of its coverage interpretation \citep{barber2022exchangeability}.
-
-Figure~\ref{fig:protocol} shows the evidence chronology.  Development fits the
-selector and family fallback; calibration fixes one residual order statistic;
-the graph list, code, configuration, and decision are hashed; and the audit is
-evaluated once.  This chronology is as important as the model because
-unrecorded iteration on audit outcomes would erase the meaning of a
-confirmatory result.
+Figure~\ref{fig:protocol} fixes the evidence chronology.  Development fits the
+selector and family fallback, calibration fixes one residual order statistic, the
+graph list, code, configuration, and decision are hashed, and the audit is
+evaluated once.  This chronology matters as much as the model, because
+unrecorded iteration on audit outcomes would erase the meaning of a confirmatory
+result.  The final decision is negative: the deployed policy slightly improves
+mean anytime regret, accepts only $\ConfirmAccepted$ of $\ConfirmN$ routes,
+harms four accepted instances, and misses the frozen coverage threshold.  A
+favorable mean coexisting with a failed reliability criterion is the distinction
+this paper is built to preserve.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/Figure1_PortfolioProtocol.pdf}
-\caption{\textbf{Internally locked fixed-budget protocol.}  Development data
-fit the structural selector and family fallback; calibration fixes a one-sided
+\caption{\textbf{Internally locked fixed-budget protocol.}  Development data fit
+the structural selector and family fallback; calibration fixes a one-sided
 residual order statistic.  The graph list, implementation, configuration, and
-decision are hashed before the 160-graph audit is evaluated.}
+decision are hashed before the $\ConfirmN$-graph audit is evaluated.}
 \label{fig:protocol}
 \end{figure*}
-
-The final decision is negative.  The deployed policy slightly improves mean
-anytime regret, but it accepts only 12 of 160 routes, harms four accepted
-instances, and misses the frozen empirical-coverage threshold.  A result can
-have a favorable mean and still fail its reliability criterion.  Preserving
-that distinction is the paper's central contribution.
 
 \section{Background}
 
@@ -188,32 +188,28 @@ A depth-$p$ QAOA state is
 \begin{equation}
  |\bm\gamma,\bm\beta\rangle =
  \prod_{j=p}^{1}e^{-i\beta_jB}e^{-i\gamma_jC_G}
- |+\rangle^{\otimes |V|}.
+ |+\rangle^{\otimes |V|},
  \label{eq:qaoa}
 \end{equation}
-The objective is
-$F_G(\bm\theta)=\langle\bm\gamma,\bm\beta|C_G|
-\bm\gamma,\bm\beta\rangle$.  Analytic parameter-shift rules can evaluate
-gradients on compatible hardware \citep{schuld2019evaluating,
-wierichs2022general}, while stochastic estimators trade coordinate resolution
-for fewer objective calls \citep{spall1992spsa}.
+with objective
+$F_G(\bm\theta)=\langle\bm\gamma,\bm\beta|C_G|\bm\gamma,\bm\beta\rangle$.
+Analytic parameter-shift rules evaluate gradients on compatible hardware
+\citep{schuld2019evaluating,wierichs2022general}, whereas stochastic estimators
+trade coordinate resolution for fewer objective calls \citep{spall1992spsa}.
 
-Gradient methods do not eliminate trainability concerns.  Random or highly
+Gradient methods do not dissolve trainability concerns.  Random or highly
 expressive circuits can exhibit barren plateaus \citep{mcclean2018barren};
-expressibility is connected to gradient concentration
-\citep{holmes2022connecting}; and control-theoretic tools refine the diagnosis
-\citep{larocca2022diagnosing}.  Gradient-free search also degrades in flat
-landscapes \citep{arrasmith2021effect}.  Our study therefore compares complete
-fixed-budget trajectories rather than assuming one access model is uniformly
+expressibility is tied to gradient concentration \citep{holmes2022connecting};
+and control-theoretic tools sharpen the diagnosis
+\citep{larocca2022diagnosing}.  Gradient-free search likewise degrades in flat
+landscapes \citep{arrasmith2021effect}.  We therefore compare complete
+fixed-budget trajectories instead of presuming one access model is uniformly
 best.
 
 \subsection{Fixed-Budget Black-Box Optimization}
 
-At checkpoints
-\begin{equation}
- \mathcal T=\{1,2,4,8,16,32\},
-\end{equation}
-arm $a$ has post hoc normalized regret
+At the checkpoints $\mathcal T=\{1,2,4,8,16,32\}$, arm $a$ on instance $i$ has
+post hoc normalized regret
 \begin{equation}
  r_{ia}(t)=1-
  \frac{\max_{s\le t}F_{G_i}(\bm\theta_{ias})}{C_{\max}(G_i)}
@@ -222,21 +218,21 @@ arm $a$ has post hoc normalized regret
 and utility
 \begin{equation}
  u_{ia}=\AURC_{ia}=
- \frac{1}{|\mathcal T|}\sum_{t\in\mathcal T}r_{ia}(t).
+ \frac{1}{|\mathcal T|}\sum_{t\in\mathcal T}r_{ia}(t),
  \label{eq:aurc}
 \end{equation}
-Lower is better.  Exact MaxCut $C_{\max}$ is used only after optimization; no
-arm sees a target or target-hitting event.
+where lower is better.  Exact MaxCut $C_{\max}$ enters only after optimization;
+no arm ever observes a target or a target-hitting event.
 
-The portfolio spans fixed schedules, transferred angles, multistart,
-SPSA, and the graph-conditioned trust-region arm.  This heterogeneity reflects
-the fact that optimizer rankings depend on the variational problem and budget
-\citep{bonet2023performance}.  Mesh-adaptive search provides a principled
-derivative-free alternative \citep{audet2006mesh}; BOBYQA uses bounded
-quadratic interpolation \citep{powell2009bobyqa}; and covariance-matrix
-adaptation learns a search distribution \citep{hansen2001cma}.  We freeze
-simpler arms because a portfolio is only meaningful relative to its actual
-controls.
+The portfolio spans fixed schedules, transferred angles, multistart, SPSA, and
+the graph-conditioned trust-region arm, a heterogeneity that reflects the fact
+that optimizer rankings depend on the problem and budget
+\citep{bonet2023performance}.  Mesh-adaptive direct search gives a principled
+derivative-free comparator \citep{audet2006mesh}, BOBYQA maintains a bounded
+quadratic model \citep{powell2009bobyqa}, and covariance-matrix adaptation learns
+a search distribution \citep{hansen2001cma}.  We keep the simpler arms because a
+portfolio is only meaningful relative to its actual controls, and a ramped
+fixed schedule is a strong low-complexity baseline \citep{montanez2025ramp}.
 
 \subsection{Selective Routing and Risk}
 
@@ -246,112 +242,98 @@ $\widehat u_a(x)$ the predicted utility of arm $a$.  The proposed arm is
  s(x)=\argminop_a\widehat u_a(x).
  \label{eq:selected}
 \end{equation}
-For family label $f$, the fallback $b(f)$ is the development arm with minimum
-family-mean utility.  Define the realized selected-minus-fallback regret
+For family label $f$, the fallback $b(f)$ is the development arm of minimum
+family-mean utility.  Define the realized selected-minus-fallback regret and its
+prediction residual
 \begin{equation}
- \Delta=u_s-u_b
- \end{equation}
-and prediction residual
-\begin{equation}
+ \Delta=u_s-u_b,
+ \qquad
  R=\Delta-(\widehat u_s-\widehat u_b).
  \label{eq:residual}
 \end{equation}
 Given a calibration upper order statistic $q$, routing is accepted when
 \begin{equation}
- \widehat u_s-\widehat u_b+q<0.
+ \widehat u_s-\widehat u_b+q<0,
  \label{eq:gate}
 \end{equation}
-Otherwise the system abstains to $b(f)$.
-
-This is selective prediction: coverage, acceptance, joint harm, and
-conditional harm are different quantities.  Conformalized quantile regression
-can adapt interval width to covariates \citep{romano2019cqr}; online selective
-methods can target error criteria under other assumptions; and classical
-exact binomial limits can summarize observed event rates
-\citep{clopper1934fiducial}.  None licenses a coverage claim without a sampling
-model.
+and otherwise abstains to $b(f)$.  This is selective prediction, in which
+coverage, acceptance, joint harm, and conditional harm are different quantities.
+Conformalized quantile regression can adapt interval width to covariates
+\citep{romano2019cqr}, and exact binomial limits can summarize observed event
+rates \citep{clopper1934fiducial}, but neither licenses a coverage claim without
+a sampling model.
 
 \section{Related Work}
 
-QAOA parameter initialization exploits concentration, interpolation, and
-problem structure \citep{zhou2020qaoa,brandao2018fixed}.  Learned graph
-initializers extend this idea using message passing \citep{jain2022gnn}.
-Weighted-MaxCut parameter transfer addresses related objectives
-\citep{shaydulin2023weighted}, while ramp schedules provide a strong
-low-complexity comparator \citep{montanez2025ramp}.  Our portfolio treats these
-ideas as arms or controls rather than assuming one initialization dominates.
+QAOA initialization exploits concentration, interpolation, and problem structure
+\citep{zhou2020qaoa,brandao2018fixed}, and learned graph initializers extend the
+idea through message passing \citep{jain2022gnn}.  Weighted-MaxCut parameter
+transfer targets related objectives \citep{shaydulin2023weighted}, while ramp
+schedules supply a strong low-complexity comparator \citep{montanez2025ramp}.
+Our portfolio treats these ideas as arms or controls rather than assuming one
+initialization dominates.
 
 Graph convolutional networks use normalized neighborhood aggregation
-\citep{kipf2017gcn}; graph attention learns neighbor weights
-\citep{velickovic2018gat}; and graph-isomorphism networks characterize a
-powerful message-passing class \citep{xu2019gin}.  We intentionally use
-16 hand-computed invariant summaries with ridge regression.  This low-capacity
-choice reduces model flexibility and makes every routing score inspectable.
+\citep{kipf2017gcn}, graph attention learns neighbor weights
+\citep{velickovic2018gat}, and graph-isomorphism networks characterize a powerful
+message-passing class \citep{xu2019gin}.  We deliberately use $16$ hand-computed
+invariant summaries with ridge regression; the low-capacity choice reduces model
+flexibility and makes every routing score inspectable.
 
-Bayesian optimization is another approach to expensive black-box search.
-Efficient global optimization introduced improvement-based acquisition
-\citep{jones1998efficient}; practical machine-learning formulations popularized
-Gaussian-process tuning \citep{snoek2012practical}; and a broad review
-organizes surrogate and acquisition choices \citep{shahriari2016taking}.
-Differentiable Monte Carlo acquisitions are available in BoTorch
-\citep{balandat2020botorch}.  These methods may be useful arms, but fitting a
-surrogate does not make its objective evaluations free.
+Bayesian optimization is another route to expensive black-box search.  Efficient
+global optimization introduced improvement-based acquisition
+\citep{jones1998efficient}, practical formulations popularized Gaussian-process
+tuning \citep{snoek2012practical}, a broad review organized surrogate and
+acquisition choices \citep{shahriari2016taking}, and differentiable Monte Carlo
+acquisitions are available in modern toolkits \citep{balandat2020botorch}.  These
+may be useful arms, yet fitting a surrogate does not make its objective
+evaluations free.
 
-Algorithm configuration learns settings across tasks.  Sequential
-model-based configuration uses prior runs to propose new configurations
-\citep{hutter2011sequential}, and SMAC3 exposes a reproducible modern package
-\citep{lindauer2022smac3}.  The portfolio view also connects to active
-subspaces \citep{constantine2015active}, sliced inverse regression
-\citep{li1991sliced}, and regression graphics \citep{cook1998regression}, but
-our predictor reduces neither the circuit parameter dimension nor the graph
-feature dimension adaptively.
+Algorithm configuration learns settings across tasks: sequential model-based
+configuration proposes new settings from prior runs \citep{hutter2011sequential},
+and SMAC3 exposes a reproducible modern package \citep{lindauer2022smac3}.  The
+portfolio view also touches active subspaces \citep{constantine2015active},
+sliced inverse regression \citep{li1991sliced}, and regression graphics
+\citep{cook1998regression}, though our predictor reduces neither the circuit
+parameter dimension nor the feature dimension adaptively.  Randomized linear
+algebra would matter for future low-rank structural models: randomized range
+finding and blocked QB give scalable, adaptive-rank approximation
+\citep{halko2011finding,yu2018randqb}, sketching offers streaming alternatives
+\citep{woodruff2014sketching,liberty2013simple}, and matrix concentration
+supplies probabilistic tools \citep{tropp2015matrix}; none is needed for the
+released $16$-feature ridge fit.  Finally, statistical safeguards address
+distinct risks: bootstrap resampling estimates sampling variation
+\citep{efron1993bootstrap}, multiple-testing procedures control false discoveries
+\citep{benjamini1995controlling}, the Neyman--Pearson framework separates size
+from power \citep{neyman1933efficient}, and cross-data-set comparison must occur
+at the data-set level \citep{demsar2006statistical}.
 
-Randomized linear algebra is relevant to possible future low-rank structural
-models.  Randomized range finding provides scalable approximation
-\citep{halko2011finding}; fixed-precision blocked QB supports adaptive rank
-\citep{yu2018randqb}; matrix sketching offers streaming alternatives
-\citep{woodruff2014sketching,liberty2013simple}; and matrix concentration
-supplies probabilistic tools under explicit assumptions \citep{tropp2015matrix}.
-The released ridge model is small enough that none of these approximations is
-needed.
-
-Finally, statistical safeguards address distinct risks.  Bootstrap resampling
-estimates sampling variation \citep{efron1993bootstrap}; multiple-testing
-procedures control false discoveries under stated dependence conditions
-\citep{benjamini1995controlling}; and the Neyman--Pearson framework separates
-size from power \citep{neyman1933efficient}.  Multiple-data-set comparisons
-also require analysis at the data-set level \citep{demsar2006statistical}.
-Our locked gate is a decision protocol, not a post hoc collection of
-significance tests.
-
-\section{Shortcomings of Unconditional Structural Routing}
+\section{Failure Modes of Structural Optimizer Routing}
 
 \subsection{Selection Bias and Distribution Shift}
 
 Choosing a route because it is best on development data is not a
-distribution-free argument.  Even a perfect empirical ranking can reverse
-under task shift, a basic distinction in algorithm selection and honest model
+distribution-free argument.  Even a perfect empirical ranking can invert under
+task shift, a basic distinction in algorithm selection and honest model
 assessment \citep{rice1976selection,cawley2010overfitting}.
 
-\begin{theorem}[Near-maximal bounded excess loss after routing shift]
+\begin{theorem}[Near-maximal excess loss after routing shift]
 \label{thm:shift}
-For every $\varepsilon\in(0,1)$, there exist two optimizer arms $a,b$, losses
-in $[0,1]$, a development distribution $P_0$, and a deployment distribution
-$P_1$ such that $a$ is the unique risk minimizer under $P_0$, $b$ is the
-unique risk minimizer under $P_1$, and routing unconditionally to $a$ has
-deployment excess risk $1-\varepsilon$.
+For every $\varepsilon\in(0,1)$ there exist two optimizer arms $a,b$, losses in
+$[0,1]$, a development distribution $P_0$, and a deployment distribution $P_1$
+such that $a$ is the unique risk minimizer under $P_0$, $b$ is the unique risk
+minimizer under $P_1$, and routing unconditionally to $a$ has deployment excess
+risk $1-\varepsilon$.
 \end{theorem}
 
 Appendix~\ref{app:proof-shift} gives a complete construction.  The theorem is
-elementary by design: no model complexity is required for a failure.  This is
-why graph splits, family strata, and chronology must be stated before
-interpreting a learned router.
-
-The first version of the project optimized against an offline target and
-compared a learned trust-region policy primarily with random restart.  Stronger
-fixed schedules were cheaper, and the target was unavailable at deployment.
-The current portfolio keeps the original evidence as a legacy diagnostic but
-does not combine it with the target-free confirmatory result.
+elementary by design: no model complexity is required to produce a failure,
+which is exactly why graph splits, family strata, and chronology must be declared
+before a learned router is interpreted.  The project's first version optimized
+against an offline target and compared a learned trust-region policy mainly with
+random restart; stronger fixed schedules were cheaper, and the target was
+unavailable at deployment.  The present portfolio keeps that history as a legacy
+diagnostic and does not merge it with the target-free confirmatory result.
 
 \begin{figure*}[t]
 \centering
@@ -364,178 +346,159 @@ descriptive one-sided coverage misses the frozen requirement.}
 
 \subsection{Coverage and Conditional Harm}
 
-Let $A$ be the event that the selector accepts a route and
-$H=\{\Delta>0\}$ the event that the selected arm is worse than the fallback.
+Let $A$ be the event that the selector accepts a route and $H=\{\Delta>0\}$ the
+event that the selected arm is worse than the fallback.
 
 \begin{proposition}[Harm-rate decomposition]
 \label{prop:harm}
 If $\Pp(A)>0$, then
 \begin{equation}
- \Pp(A\cap H)=\Pp(A)\Pp(H\mid A).
+ \Pp(A\cap H)=\Pp(A)\,\Pp(H\mid A),
  \label{eq:harm}
 \end{equation}
-Consequently, controlling joint harm alone does not control conditional harm
-when acceptance can be small.
+so controlling joint harm alone does not control conditional harm when
+acceptance can be small.
 \end{proposition}
 
-The proof and an explicit counterexample appear in
-Appendix~\ref{app:proof-harm}.  In the audit,
-$\Pp_n(A)=12/160=0.075$,
-$\Pp_n(A\cap H)=4/160=0.025$, and
-$\Pp_n(H\mid A)=4/12=0.333$.  The joint rate is small because acceptance is
-small, not because accepted routes are uniformly safe.
-
-Marginal coverage is also distinct from selective harm.  An upper residual
-bound can cover $\Delta$ while the acceptance rule still concentrates errors
-near the decision boundary.  Conversely, a policy may have acceptable joint
-harm while missing a nominal residual-coverage target.  All four quantities
-must be reported; marginal calibration and conditional selection answer
-different questions \citep{vovk2005algorithmic,angelopoulos2021gentle,
-romano2019cqr}.
+The proof and an explicit counterexample are in Appendix~\ref{app:proof-harm}.
+In the audit, $\Pp_n(A)=\ConfirmAccepted/\ConfirmN=\ConfirmAcceptedRate$,
+$\Pp_n(A\cap H)=\ConfirmHarms/\ConfirmN=\ConfirmJointHarmRate$, and
+$\Pp_n(H\mid A)=\ConfirmHarms/\ConfirmAccepted=\ConfirmConditionalHarmRate$.  The
+joint rate is small because acceptance is small, not because accepted routes are
+uniformly safe.  Marginal coverage is also distinct from selective harm: an upper
+residual bound can cover $\Delta$ while acceptance concentrates errors near the
+decision boundary, and conversely a policy can have acceptable joint harm while
+missing a nominal residual-coverage target.  All four quantities must be
+reported, because marginal calibration and conditional selection answer different
+questions \citep{vovk2005algorithmic,angelopoulos2021gentle}.
 
 \subsection{Acceptance, Exceedance, and Non-Certification}
 
-Write
-$\widehat d=\widehat u_s-\widehat u_b$,
-$R=\Delta-\widehat d$,
-$A=\{\widehat d+q<0\}$, and $H=\{\Delta>0\}$.
-The acceptance rule has a useful deterministic implication that does not
-itself require a sampling model.
+Write $\widehat d=\widehat u_s-\widehat u_b$, $R=\Delta-\widehat d$,
+$A=\{\widehat d+q<0\}$, and $H=\{\Delta>0\}$.  The acceptance rule has a
+deterministic implication that needs no sampling model.
 
 \begin{proposition}[Acceptance--exceedance containment]
 \label{prop:containment}
-For every joint distribution of $(\Delta,\widehat d)$ and every
-$q\in\R$,
+For every joint distribution of $(\Delta,\widehat d)$ and every $q\in\R$,
 \begin{equation}
  A\cap H\subseteq\{R>q\}.
  \label{eq:containment}
 \end{equation}
-Consequently, for any $\alpha\in[0,1]$, if
-$\Pp(R\le q)\ge1-\alpha$, then
-$\Pp(A\cap H)\le\alpha$; if additionally $\Pp(A)>0$, then
+Consequently, for any $\alpha\in[0,1]$, if $\Pp(R\le q)\ge1-\alpha$ then
+$\Pp(A\cap H)\le\alpha$; if additionally $\Pp(A)>0$ then
 $\Pp(H\mid A)\le\alpha/\Pp(A)$.
 \end{proposition}
 
 Appendix~\ref{app:proof-containment} proves every implication.  The result
-clarifies both the appeal and the limitation of residual calibration:
-idealized marginal residual coverage controls joint harm, whereas the
-conditional bound deteriorates as acceptance becomes rare.  More
-importantly, the locked fixed-quota, sequentially filtered audit does not
-establish the pooled exchangeability needed to infer the premise from the
-order statistic.  Proposition~\ref{prop:containment} is therefore an
-algebraic interpretation of the gate, not a certificate for the released
-audit \citep{barber2022exchangeability}.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.98\textwidth]{figures/Figure3_DevelopmentToConfirmation.pdf}
-\caption{\textbf{Development-to-confirmation progression.}  The heterogeneous
-development split satisfies the frozen gate, while the confirmatory split
-misses its empirical-coverage component.  Audit outcomes were not used to
-retune the released decision.}
-\label{fig:progression}
-\end{figure*}
-
-\paragraph{Dependence induced by fixed family quotas.}
-
-Balancing an audit across graph families improves the visibility of
-family-specific failures, but it changes the sampling law.  Even if the final
-order of the audit graphs is randomized, the family labels are dependent once
-their totals are fixed, so comparisons must respect the data-set and stratum
-as the sampling units \citep{demsar2006statistical,efron1993bootstrap}.
+clarifies both the appeal and the limit of residual calibration: idealized
+marginal residual coverage controls joint harm, whereas the conditional bound
+deteriorates as acceptance becomes rare.  More importantly, the locked
+fixed-quota, sequentially filtered audit does not establish the pooled
+exchangeability needed to infer the premise from the order statistic, so
+Proposition~\ref{prop:containment} is an algebraic reading of the gate rather
+than a certificate for the released audit \citep{barber2022exchangeability}.
+Balancing an audit across families changes the sampling law: even if the final
+order is randomized, family labels are dependent once their totals are fixed, so
+comparisons must respect the stratum as the sampling unit
+\citep{demsar2006statistical,efron1993bootstrap}.
 
 \begin{proposition}[Fixed quotas are not pooled iid sampling]
 \label{prop:quota}
 Consider an audit of size $n$ with exactly $n_f$ graphs from family $f$, where
 $0<n_f<n$, and let the order of the $n$ graphs be uniformly randomized.  For
-distinct positions $i\ne j$, define
-$Z_i=\mathbf 1\{\text{position }i\text{ has family }f\}$.  Then
+distinct positions $i\ne j$, with
+$Z_i=\mathbf 1\{\text{position }i\text{ has family }f\}$ and $p_f=n_f/n$,
 \begin{equation}
- \operatorname{Cov}(Z_i,Z_j)
- =-\frac{p_f(1-p_f)}{n-1}<0,
- \qquad p_f=\frac{n_f}{n}.
+ \operatorname{Cov}(Z_i,Z_j)=-\frac{p_f(1-p_f)}{n-1}<0.
  \label{eq:quota-covariance}
 \end{equation}
-Consequently, the pooled family labels are exchangeable but not independent,
-and the audit is not an iid sample from the mixture with family mass $p_f$.
+Hence the pooled family labels are exchangeable but not independent, and the
+audit is not an iid sample from the mixture with family mass $p_f$.
 \end{proposition}
 
-Appendix~\ref{app:proof-quota} proves the covariance identity by direct
-counting.  The proposition does not invalidate stratum-specific description
-or a design-based analysis.  It limits only an iid interpretation that ignores
-the fixed quotas and sequential graph filtering.
+Appendix~\ref{app:proof-quota} proves the covariance identity by direct counting.
+The proposition does not invalidate stratum-specific description or a
+design-based analysis; it limits only an iid interpretation that ignores the
+fixed quotas and sequential filtering.
 
-\section{Graph-Conditioned Trust Regions}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/Figure3_DevelopmentToConfirmation.pdf}
+\caption{\textbf{Development-to-confirmation progression.}  The heterogeneous
+development split satisfies the frozen gate, while the confirmatory split misses
+its empirical-coverage component.  Audit outcomes were not used to retune the
+released decision.}
+\label{fig:progression}
+\end{figure*}
+
+\section{Risk-Controlled Graph-Conditioned Trust Regions}
 
 \subsection{Target-Free Portfolio Utility}
 
-Every arm receives the same 32-call counter.  Seed evaluations, restarts, and
-all intermediate queries count against the ceiling.  The final utility in
-Eq.~\eqref{eq:aurc} rewards useful values early without granting an optimizer
-access to $C_{\max}$.  Exact MaxCut remains a small-instance analysis oracle,
-so the metric is target free for control but not hardware native.
-
-The nine arms are a training-set concentration vector; four midpoint linear
-schedules; one-nearest-neighbor transfer; four-start random multistart; SPSA;
-and the legacy graph-conditioned Gaussian trust-region policy.  A fixed
-schedule can be competitive because QAOA angles concentrate
-\citep{akshay2021concentration}; the portfolio therefore retains simple arms
-instead of comparing only learned policies.
+Every arm receives the same $32$-call counter; seed evaluations, restarts, and
+all intermediate queries count against the ceiling.  The utility in
+Eq.~\eqref{eq:aurc} rewards useful values early without granting any optimizer
+access to $C_{\max}$, so the metric is target free for control even though exact
+MaxCut remains a small-instance analysis oracle.  The nine arms are a
+training-set concentration vector, four midpoint linear schedules,
+one-nearest-neighbor transfer, four-start random multistart, SPSA, and the legacy
+graph-conditioned Gaussian trust-region policy.  A fixed schedule can be
+competitive because QAOA angles concentrate \citep{akshay2021concentration}, so
+the portfolio retains simple arms instead of comparing only learned policies.
 
 \subsection{Structural Prediction and Family Fallback}
 
-The structural vector contains size, edge count per vertex, density, seven
-degree summaries, mean clustering, transitivity, triangles per vertex, and
-three normalized-Laplacian summaries.  A multi-output ridge model predicts
-each arm's AURC:
+The structural vector contains size, edges per vertex, density, seven degree
+summaries, mean clustering, transitivity, triangles per vertex, and three
+normalized-Laplacian summaries.  A multi-output ridge model predicts each arm's
+utility,
 \begin{equation}
  \widehat{\bm u}(x)=\bm a+W\widetilde x,
  \qquad \lambda_{\rm ridge}=1,
  \label{eq:ridge}
 \end{equation}
-where normalization uses development means and scales only.
-
-The known synthetic family label defines a strong deployable fallback.  This
-choice is intentionally favorable to the control.  The router must improve
-upon what can be selected without instance-level prediction.  General
-algorithm-selection theory warns that larger portfolios increase both
-opportunity and overfitting risk \citep{rice1976selection,cawley2010overfitting}.
+where normalization uses development means and scales only.  The known synthetic
+family label defines a strong deployable fallback, a choice deliberately
+favorable to the control: the router must improve on what can be selected without
+instance-level prediction.  General algorithm-selection theory warns that larger
+portfolios raise both opportunity and overfitting risk
+\citep{rice1976selection,cawley2010overfitting}.
 
 \subsection{Residual Order-Statistic Abstention}
 
-Fix $\alpha\in(0,1)$.  Suppose calibration residuals
-$R_1,\ldots,R_n$ and a future residual
-$R_{n+1}$ are exchangeable and almost surely distinct.  Let
-$k=\lceil(n+1)(1-\alpha)\rceil$, and let $q$ be the $k$th calibration order
-statistic, with $q=+\infty$ if $k>n$.
+Fix $\alpha\in(0,1)$, and suppose calibration residuals $R_1,\dots,R_n$ and a
+future residual $R_{n+1}$ are exchangeable and almost surely distinct.  Let
+$k=\lceil(n+1)(1-\alpha)\rceil$ and let $q$ be the $k$th calibration order
+statistic, with $q=+\infty$ when $k>n$.
 
 \begin{theorem}[Split order-statistic coverage]
 \label{thm:order}
-Under the preceding assumptions,
+Under these assumptions,
 \begin{equation}
  \Pp(R_{n+1}\le q)=\frac{k}{n+1}\ge1-\alpha.
  \label{eq:coverage}
 \end{equation}
 \end{theorem}
 
-Appendix~\ref{app:proof-order} proves the result by rank symmetry.  Ties can be
+Appendix~\ref{app:proof-order} proves the result by rank symmetry.  Ties are
 handled conservatively or by randomized ranks.  The theorem explains the
-calibration rule; it does not assert that the quota-filtered audit residual is
-exchangeable with pooled calibration residuals.
+calibration rule but does not assert that the quota-filtered audit residual is
+exchangeable with the pooled calibration residuals; here $n=48$ and
+$\alpha=0.10$ give the rank-$45$ upper statistic.
 
 \subsection{Locked Confirmatory Decision}
 
 The configuration, graph identities, angle labels, implementation, non-audit
-traces, learned state, calibration statistic, and decision are hashed before
-audit evaluation.  The evidence directory rejects a second audit run.  The
-generator validates these hashes before producing manuscript displays.
-
-This locking scheme is not an external preregistration and does not prevent
-all researcher degrees of freedom.  The hashes establish internal consistency
-with the declared execution order, and the output lock refuses an overwrite
-inside the designated evidence directory.  They are not an independent
-timestamp and cannot exclude unrecorded alternative runs.  Reproducibility
-concerns both computational determinism and inferential chronology.
+traces, learned state, calibration statistic, and decision are hashed before the
+audit is evaluated, and the evidence directory refuses a second audit run; the
+generator revalidates these hashes before producing manuscript displays.  This
+scheme is not an external preregistration and does not remove every researcher
+degree of freedom.  The hashes establish internal consistency with the declared
+execution order and the output lock refuses an overwrite, but they are not an
+independent timestamp and cannot exclude unrecorded alternative runs.
+Reproducibility here concerns both computational determinism and inferential
+chronology.
 
 \section{Experiments}
 
@@ -543,33 +506,28 @@ concerns both computational determinism and inferential chronology.
 
 Graphs come from four synthetic families: Erd\H{o}s--R\'enyi
 \citep{erdos1959random}, random regular as generated by NetworkX
-\citep{hagberg2008networkx}, Barab\'asi--Albert
-\citep{barabasi1999emergence}, and Watts--Strogatz
-\citep{watts1998collective}.  Sequential filtering rejects isomorphic repeats
-within each stratum.  Separate angle-label, development, calibration, and audit
-splits are frozen by graph identity.
+\citep{hagberg2008networkx}, Barab\'asi--Albert \citep{barabasi1999emergence},
+and Watts--Strogatz \citep{watts1998collective}.  Sequential filtering rejects
+isomorphic repeats within each stratum, and separate angle-label, development,
+calibration, and audit splits are frozen by graph identity.  An initial
+fixed-parameter generator grid used all four families without broad parameter
+variation; a subsequent $64$-graph heterogeneous development audit used declared
+ranges and triggered the family-fallback protocol.  The locked selector was then
+fit on $48$ development graphs and its residual threshold computed from $48$
+disjoint calibration graphs, all before the confirmatory list and decision were
+frozen.
 
-The initial fixed-parameter generator-grid study included all four families
-but did not vary each family's generator parameters broadly.  A subsequent
-64-graph heterogeneous development-stage audit used declared parameter ranges
-and triggered the family-fallback protocol.  The locked selector was then fit
-on 48 development graphs and its residual threshold was computed from 48
-disjoint calibration graphs.  This adaptation occurred before the
-confirmatory graph list and decision were frozen.
-
-For any split of $N$ graphs, let $\bar u_{\rm global}$ be the mean AURC of the
-single global arm and let
-$\bar u_{\rm oracle}=N^{-1}\sum_{i=1}^{N}\min_a u_{ia}$ be the mean
-per-graph portfolio oracle.  We define portfolio opportunity as
+For any split of $N$ graphs, let $\bar u_{\rm global}$ be the mean utility of the
+single global arm and $\bar u_{\rm oracle}=N^{-1}\sum_{i}\min_a u_{ia}$ the mean
+per-graph portfolio oracle.  Portfolio opportunity is
 \begin{equation}
  \mathcal O=
- \frac{\bar u_{\rm global}-\bar u_{\rm oracle}}
- {\bar u_{\rm global}}.
+ \frac{\bar u_{\rm global}-\bar u_{\rm oracle}}{\bar u_{\rm global}}.
  \label{eq:opportunity}
 \end{equation}
-The heterogeneous development-stage audit recorded $\mathcal O=0.10710$.
-The locked confirmatory audit retained the requirement
-$\mathcal O\ge0.05$ and recorded $\mathcal O=0.07115$.
+The heterogeneous development audit recorded $\mathcal O=0.10710$; the locked
+confirmatory audit retained the requirement $\mathcal O\ge0.05$ and recorded
+$\mathcal O=0.07115$.
 
 \begin{table*}[t]
 \centering
@@ -582,117 +540,134 @@ disjoint graph split.}
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/Figure4_ArmOpportunityRanking.pdf}
-\caption{\textbf{Arm opportunity and split stability.}  \textbf{(a)} Mean
-AURC for every arm on the frozen development, calibration, and audit splits;
-lower is better.  \textbf{(b)} Number of audit graphs on which each arm has
-the smallest AURC.  Heterogeneous graph-level winners motivate a portfolio,
-but do not by themselves validate a learned router.}
+\caption{\textbf{Arm opportunity and split stability.}  \textbf{(a)} Mean utility
+for every arm on the frozen development, calibration, and audit splits; lower is
+better.  \textbf{(b)} Number of audit graphs on which each arm is best.
+Heterogeneous graph-level winners motivate a portfolio but do not by themselves
+validate a learned router.}
 \label{fig:arm-ranking}
 \end{figure*}
 
 \subsection{Confirmatory Audit}
 
-The one-shot audit contains 160 graphs, 40 per family.  The gated deployment
-has mean AURC $\ConfirmGatedAURC$, compared with
-$\ConfirmFamilyAURC$ for the family fallback and
-$\ConfirmGlobalAURC$ for the global development arm.  The selected-minus-family
-difference is $\ConfirmDelta$.  A frozen 4,000-resample stratified percentile
-bootstrap interval is $[\ConfirmCILow,\ConfirmCIHigh]$.
-
-That interval is not the decision by itself.  The policy accepts
-$\ConfirmAccepted$ routes, incurs $\ConfirmHarms$ joint harms, and has
-empirical residual coverage $\ConfirmCoverage$ against nominal
-$\ConfirmNominal$.  Since coverage is below the internally frozen threshold, the
-reliability gate fails.  A binomial sensitivity model gives probability
-$0.249$ of observing at most 141 covered cases under independent 0.90 coverage,
-so the miss is compatible with nominal variation; it nevertheless fails the
-literal frozen rule.
+The one-shot audit contains $\ConfirmN$ graphs, $40$ per family.  Gated
+deployment has mean utility $\ConfirmGatedAURC$ against $\ConfirmFamilyAURC$ for
+the family fallback and $\ConfirmGlobalAURC$ for the global development arm, with
+per-graph oracle $\ConfirmOracleAURC$; the selected-minus-family difference is
+$\ConfirmDelta$, and a frozen $4{,}000$-resample stratified percentile bootstrap
+interval is $[\ConfirmCILow,\ConfirmCIHigh]$.  That interval is not the decision.
+The policy accepts $\ConfirmAccepted$ routes, incurs $\ConfirmHarms$ joint harms,
+and has empirical residual coverage $\ConfirmCoverage$ against nominal
+$\ConfirmNominal$; since coverage is below the internally frozen threshold, the
+reliability gate fails.  A binomial sensitivity model gives probability $0.249$
+of observing at most $141$ covered cases under independent $0.90$ coverage, so
+the miss is compatible with nominal variation yet still fails the literal frozen
+rule.  Family-conditional gains are heterogeneous: the improvement is largest for
+random regular graphs ($\ConfirmRRdelta$) while Barab\'asi--Albert graphs
+regress ($\ConfirmBAdelta$) and Watts--Strogatz graphs move slightly
+($\ConfirmWSdelta$).
 
 \begin{table*}[t]
 \centering
-\caption{\textbf{Confirmatory results by graph family.}  Lower AURC is better
+\caption{\textbf{Confirmatory results by graph family.}  Lower utility is better
 and $\Delta$ is gated minus family fallback.}
 \label{tab:confirmatory}
 \resizebox{\textwidth}{!}{\input{tables/table_confirmatory_results.tex}}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{\textbf{Locked confirmatory policy comparison.}  Lower AURC is better,
+and every difference is measured against the family fallback on the same 160
+audit graphs.  The oracle is retrospective and unavailable at deployment.}
+\label{tab:policy-comparison}
+\resizebox{\textwidth}{!}{\input{tables/table_policy_comparison.tex}}
 \end{table*}
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/Figure5_ResidualOrderStatistic.pdf}
 \caption{\textbf{Frozen residual rule and its inferential boundary.}
-\textbf{(a)} The one-sided calibration statistic is the rank-$45$ order
-statistic among 48 residuals.  \textbf{(b)} Calibration and audit empirical
-CDFs are shown descriptively.  Fixed family quotas and sequential
-de-duplication do not justify a pooled exchangeability certificate.}
+\textbf{(a)} The one-sided calibration statistic is the rank-$45$ order statistic
+among $48$ residuals.  \textbf{(b)} Calibration and audit empirical CDFs are
+shown descriptively.  Fixed family quotas and sequential de-duplication do not
+justify a pooled exchangeability certificate.}
 \label{fig:residual-order}
 \end{figure*}
 
 \subsection{Anytime Behavior and Resource Accounting}
 
-Every arm receives 32 exact objective calls, so the audit consumes 288 calls
-per graph across nine arms and 46,080 calls for the 160 audit graphs.  The
-angle-label track is reported separately.  Runtime is descriptive because
-Python and simulator overhead differ by arm.
-
-The released simulator uses PyTorch for numerical kernels
-\citep{paszke2019pytorch}.  It does not include shot noise, gate noise,
-compilation, or queue latency.  Analytic gradients and higher derivatives can
-be estimated on quantum hardware under appropriate gates
-\citep{mari2021estimating}, and quantum-natural-gradient methods alter the
-local metric \citep{stokes2020quantum}; neither is evaluated here.
+Every arm receives $32$ exact objective calls, so the audit consumes $288$ calls
+per graph across nine arms and $46{,}080$ calls for the $\ConfirmN$ audit graphs;
+the angle-label track is reported separately, and runtime is descriptive because
+Python and simulator overhead differ by arm.  The simulator uses PyTorch for
+numerical kernels \citep{paszke2019pytorch} and includes no shot noise, gate
+noise, compilation, or queue latency.  Analytic gradients and higher derivatives
+can be estimated on hardware under appropriate gates \citep{mari2021estimating},
+and quantum-natural-gradient methods alter the local metric
+\citep{stokes2020quantum}; neither is evaluated here.  The audit's statistical
+unit is the graph, and the bootstrap resamples within the eight family-by-size
+strata \citep{efron1993bootstrap}, so the fixed quota improves balance while
+leaving the pooled sample non-iid.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/Figure6_PredictedVsRealizedRoutes.pdf}
 \caption{\textbf{Predicted versus realized accepted routes.}  \textbf{(a)}
-Predicted and realized selected-minus-fallback AURC differences for the 12
-accepted graphs.  \textbf{(b)} Four accepted routes are harmful despite
-negative frozen upper scores.  The display diagnoses selective failure; it
-does not refit the gate.}
+Predicted and realized selected-minus-fallback differences for the
+$\ConfirmAccepted$ accepted graphs.  \textbf{(b)} Four accepted routes are
+harmful despite negative frozen upper scores.  The display diagnoses selective
+failure; it does not refit the gate.}
 \label{fig:predicted-realized}
 \end{figure*}
 
-The audit's statistical unit is the graph.  Bootstrap resampling is stratified
-by the eight family-by-size strata \citep{efron1993bootstrap}.  The fixed quota improves balance but
-means the pooled sample is not an iid draw from an unspecified graph
-population.  The reported interval is therefore the output of the frozen
-analysis, not a universal confidence statement.
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/Figure7_AnytimeByFamily.pdf}
+\caption{\textbf{Anytime behavior by fixed graph family.}  Mean normalized regret
+is shown at every recorded checkpoint for the global arm, family fallback, gated
+deployment, and per-checkpoint oracle.  Family heterogeneity persists across the
+$32$-call budget.}
+\label{fig:anytime-family}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/Figure8_FamilyEffects.pdf}
+\caption{\textbf{Family-conditional effects.}  \textbf{(a)} Mean
+gated-minus-fallback utility within each fixed family.  \textbf{(b)} Acceptance
+and realized-harm counts.  The pooled improvement is concentrated in random
+regular graphs, whereas all four observed harms occur in the Barab\'asi--Albert
+stratum.}
+\label{fig:family-effects}
+\end{figure*}
 
 \section{Conclusion}
 
-Graph structure contains useful information about QAOA optimizer behavior, but
+Graph structure carries useful information about QAOA optimizer behavior, but
 useful information is not the same as reliable routing.  The frozen selector
 slightly improves mean anytime regret over a strong family fallback, yet its
 accepted set is small, one third of accepted routes are harmful, and the
-internally frozen empirical-coverage requirement fails.  We therefore reject the
-confirmatory reliability claim.
+internally frozen empirical-coverage requirement fails, so we reject the
+confirmatory reliability claim.  The value of the study is methodological:
+target-free anytime utility, matched controls, split-and-lock chronology, and a
+report that keeps coverage, acceptance, joint harm, and conditional harm
+distinct.
 
 \paragraph{Limitations.}
-The experiment has six major limitations.  It uses exact statevectors, depth
-two, small unweighted MaxCut graphs, fixed graph-family quotas, a known family
-label at deployment, and a hand-designed nine-arm portfolio.  It provides no
-hardware result, noise result, asymptotic scaling result, or quantum advantage.
-The percentile bootstrap endpoint is boundary sensitive, and the pooled
-exchangeability condition required by the simplest order-statistic theorem is
-not established.
-
-The next experiment should replace the descriptive gate with a prospective
-sampling design, predefine the graph population and filtering procedure,
-increase accepted-route power, include shot and device noise, and compare
-against stronger adaptive controls.  If multiple reliability criteria are
-tested, the associated multiplicity correction and joint decision rule should
-be fixed before analysis \citep{benjamini1995controlling}.  If exact binomial
-or concentration bounds are reported, the associated independence or
-exchangeability assumptions must be stated
-\citep{clopper1934fiducial,hoeffding1963probability}.
-
-The repository is an installable package.  The command
-\texttt{gctr-reproduce --validate-only} audits source records and hashes;
-\texttt{gctr-reproduce} regenerates the original data displays; and
-\texttt{python manuscript/generate\_portfolio\_artifacts.py} regenerates the
-locked portfolio figures and tables.  A separate prospective-risk-control
-design file is marked unregistered, incomplete, and unexecuted; it contributes
-no result.
+The experiment uses exact statevectors, depth two, small unweighted MaxCut
+graphs, fixed graph-family quotas, a known family label at deployment, and a
+hand-designed nine-arm portfolio, and it provides no hardware, noise, asymptotic
+scaling, or quantum-advantage result.  The percentile bootstrap endpoint is
+boundary sensitive, and the pooled exchangeability condition required by the
+simplest order-statistic theorem is not established.  A future experiment should
+replace the descriptive gate with a prospective sampling design, predefine the
+graph population and filtering procedure, increase accepted-route power, add shot
+and device noise, and compare against stronger adaptive controls; if several
+reliability criteria are tested, their multiplicity correction and joint decision
+rule should be fixed before analysis \citep{benjamini1995controlling}, and any
+exact binomial or concentration bound must state its independence or
+exchangeability assumptions \citep{clopper1934fiducial,hoeffding1963probability}.
 
 \clearpage
 \bibliographystyle{plainnat}
@@ -704,316 +679,230 @@ no result.
 
 \section{Proofs}
 
-\subsection{Proof for Theorem~\ref{thm:shift}}
+\subsection{Proof of Theorem~\ref{thm:shift}}
 \label{app:proof-shift}
 
 \begin{proof}
-Let the instance space contain two points $x_0$ and $x_1$.  Define losses
+Let the instance space contain two points $x_0$ and $x_1$, and define losses
 \[
 \begin{aligned}
  \ell(a,x_0)&=0, & \ell(b,x_0)&=\varepsilon,\\
- \ell(a,x_1)&=1, & \ell(b,x_1)&=\varepsilon.
+ \ell(a,x_1)&=1, & \ell(b,x_1)&=\varepsilon,
 \end{aligned}
 \]
-Every displayed loss belongs to $[0,1]$ because
-$\varepsilon\in(0,1)$.
-Let $P_0$ put probability one on $x_0$ and $P_1$ put probability one on
-$x_1$.  Under $P_0$,
-\[
- \E_{P_0}\ell(a,X)=0<\varepsilon=\E_{P_0}\ell(b,X),
-\]
-so $a$ is the unique development risk minimizer.  Under $P_1$,
-\[
- \E_{P_1}\ell(b,X)=\varepsilon<1=\E_{P_1}\ell(a,X),
-\]
-so $b$ is the unique deployment risk minimizer.  A router that
-unconditionally deploys the development minimizer $a$ has deployment excess
-risk
+each of which lies in $[0,1]$ because $\varepsilon\in(0,1)$.  Let $P_0$ place
+probability one on $x_0$ and $P_1$ probability one on $x_1$.  Under $P_0$,
+$\E_{P_0}\ell(a,X)=0<\varepsilon=\E_{P_0}\ell(b,X)$, so $a$ is the unique
+development risk minimizer; under $P_1$,
+$\E_{P_1}\ell(b,X)=\varepsilon<1=\E_{P_1}\ell(a,X)$, so $b$ is the unique
+deployment risk minimizer.  A router that unconditionally deploys the development
+minimizer $a$ has deployment excess risk
 \[
  \E_{P_1}\ell(a,X)-\min_{c\in\{a,b\}}\E_{P_1}\ell(c,X)
- =1-\varepsilon.
+ =1-\varepsilon .
 \]
-Because $\varepsilon$ can approach zero, this excess approaches the largest
-possible difference for losses in $[0,1]$.  No estimation error or model
-misspecification is needed.
+Because $\varepsilon$ can be taken arbitrarily close to zero, this excess
+approaches the largest possible gap for losses in $[0,1]$, and no estimation
+error or model misspecification is needed to produce it.
 \end{proof}
 
-\subsection{Proof for Proposition~\ref{prop:harm}}
+\subsection{Proof of Proposition~\ref{prop:harm}}
 \label{app:proof-harm}
 
 \begin{proof}
-By the definition of conditional probability, when $\Pp(A)>0$,
-\[
- \Pp(H\mid A)=\frac{\Pp(A\cap H)}{\Pp(A)}.
-\]
-Multiplying both sides by $\Pp(A)$ gives
-Eq.~\eqref{eq:harm}.
-
-To prove the second claim, fix any joint-harm ceiling $\eta\in(0,1)$ and any
-$c\in[\eta,1]$.  Construct events with
-$\Pp(A)=\eta/c$ and
-$\Pp(H\mid A)=c$.  Then
-$\Pp(A\cap H)=\eta$ while the conditional harm is $c$.  In particular, taking
-$c=1$ and $\Pp(A)=\eta$ gives joint harm $\eta$ with every accepted route
-harmful.  Thus a bound on $\Pp(A\cap H)$ alone cannot imply a nontrivial bound
-on $\Pp(H\mid A)$ unless acceptance is bounded away from zero.
+By the definition of conditional probability, when $\Pp(A)>0$ we have
+$\Pp(H\mid A)=\Pp(A\cap H)/\Pp(A)$, and multiplying both sides by $\Pp(A)$ gives
+Eq.~\eqref{eq:harm}.  For the second claim, fix any joint-harm ceiling
+$\eta\in(0,1)$ and any $c\in[\eta,1]$, and construct events with $\Pp(A)=\eta/c$
+and $\Pp(H\mid A)=c$; then $\Pp(A\cap H)=\Pp(A)\Pp(H\mid A)=\eta$ while the
+conditional harm equals $c$.  Taking $c=1$ and $\Pp(A)=\eta$ in particular yields
+joint harm $\eta$ with every accepted route harmful.  Thus a bound on
+$\Pp(A\cap H)$ alone cannot imply any nontrivial bound on $\Pp(H\mid A)$ unless
+acceptance is bounded away from zero, which is the assertion of the proposition.
 \end{proof}
 
-\subsection{Proof for Proposition~\ref{prop:quota}}
+\subsection{Proof of Proposition~\ref{prop:containment}}
+\label{app:proof-containment}
+
+\begin{proof}
+Take any outcome in $A\cap H$.  Membership in $A$ gives $\widehat d+q<0$, hence
+$-\widehat d>q$, and membership in $H$ gives $\Delta>0$.  Therefore
+\[
+ R=\Delta-\widehat d>-\widehat d>q ,
+\]
+so the outcome lies in $\{R>q\}$; since the outcome was arbitrary,
+$A\cap H\subseteq\{R>q\}$, which is Eq.~\eqref{eq:containment}.  Taking
+probabilities of both sides of the inclusion gives
+$\Pp(A\cap H)\le\Pp(R>q)=1-\Pp(R\le q)$.  If $\Pp(R\le q)\ge1-\alpha$ then the
+right-hand side is at most $\alpha$, so $\Pp(A\cap H)\le\alpha$; and when
+$\Pp(A)>0$, dividing by $\Pp(A)$ gives $\Pp(H\mid A)\le\alpha/\Pp(A)$.  Each step
+follows from the deterministic containment and the definition of conditional
+probability, and no exchangeability assumption enters this argument;
+exchangeability is relevant only to establishing the separate premise
+$\Pp(R\le q)\ge1-\alpha$ from calibration data.
+\end{proof}
+
+\subsection{Proof of Proposition~\ref{prop:quota}}
 \label{app:proof-quota}
 
 \begin{proof}
 Uniformly randomizing the audit order is equivalent to choosing the $n_f$
-positions occupied by family $f$ uniformly from the
-$\binom{n}{n_f}$ subsets of size $n_f$.  For any position $i$,
+positions occupied by family $f$ uniformly among the $\binom{n}{n_f}$ subsets of
+size $n_f$.  For any position $i$,
 \[
- \Pp(Z_i=1)
- =\frac{\binom{n-1}{n_f-1}}{\binom{n}{n_f}}
- =\frac{n_f}{n}
- =p_f.
+ \Pp(Z_i=1)=\frac{\binom{n-1}{n_f-1}}{\binom{n}{n_f}}=\frac{n_f}{n}=p_f ,
 \]
-For distinct positions $i$ and $j$,
+and for distinct positions $i\ne j$,
 \[
-\Pp(Z_i=1,Z_j=1)
- =\frac{\binom{n-2}{n_f-2}}{\binom{n}{n_f}}
- =\frac{n_f(n_f-1)}{n(n-1)}.
+ \Pp(Z_i=1,Z_j=1)=\frac{\binom{n-2}{n_f-2}}{\binom{n}{n_f}}
+ =\frac{n_f(n_f-1)}{n(n-1)} ,
 \]
-Here and below, $\binom{N}{k}=0$ when $k<0$ or $k>N$; thus the displayed
-identity also covers $n_f=1$.
+with the convention $\binom{N}{k}=0$ for $k<0$, which also covers $n_f=1$.
 Therefore
-\begin{align*}
+\[
  \operatorname{Cov}(Z_i,Z_j)
- &=\E[Z_iZ_j]-\E[Z_i]\E[Z_j]\\
- &=\frac{n_f(n_f-1)}{n(n-1)}-\frac{n_f^2}{n^2}\\
- &=-\frac{n_f(n-n_f)}{n^2(n-1)}
- =-\frac{p_f(1-p_f)}{n-1}.
-\end{align*}
-Because $0<n_f<n$, the covariance is strictly negative.  Independent
-Bernoulli variables have zero covariance, so the family indicators cannot be
-independent.  Their joint law is invariant under permutations of audit
-positions, hence exchangeable.  Finally, iid sampling from a mixture with
-family probability $p_f$ would produce a random family count with binomial
-variance $np_f(1-p_f)>0$, whereas the quota design fixes that count at $n_f$
-with variance zero.  Thus the quota design is not pooled iid mixture sampling.
+ =\frac{n_f(n_f-1)}{n(n-1)}-\frac{n_f^2}{n^2}
+ =-\frac{n_f(n-n_f)}{n^2(n-1)}
+ =-\frac{p_f(1-p_f)}{n-1} ,
+\]
+which is strictly negative because $0<n_f<n$.  Independent Bernoulli variables
+have zero covariance, so the family indicators cannot be independent; their joint
+law is invariant under permutations of positions, hence exchangeable.  Finally,
+iid sampling from a mixture with family probability $p_f$ would give a binomial
+family count with variance $np_f(1-p_f)>0$, whereas the quota design fixes that
+count at $n_f$ with variance zero, so the design is not pooled iid mixture
+sampling.
 \end{proof}
 
-\subsection{Proof for Proposition~\ref{prop:containment}}
-\label{app:proof-containment}
-
-\begin{proof}
-Take any outcome in $A\cap H$.  Membership in $A$ gives
-\[
- \widehat d+q<0,
-\]
-and hence
-\[
- -\widehat d>q.
-\]
-Membership in $H$ gives $\Delta>0$.  Therefore
-\[
- R=\Delta-\widehat d>-\widehat d>q.
-\]
-Thus every outcome in $A\cap H$ belongs to $\{R>q\}$, which proves
-Eq.~\eqref{eq:containment}.
-
-Taking probabilities on both sides of the set inclusion yields
-\[
- \Pp(A\cap H)\le \Pp(R>q)
- =1-\Pp(R\le q).
-\]
-If $\Pp(R\le q)\ge1-\alpha$, then the right-hand side is at most
-$\alpha$, so $\Pp(A\cap H)\le\alpha$.  Finally, when $\Pp(A)>0$,
-\[
- \Pp(H\mid A)
- =\frac{\Pp(A\cap H)}{\Pp(A)}
- \le\frac{\alpha}{\Pp(A)}.
-\]
-Each step follows from the deterministic containment and the definition of
-conditional probability; no exchangeability assumption is used inside this
-proof.  Exchangeability is relevant only to establishing the separate premise
-$\Pp(R\le q)\ge1-\alpha$ from calibration data.
-\end{proof}
-
-\subsection{Proof for Theorem~\ref{thm:order}}
+\subsection{Proof of Theorem~\ref{thm:order}}
 \label{app:proof-order}
 
 \begin{proof}
-Because $R_1,\ldots,R_{n+1}$ are exchangeable and almost surely distinct, the
-rank
+Because $R_1,\dots,R_{n+1}$ are exchangeable and almost surely distinct, the rank
 \[
- \operatorname{rank}(R_{n+1})
- =1+\sum_{i=1}^{n}\mathbf 1\{R_i<R_{n+1}\}
+ \operatorname{rank}(R_{n+1})=1+\sum_{i=1}^{n}\mathbf 1\{R_i<R_{n+1}\}
 \]
-is uniform on $\{1,\ldots,n+1\}$.  Let $q$ be the $k$th smallest calibration
+is uniform on $\{1,\dots,n+1\}$.  Let $q$ be the $k$th smallest calibration
 score.  If $k=n+1$, the convention $q=+\infty$ gives
-$\Pp(R_{n+1}\le q)=1=k/(n+1)$, and the claim follows.  Hence assume
-$1\le k\le n$.  If the test rank is at most $k$, then at most $k-1$
-calibration scores
-are smaller than $R_{n+1}$, so the $k$th calibration score is at least
-$R_{n+1}$ and $R_{n+1}\le q$.  If the test rank exceeds $k$, then at least
-$k$ calibration scores are smaller, so $R_{n+1}>q$.  Hence
-\[
- \{R_{n+1}\le q\}
- =\{\operatorname{rank}(R_{n+1})\le k\}.
-\]
-Uniformity of the rank gives
-\[
- \Pp(R_{n+1}\le q)=\frac{k}{n+1}.
-\]
-Finally,
-$k=\lceil(n+1)(1-\alpha)\rceil\ge(n+1)(1-\alpha)$, so division by $n+1$
-gives the desired lower bound.
+$\Pp(R_{n+1}\le q)=1=k/(n+1)$ and the claim holds, so assume $1\le k\le n$.  If
+the test rank is at most $k$, then at most $k-1$ calibration scores are smaller
+than $R_{n+1}$, so the $k$th calibration score is at least $R_{n+1}$ and
+$R_{n+1}\le q$; if the test rank exceeds $k$, then at least $k$ calibration
+scores are smaller and $R_{n+1}>q$.  Hence
+$\{R_{n+1}\le q\}=\{\operatorname{rank}(R_{n+1})\le k\}$, and uniformity of the
+rank gives $\Pp(R_{n+1}\le q)=k/(n+1)$.  Finally
+$k=\lceil(n+1)(1-\alpha)\rceil\ge(n+1)(1-\alpha)$, so dividing by $n+1$ yields
+$\Pp(R_{n+1}\le q)\ge1-\alpha$.
 \end{proof}
 
-\section{Algorithm}
+\section{Frozen Structural Routing}
+\label{app:algorithm}
 
 \begin{algorithm}{Frozen structural routing}
 \label{alg:frozen-routing}
 Given a graph $G$, development standardization, ridge coefficients, a family
-fallback map, and order statistic $q$:
+fallback map, and the order statistic $q$:
 \begin{enumerate}
-\item compute the 16 relabeling-invariant summaries $x(G)$;
+\item compute the $16$ relabeling-invariant summaries $x(G)$;
 \item standardize them using development means and scales;
-\item predict all nine AURCs with Eq.~\eqref{eq:ridge};
+\item predict all nine utilities with Eq.~\eqref{eq:ridge};
 \item choose $s=\argminop_a\widehat u_a(x)$ and retrieve $b(f)$;
-\item accept $s$ only if
-$\widehat u_s-\widehat u_b+q<0$; otherwise deploy $b$;
-\item run the deployed arm with a hard 32-call counter and record every
+\item accept $s$ only if $\widehat u_s-\widehat u_b+q<0$; otherwise deploy $b$;
+\item run the deployed arm under a hard $32$-call counter and record every
 best-so-far checkpoint.
 \end{enumerate}
 \end{algorithm}
 The audit implementation additionally verifies that the graph, configuration,
-decision, and implementation hashes match the frozen manifest before
-evaluation.
+decision, and implementation hashes match the frozen manifest before any
+evaluation.  The nine arms combine model-based and model-free search;
+Gaussian-process optimization is a natural future arm
+\citep{snoek2012practical,balandat2020botorch}, and randomized low-rank models
+may reduce structural fitting cost on much larger feature sets
+\citep{martinsson2020randomized}, though neither is needed for the released
+$16$-feature ridge fit.
 
-\section{Optimizer Portfolio}
+\section{Risk Quantities and Reliability Sensitivity}
+\label{app:risk}
 
-The concentration arm uses the coordinate-wise median of the 48 angle-label
-training vectors.  Four linear schedules
-interpolate fixed midpoint ramps.  One-nearest-neighbor transfer retrieves the
-closest angle-label training graph in standardized feature space.  Multistart divides
-the budget across four seeded starts.  SPSA uses a frozen gain schedule.  The
-legacy GCTR arm maps graph features to a Gaussian angle policy and a local
-budget rule.
+Ridge predictions carry estimation error from finite development data, model bias
+from linearity, and distribution shift across strata, while the
+selected-minus-fallback residual additionally contains selection-induced
+dependence because the selected arm is an $\argminop$ of the same prediction
+vector; calibration treats the resulting scalar as a conformity score without
+assuming Gaussianity.  Figure~\ref{fig:risk-sensitivity} pairs empirical
+coverage-failure, joint-harm, and conditional-harm rates with one-sided
+exact-binomial upper bounds under a hypothetical iid model: the $141$ covered
+residuals out of $\ConfirmN$ fall below the literal $0.90$ requirement, and a
+binomial model with success probability $0.90$ places lower-tail probability
+$0.249$ on that count.  These are sensitivity analyses, not certificates for the
+dependent fixed-quota design.  Broader operator portfolios could eventually
+motivate shadow-tomography or classical-shadow measurement
+\citep{aaronson2018shadow,huang2020shadows}, but the present commuting MaxCut
+objective does not require them.  The released legacy optimizer-ablation
+artifact remains a reproducible historical development diagnostic and is kept
+outside the locked confirmatory portfolio decision.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/Figure9_RiskSensitivity.pdf}
+\caption{\textbf{Risk quantities are not interchangeable.}  \textbf{(a)}
+Empirical coverage-failure, joint-harm, and conditional-harm rates with one-sided
+exact-binomial upper bounds under a hypothetical iid model.  \textbf{(b)} The
+observed coverage count against the frozen point requirement.  These are
+sensitivity analyses, not certificates for the dependent design.}
+\label{fig:risk-sensitivity}
+\end{figure*}
+
+The released legacy optimizer-ablation artifact remains a reproducible
+historical development diagnostic.  It informs arm design but is excluded from
+the locked confirmatory decision.
+
+\section{Optimizer Portfolio and Frozen Arms}
+\label{app:portfolio}
+
+The concentration arm uses the coordinate-wise median of the $48$ angle-label
+training vectors; four linear schedules interpolate fixed midpoint ramps;
+one-nearest-neighbor transfer retrieves the closest angle-label training graph in
+standardized feature space; multistart divides the budget across four seeded
+starts; SPSA uses a frozen gain schedule; and the legacy trust-region arm maps
+graph features to a Gaussian angle policy and a local budget rule, receiving no
+extra calls.  The lowest development mean-utility arm within the known generator
+family is the deployable fallback, and the structural $\argminop$ replaces it
+only when Eq.~\eqref{eq:gate} certifies a negative predicted upper bound.
 
 \begin{table*}[t]
 \centering
 \caption{\textbf{Frozen nine-arm portfolio.}  Every arm receives the same
-32-call ceiling; offline labels and search rules are shown explicitly.}
+$32$-call ceiling; offline labels and search rules are shown explicitly.}
 \label{tab:portfolio-arms}
 \resizebox{\textwidth}{!}{\input{tables/table_portfolio_arms.tex}}
 \end{table*}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.98\textwidth]{figures/Figure7_AnytimeByFamily.pdf}
-\caption{\textbf{Anytime behavior by fixed graph family.}  Mean normalized
-regret is shown at every recorded query checkpoint for the global arm, family
-fallback, gated deployment, and per-checkpoint oracle.  Family heterogeneity
-persists throughout the 32-call budget.}
-\label{fig:anytime-family}
+\includegraphics[width=0.98\textwidth]{figures/Figure10_ArmTransitions.pdf}
+\caption{\textbf{Selection-to-deployment transitions.}  \textbf{(a)} Counts from
+the structurally selected arm to the actually deployed arm.  \textbf{(b)}
+Accepted and abstained graphs by family.  The gate returns most structural
+proposals to their family control.}
+\label{fig:arm-transitions}
 \end{figure*}
 
-The portfolio mixes model-based and model-free search.  Gaussian-process
-optimization is a natural future arm \citep{snoek2012practical,
-balandat2020botorch}; randomized low-rank models may reduce structural fitting
-cost on much larger feature sets \citep{martinsson2020randomized}.  Neither is
-needed for the released 16-feature ridge fit.
+\section{Split Diagnostics and Locked Gate}
+\label{app:splits}
 
-\section{Bias and Variance of Routing Estimates}
-
-Ridge predictions have estimation error from finite development data, model
-bias from linearity, and distribution shift across graph strata.  The
-selected-minus-fallback residual further contains selection-induced dependence
-because the selected arm is an argmin of the same prediction vector.
-Calibration treats the resulting scalar residual as the conformity score
-without assuming Gaussianity.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.98\textwidth]{figures/Figure8_FamilyEffects.pdf}
-\caption{\textbf{Family-conditional effects.}  \textbf{(a)} Mean
-gated-minus-fallback AURC within each fixed family.  \textbf{(b)} Acceptance
-and realized-harm counts.  The pooled improvement is concentrated in random
-regular graphs, whereas all four observed harms occur in the
-Barab\'asi--Albert stratum.}
-\label{fig:family-effects}
-\end{figure*}
-
-The frozen bootstrap resamples graphs within each family-by-size stratum.  Its percentile endpoint
-is sensitive when the observed upper bound is close to zero.  Normal,
-studentized, or randomization-based alternatives would answer different
-questions and were not substituted after seeing the audit.
-
-\section{Graph-Conditioned Optimizer Arms}
-
-\subsection{Concentration Schedule}
-The coordinate-wise median of the 48 angle-label training vectors is a
-zero-query structural control after training.
-
-\subsection{Linear Ramps}
-Four fixed midpoint schedules span conservative to aggressive angle scales.
-
-\subsection{Nearest-Neighbor Transfer}
-The nearest standardized angle-label training feature vector supplies an
-angle seed.
-
-\subsection{Random Multistart}
-Four independent starts divide the same 32-call budget.
-
-\subsection{SPSA}
-Two perturbed objectives estimate a stochastic search direction at each
-update.
-
-\subsection{Legacy Trust Region}
-The graph-conditioned Gaussian supplies an initializer, covariance-shaped
-region, and frozen local policy.  It receives no extra calls.
-
-\subsection{Family Fallback}
-The lowest development mean-AURC arm within the known generator family is the
-deployable control.
-
-\subsection{Gated Selector}
-The structural argmin replaces the fallback only when Eq.~\eqref{eq:gate}
-certifies a negative predicted upper bound under the frozen score.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.98\textwidth]{figures/Figure9_RiskSensitivity.pdf}
-\caption{\textbf{Risk quantities are not interchangeable.}  \textbf{(a)}
-Empirical coverage-failure, joint-harm, and conditional-harm rates are paired
-with one-sided exact-binomial upper bounds under a hypothetical iid model.
-\textbf{(b)} The observed coverage count is compared with the frozen point
-requirement.  These calculations are sensitivity analyses, not certificates
-for the dependent fixed-quota design.}
-\label{fig:risk-sensitivity}
-\end{figure*}
-
-\section{Graph Benchmark Tasks}
-
-\subsection{Erd\H{o}s--R\'enyi}
-Edges are sampled independently before sequential non-isomorphism filtering.
-
-\subsection{Random Regular}
-Every vertex has fixed degree, producing a homogeneous structural stratum.
-
-\subsection{Barab\'asi--Albert}
-Preferential attachment yields heterogeneous degrees and hub structure.
-
-\subsection{Watts--Strogatz}
-Ring-lattice rewiring yields clustered small-world graphs.
-
-\subsection{Fixed-Quota Audit}
-Each family contributes exactly 40 audit graphs.  The balanced design supports
-stratified description but is not a pooled iid sample from a naturally
-occurring graph population.
-
-\section{Experimental Details for Development}
-
-Development and calibration each use disjoint graph lists.  Feature
+Development and calibration use disjoint graph lists, and feature
 standardization, ridge fitting, family-arm means, and residual sorting use only
-their assigned roles.  The calibration quantile is the conservative upper
-order statistic for $\alpha=0.10$.
+their assigned roles; the calibration quantile is the conservative upper order
+statistic for $\alpha=0.10$.  The frozen gate applies the recorded decision rule
+literally to the locked summaries and does not reinterpret a failed criterion
+after audit inspection.  The confirmatory configuration fixes $20$ graphs per
+family-size stratum for $\ConfirmN$ total, and the decision manifest stores the
+selected arm, fallback, predicted delta, acceptance flag, and relevant hashes
+before audit traces are scored.  Development-stage figures record
+$\DevAccepted$ accepted routes, $\DevHarms$ joint harm, and coverage
+$\DevCoverage$, with paired difference $\DevDelta$ and interval
+$[\DevCILow,\DevCIHigh]$.
 
 \begin{table*}[t]
 \centering
@@ -1023,102 +912,58 @@ fails, so the overall decision is no-go.}
 \resizebox{\textwidth}{!}{\input{tables/table_confirmatory_gate.tex}}
 \end{table*}
 
-The gate table is kept distinct from interval estimation: it applies the
-recorded decision rule literally to the locked summaries and does not
-reinterpret a failed criterion after audit inspection.
-
-\section{Experimental Details for the Locked Audit}
-
-The confirmatory configuration fixes 20 graphs per family-size stratum for 160
-total.  The decision manifest stores the selected arm, fallback, predicted
-delta, acceptance flag, and relevant hashes before audit traces are scored.
-Non-audit traces remain available for chronology checks.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.98\textwidth]{figures/Figure10_ArmTransitions.pdf}
-\caption{\textbf{Selection-to-deployment transitions.}  \textbf{(a)} Counts
-from the structurally selected arm to the actually deployed arm.
-\textbf{(b)} Accepted and abstained graphs by family.  The gate sends most
-structural proposals back to their family control.}
-\label{fig:arm-transitions}
-\end{figure*}
-
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/Figure11_SplitDiagnostics.pdf}
-\caption{\textbf{Split diagnostics.}  \textbf{(a)} Feature means expressed in
+\caption{\textbf{Split diagnostics.}  \textbf{(a)} Feature means in
 development-standardized units for development, calibration, and audit.
-\textbf{(b)} Fixed family-by-size quotas.  Balance aids stratified diagnosis
-but does not make the pooled sample iid.}
+\textbf{(b)} Fixed family-by-size quotas.  Balance aids stratified diagnosis but
+does not make the pooled sample iid.}
 \label{fig:split-diagnostics}
 \end{figure*}
 
 \section{Resource Accounting}
+\label{app:resource}
 
-Every optimizer arm receives exactly 32 objective calls.  Fixed schedules
-still pay for their seed evaluation.  Multistart pays for each start from the
-same counter.  Model training and angle-label generation are reported outside
-the deployable per-graph budget.  Exact statevector runtime is not converted
-into hardware shots.
-
-The displayed ledger covers the final locked protocol and totals 79,488 exact
-objective calls.  The earlier regular-grid and heterogeneous
-development-stage studies used 36,096 and 51,840 additional calls,
-respectively.  Repeating all three committed evidence tracks would therefore
-use 167,424 exact objective calls.  These are research-construction costs, not
-the 32-call cost of deploying one frozen arm on a new graph.
+Every optimizer arm receives exactly $32$ objective calls: fixed schedules still
+pay for their seed evaluation, multistart pays for each start from the same
+counter, and model training and angle-label generation are reported outside the
+deployable per-graph budget.  The displayed ledger covers the final locked
+protocol and totals $79{,}488$ exact objective calls; the earlier regular-grid
+and heterogeneous development-stage studies used $36{,}096$ and $51{,}840$
+additional calls, so repeating all three committed evidence tracks would use
+$167{,}424$ exact objective calls.  These are research-construction costs, not
+the $32$-call cost of deploying one frozen arm on a new graph, and exact
+statevector runtime is never converted into hardware shots.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/Figure12_ResourceLedger.pdf}
 \caption{\textbf{Exact-statevector resource ledger.}  \textbf{(a)} Exact
-objective calls used for angle labels, development, calibration, and the
-one-shot audit.  \textbf{(b)} The nine-arm research audit is separated from
-the 32-call ceiling of one deployed arm.  No conversion to shots or hardware
-time is made.}
+objective calls used for angle labels, development, calibration, and the one-shot
+audit.  \textbf{(b)} The nine-arm research audit is separated from the $32$-call
+ceiling of one deployed arm.  No conversion to shots or hardware time is made.}
 \label{fig:resource-ledger}
 \end{figure*}
 
 \begin{table*}[t]
 \centering
-\caption{\textbf{Final-protocol exact-statevector resource ledger.}  Query
-totals are regenerated from the locked confirmatory summary.  Earlier
-development-stage studies are reported in the surrounding text, and the
-deployed per-graph ceiling is not multiplied by the nine-arm research audit.}
+\caption{\textbf{Final-protocol exact-statevector resource ledger.}  Query totals
+are regenerated from the locked confirmatory summary; earlier development-stage
+studies are reported in the surrounding text, and the deployed per-graph ceiling
+is not multiplied by the nine-arm research audit.}
 \label{tab:resource-ledger}
 \resizebox{\textwidth}{!}{\input{tables/table_resource_accounting.tex}}
 \end{table*}
 
-\section{Additional Reliability Analysis}
-
-The 141 covered residuals out of 160 fall below the literal 0.90 requirement.
-Under a hypothetical independent binomial model with success probability
-0.90, the lower-tail probability is 0.249.  This sensitivity analysis explains
-that the miss is not surprising; it does not alter the frozen pass/fail
-rule or justify independence.
-
-The legacy optimizer-ablation values remain reproducible from
-\texttt{tables/table\_ablation.tex}.  They are historical development
-diagnostics rather than part of the locked confirmatory portfolio decision,
-so they are excluded from the five numbered study tables.
-
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/Figure13_InferenceThresholdSensitivity.pdf}
-\caption{\textbf{Exploratory inference and threshold sensitivity.}
-\textbf{(a)} Percentile-bootstrap endpoints under 40 deterministic resampling
-seed perturbations.  \textbf{(b)} Acceptance and harm rates under post-hoc
-additive gate margins.  Neither panel replaces or modifies the frozen
-confirmatory decision.}
+\caption{\textbf{Exploratory inference and threshold sensitivity.}  \textbf{(a)}
+Percentile-bootstrap endpoints under deterministic resampling-seed perturbations.
+\textbf{(b)} Acceptance and harm rates under post-hoc additive gate margins.
+Neither panel replaces or modifies the frozen confirmatory decision.}
 \label{fig:inference-threshold-sensitivity}
 \end{figure*}
-
-Future reliability work should power the accepted subset directly, report
-family-conditional coverage, and predefine how graph filtering affects the
-sampling law.  Shadow-tomography and classical-shadow measurement methods
-could support broader operator portfolios
-\citep{aaronson2018shadow,huang2020shadows}, but the present commuting MaxCut
-objective does not require them.
 
 \end{document}

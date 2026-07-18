@@ -1371,6 +1371,47 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
         "\\end{tabular}\n"
     )
 
+    table_policy = TABLES / "table_policy_comparison.tex"
+    family_mean = audit["family_label_control_mean_aurc"]
+    policy_rows = [
+        (
+            "Global development arm",
+            audit["baseline_mean_aurc"],
+            audit["baseline_mean_aurc"] - family_mean,
+            "deployable control",
+        ),
+        (
+            "Family fallback",
+            family_mean,
+            0.0,
+            "deployable control",
+        ),
+        (
+            "Gated selector",
+            audit["gated_selector_mean_aurc"],
+            audit["mean_delta_gated_minus_family_label_control"],
+            f"{audit['accepted_count']} accepted routes",
+        ),
+        (
+            "Per-graph portfolio oracle",
+            audit["oracle_mean_aurc"],
+            audit["oracle_mean_aurc"] - family_mean,
+            "retrospective only",
+        ),
+    ]
+    table_policy.write_text(
+        "\\begin{tabular}{@{}lrrl@{}}\n"
+        "\\toprule\n"
+        "Policy & Mean AURC & $\\Delta$ versus family & Interpretation \\\\\n"
+        "\\midrule\n"
+        + "\n".join(
+            f"{label} & {mean:.5f} & {delta:+.5f} & {interpretation} \\\\"
+            for label, mean, delta, interpretation in policy_rows
+        )
+        + "\n\\bottomrule\n"
+        "\\end{tabular}\n"
+    )
+
     gates = audit["go_no_go"]
     global_high = audit["delta_bootstrap_95_interval"][1]
     family_high = audit["family_control_delta_bootstrap_95_interval"][1]
@@ -1496,6 +1537,7 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
         table_protocol,
         table_arms,
         table_results,
+        table_policy,
         table_gate,
         table_resources,
         macros,
@@ -1514,8 +1556,8 @@ def write_artifact_manifest(
     ]
     if len(figure_paths) != 2 * len(FIGURE_STEMS):
         raise ValueError("artifact set must contain PDF and PNG for 13 figures")
-    if len(table_paths) != 5:
-        raise ValueError("artifact set must contain exactly five study tables")
+    if len(table_paths) != 6:
+        raise ValueError("artifact set must contain exactly six study tables")
     body = {
         "schema_version": 2,
         "generator": "manuscript/generate_portfolio_artifacts.py",
@@ -1582,8 +1624,8 @@ def main() -> int:
         path for path in table_outputs
         if path.name.startswith("table_")
     ]
-    if len(table_paths) != 5:
-        raise ValueError("generator must emit exactly five current-study tables")
+    if len(table_paths) != 6:
+        raise ValueError("generator must expose exactly six manuscript tables")
     outputs.extend(table_outputs)
     manifest = write_artifact_manifest(
         outputs, evidence, table_paths=table_paths)

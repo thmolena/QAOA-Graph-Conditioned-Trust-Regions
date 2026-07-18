@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the deterministic 21-member GCTR arXiv source archive."""
+"""Build the deterministic 22-member GCTR arXiv source archive."""
 
 from __future__ import annotations
 

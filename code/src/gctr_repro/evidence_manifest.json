@@ -229,16 +229,16 @@
       "size": 177159
     },
     "manuscript/figures/specops_gctr_manifest.json": {
-      "sha256": "1939433d438a992c36d9f37a9505bec3e21168fb362d5d4a45f5cca9cf3642fc",
+      "sha256": "f52bf5b37c785c1d174b435fef6c864f37bbff6c9f3c0992277dc06357f7042b",
       "size": 7293
     },
     "manuscript/generate_portfolio_artifacts.py": {
-      "sha256": "941244faafacc782216d2d2230c57d69f537f6cf6354953266bc7b728e90dd21",
-      "size": 64697
+      "sha256": "e7c773f5a0004adaf772909d42880d08b0412f8780469a02c485127bfb6743ac",
+      "size": 66014
     },
     "manuscript/portfolio_artifacts_manifest.json": {
-      "sha256": "388f5481ff68aa166c299531eb82ab9059623cb2f05c281df2220d7c79ca442a",
-      "size": 5718
+      "sha256": "fc5cf1b7b8347989b74c4676b32f0bf50e40cb46dffbc015b10e7955f4bfb7ab",
+      "size": 5894
     },
     "manuscript/source_data/EDFig2_ShotNoise.csv": {
       "sha256": "896c80a9ff2ff3d9edf87d7abda3e75ef2b2e80fc092bba70d60ddf5fdb8f558",
@@ -311,6 +311,10 @@
     "manuscript/tables/table_efficiency.tex": {
       "sha256": "9d7bfc38d885fb25c968f9b43a5861b965e3b2714366fca62b70933e3114c587",
       "size": 771
+    },
+    "manuscript/tables/table_policy_comparison.tex": {
+      "sha256": "10a4427d4db6f65bbf49a4f8c868a50586b5638058213200f7c5009f6b07e968",
+      "size": 397
     },
     "manuscript/tables/table_portfolio_arms.tex": {
       "sha256": "639641f62cc227381be053a489a760a64872d4d46a81ee80464c7292717c682e",
@@ -421,6 +425,6 @@
       "size": 1927498
     }
   },
-  "manifest_sha256": "52051e5ad146565352310c6f94018ce5b0b31390691646572ccc6bdd64afff93",
+  "manifest_sha256": "8b5c8af07b282bfcc961758f5f70e4efbbaa92b4a95cd4eca72dde020cb7338f",
   "schema_version": 1
 }

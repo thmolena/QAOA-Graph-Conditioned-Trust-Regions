@@ -28,7 +28,7 @@ def test_source_tree_is_byte_identical() -> None:
 def test_replay_validates_all_committed_evidence() -> None:
     report = replay()
     assert report["mode"] == "byte-hash-replay"
-    assert report["files"] == 105
+    assert report["files"] == 106
     assert report["legacy_schema"] == 2
     assert len(report["portfolio_decisions"]) == 3
 

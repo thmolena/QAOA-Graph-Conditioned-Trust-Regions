@@ -22,11 +22,12 @@
       "Figure12_ResourceLedger",
       "Figure13_InferenceThresholdSensitivity"
     ],
-    "table_count": 5,
+    "table_count": 6,
     "table_files": [
       "manuscript/tables/table_portfolio_protocol.tex",
       "manuscript/tables/table_portfolio_arms.tex",
       "manuscript/tables/table_confirmatory_results.tex",
+      "manuscript/tables/table_policy_comparison.tex",
       "manuscript/tables/table_confirmatory_gate.tex",
       "manuscript/tables/table_resource_accounting.tex"
     ],
@@ -71,9 +72,10 @@
     "manuscript/tables/portfolio_numbers.tex": "0fa8fa8547bdecbbf442d3b956d3da0212d9c2708e1ee353da65f517ab1b4a3c",
     "manuscript/tables/table_confirmatory_gate.tex": "807d5ee0fd00b37844b9e91dae984f8cf2f8120b004c8565f03d505c2caa79ec",
     "manuscript/tables/table_confirmatory_results.tex": "0d39ffc186d590e9370b55aeaffa65c55a4e5170284d648bc2e161688f5d1f39",
+    "manuscript/tables/table_policy_comparison.tex": "10a4427d4db6f65bbf49a4f8c868a50586b5638058213200f7c5009f6b07e968",
     "manuscript/tables/table_portfolio_arms.tex": "639641f62cc227381be053a489a760a64872d4d46a81ee80464c7292717c682e",
     "manuscript/tables/table_portfolio_protocol.tex": "bba977786de0eeef19d4b7995ca2ea8b59d57a65597f14272b7d4b62f1cf035b",
     "manuscript/tables/table_resource_accounting.tex": "708bc4bf5080c4daff0a7e70d83233152d4ff3010ee090ad7057c6ce69ab895b"
   },
-  "manifest_sha256": "344e2452996ac2181f178abcc0b915459e23f1c3d41503ad6e865900ddde45f3"
+  "manifest_sha256": "4539e4c67185540606370ff1ce1729051b13e41c0980e261d5417039207d2893"
 }
