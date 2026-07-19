@@ -40,6 +40,8 @@ does not run training, optimization, or plotting:
 gctr-reproduce-all replay
 python tools/check_source_sync.py
 python -m pytest
+gctr-optimize --help
+gctr-portfolio --help
 ```
 
 To materialize an exact byte-for-byte copy of the committed evidence:
@@ -87,6 +89,33 @@ Replay and rerun answer different questions:
 The design-only `prospective_risk_control_v2.design.json` is included and
 hashed. It is intentionally not executed because its own status is
 `design_only_not_registered_not_run`.
+
+## Complete manuscript release gate
+
+From the repository root, one command regenerates the 13 figures and five
+numbered tables from validated locked evidence, verifies source and evidence
+mirrors, builds the REVTeX manuscript and deterministic source archive, and
+recompiles the extracted archive:
+
+```bash
+python run.py release
+```
+
+The command stops on evidence, source, reported-value, manuscript-input,
+citation, or archive drift.
+
+## Python API
+
+The graph generator, policy configuration, exact-statevector objective, and
+query-counted search are available as composable imports:
+
+```python
+from specops_gctr import Config, make_instance
+
+config = Config(p_depth=2, budget=32, seed=7)
+instance = make_instance("er", n=8, seed=config.seed)
+print(instance.graph.number_of_edges(), config.budget)
+```
 
 ## Build and wheel-install checks
 

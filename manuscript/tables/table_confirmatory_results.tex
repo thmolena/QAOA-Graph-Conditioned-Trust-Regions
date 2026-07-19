@@ -1,3 +1,5 @@
+\begin{minipage}{\textwidth}
+\textbf{(a) Family-stratified confirmatory audit.}\par\smallskip
 \begin{tabular}{@{}lrrrrrr@{}}
 \toprule
 Stratum & $N$ & Fallback & Gated & $\Delta$ & Accepted & Harms \\
@@ -10,3 +12,16 @@ Watts--Strogatz & 40 & 0.16391 & 0.16234 & -0.00157 & 1 & 0 \\
 All & 160 & 0.17207 & 0.16930 & -0.00277 & 12 & 4 \\
 \bottomrule
 \end{tabular}
+\par\medskip
+\textbf{(b) Locked policy comparison.}\par\smallskip
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Policy & Mean AURC & $\Delta$ versus family & Interpretation \\
+\midrule
+Global development arm & 0.17277 & +0.00070 & deployable control \\
+Family fallback & 0.17207 & +0.00000 & deployable control \\
+Gated selector & 0.16930 & -0.00277 & 12 accepted routes \\
+Per-graph portfolio oracle & 0.16048 & -0.01159 & retrospective only \\
+\bottomrule
+\end{tabular}
+\end{minipage}

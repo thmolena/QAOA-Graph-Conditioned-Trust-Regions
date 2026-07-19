@@ -1,211 +1,100 @@
 {
-  "schema_version": 1,
-  "description": "Exact mapping from numbered manuscript floats to committed assets, generators, and evidence.",
+  "schema_version": 2,
+  "description": "Exact mapping from every numbered manuscript float to a committed asset and its deterministic generator.",
+  "generator": "manuscript/generate_portfolio_artifacts.py",
+  "evidence_contract": "manuscript/portfolio_artifacts_manifest.json",
   "figures": [
     {
       "number": 1,
       "label": "fig:protocol",
-      "asset": "figures/Figure1_PortfolioProtocol.pdf",
-      "kind": "evidence diagram",
-      "generator": "manuscript/generate_portfolio_artifacts.py",
-      "evidence": [
-        "configs/portfolio_heterogeneous_confirmatory.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/summary.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/frozen_decision.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/portfolio_manifest.json"
-      ]
+      "asset": "figures/Figure1_PortfolioProtocol.pdf"
     },
     {
       "number": 2,
       "label": "fig:confirm",
-      "asset": "figures/Figure2_ConfirmatoryAudit.pdf",
-      "kind": "locked result",
-      "generator": "manuscript/generate_portfolio_artifacts.py",
-      "evidence": [
-        "configs/portfolio_heterogeneous_confirmatory.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/summary.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/frozen_decision.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/traces.jsonl"
-      ]
+      "asset": "figures/Figure2_ConfirmatoryAudit.pdf"
     },
     {
       "number": 3,
       "label": "fig:progression",
-      "asset": "figures/Figure3_DevelopmentToConfirmation.pdf",
-      "kind": "development-confirmation comparison",
-      "generator": "manuscript/generate_portfolio_artifacts.py",
-      "evidence": [
-        "portfolio_results/development_v2_tqa_family_gate/summary.json",
-        "portfolio_results/heterogeneous_development_v2_tqa_family_gate/summary.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/summary.json"
-      ]
+      "asset": "figures/Figure3_DevelopmentToConfirmation.pdf"
     },
     {
       "number": 4,
-      "label": "fig:legacygeneralization",
-      "asset": "figures/Figure4_Generalization.pdf",
-      "kind": "legacy diagnostic",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "manuscript/source_data/Figure4_Generalization.csv",
-        "manuscript/source_data/meta.json"
-      ]
+      "label": "fig:arm-ranking",
+      "asset": "figures/Figure4_ArmOpportunityRanking.pdf"
     },
     {
       "number": 5,
-      "label": "fig:legacyablation",
-      "asset": "figures/Figure5_Ablation.pdf",
-      "kind": "legacy diagnostic",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "manuscript/source_data/Figure5_Ablation.csv",
-        "manuscript/source_data/meta.json"
-      ]
+      "label": "fig:residual-order",
+      "asset": "figures/Figure5_ResidualOrderStatistic.pdf"
     },
     {
       "number": 6,
-      "label": "fig:legacyfrontier",
-      "asset": "figures/Figure6_QualityCostFrontier.pdf",
-      "kind": "legacy diagnostic",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "manuscript/source_data/Figure2_QueryEfficiency.csv",
-        "manuscript/source_data/meta.json"
-      ]
+      "label": "fig:predicted-realized",
+      "asset": "figures/Figure6_PredictedVsRealizedRoutes.pdf"
     },
     {
       "number": 7,
-      "label": "fig:budgetpolicy",
-      "asset": "figures/Figure7_UncertaintyBudgetPolicy.pdf",
-      "kind": "legacy diagnostic",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "manuscript/source_data/Figure7_BudgetPolicy.csv",
-        "manuscript/source_data/meta.json"
-      ]
+      "label": "fig:anytime-family",
+      "asset": "figures/Figure7_AnytimeByFamily.pdf"
     },
     {
       "number": 8,
-      "label": "fig:theorymap",
-      "asset": "figures/Figure8_TheoryMap.pdf",
-      "kind": "mathematical dependency diagram",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "specops_gctr/plots.py"
-      ]
+      "label": "fig:family-effects",
+      "asset": "figures/Figure8_FamilyEffects.pdf"
     },
     {
       "number": 9,
-      "label": "fig:landscape",
-      "asset": "figures/Figure9_LandscapeSlice.pdf",
-      "kind": "legacy exact-statevector diagnostic",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "manuscript/source_data/meta.json"
-      ]
+      "label": "fig:risk-sensitivity",
+      "asset": "figures/Figure9_RiskSensitivity.pdf"
     },
     {
       "number": 10,
-      "label": "fig:architecture",
-      "asset": "figures/Figure10_RepositoryArchitecture.pdf",
-      "kind": "repository diagram",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "pyproject.toml",
-        "specops_gctr/plots.py",
-        "tests/test_package.py"
-      ]
+      "label": "fig:arm-transitions",
+      "asset": "figures/Figure10_ArmTransitions.pdf"
     },
     {
       "number": 11,
-      "label": "fig:reproworkflow",
-      "asset": "figures/Figure11_ReproducibilityWorkflow.pdf",
-      "kind": "reproduction workflow diagram",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "specops_gctr/reproduce.py",
-        "manuscript/generate_portfolio_artifacts.py",
-        "tests/test_package.py"
-      ]
+      "label": "fig:split-diagnostics",
+      "asset": "figures/Figure11_SplitDiagnostics.pdf"
     },
     {
       "number": 12,
-      "label": "fig:shotnoise",
-      "asset": "figures/ExtendedData/ED_Fig2_ShotNoiseRobustness.pdf",
-      "kind": "legacy diagnostic",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "manuscript/source_data/EDFig2_ShotNoise.csv",
-        "manuscript/source_data/meta.json"
-      ]
+      "label": "fig:resource-ledger",
+      "asset": "figures/Figure12_ResourceLedger.pdf"
     },
     {
       "number": 13,
-      "label": "fig:seedstability",
-      "asset": "figures/ExtendedData/ED_Fig3_SeedStability.pdf",
-      "kind": "legacy diagnostic",
-      "generator": "specops_gctr/plots.py",
-      "evidence": [
-        "manuscript/source_data/EDFig3_SeedStability.csv",
-        "manuscript/source_data/meta.json"
-      ]
+      "label": "fig:inference-threshold-sensitivity",
+      "asset": "figures/Figure13_InferenceThresholdSensitivity.pdf"
     }
   ],
   "tables": [
     {
       "number": 1,
       "label": "tab:protocol",
-      "asset": "tables/table_portfolio_protocol.tex",
-      "kind": "locked protocol summary",
-      "generator": "manuscript/generate_portfolio_artifacts.py",
-      "evidence": [
-        "configs/portfolio_heterogeneous_confirmatory.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/summary.json"
-      ]
+      "asset": "tables/table_portfolio_protocol.tex"
     },
     {
       "number": 2,
       "label": "tab:confirmatory",
-      "asset": "tables/table_confirmatory_results.tex",
-      "kind": "locked result",
-      "generator": "manuscript/generate_portfolio_artifacts.py",
-      "evidence": [
-        "portfolio_results/heterogeneous_confirmatory_v1/summary.json"
-      ]
+      "asset": "tables/table_confirmatory_results.tex"
     },
     {
       "number": 3,
-      "label": "tab:gate",
-      "asset": "tables/table_confirmatory_gate.tex",
-      "kind": "locked decision",
-      "generator": "manuscript/generate_portfolio_artifacts.py",
-      "evidence": [
-        "configs/portfolio_heterogeneous_confirmatory.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/summary.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/frozen_decision.json"
-      ]
+      "label": "tab:portfolio-arms",
+      "asset": "tables/table_portfolio_arms.tex"
     },
     {
       "number": 4,
-      "label": "tab:legacy-efficiency",
-      "asset": "tables/table_efficiency.tex",
-      "kind": "legacy diagnostic",
-      "generator": "specops_gctr/tables.py",
-      "evidence": [
-        "manuscript/source_data/Figure2_QueryEfficiency.csv",
-        "manuscript/source_data/meta.json"
-      ]
+      "label": "tab:gate",
+      "asset": "tables/table_confirmatory_gate.tex"
     },
     {
       "number": 5,
       "label": "tab:resource-ledger",
-      "asset": "tables/table_resource_accounting.tex",
-      "kind": "locked resource accounting",
-      "generator": "manuscript/generate_portfolio_artifacts.py",
-      "evidence": [
-        "configs/portfolio_heterogeneous_confirmatory.json",
-        "portfolio_results/heterogeneous_confirmatory_v1/summary.json"
-      ]
+      "asset": "tables/table_resource_accounting.tex"
     }
   ]
 }

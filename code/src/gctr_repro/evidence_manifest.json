@@ -17,8 +17,16 @@
       "size": 18022
     },
     "manuscript/artifact_reproduction_map.json": {
-      "sha256": "0068b9ba12855c9a3fbc3e8bb3a03fcad4749109f6bf8606624301a5061a0476",
-      "size": 6900
+      "sha256": "bca0c1a40a2a53b2f95b6d75e6510dcafcef664a314a068db8a653c721825c9f",
+      "size": 2562
+    },
+    "manuscript/arxiv-source-gctr.zip": {
+      "sha256": "fa3f8104da2d8da8cfb8b024aeaf01e46d6c8a3d8dcc4c70811757183ae2895c",
+      "size": 401142
+    },
+    "manuscript/build_arxiv_archive.py": {
+      "sha256": "2ce39bfd2ed1f85baaafdfe5eee77566e020d8f71efd4637bebbc8a6cc9fefd5",
+      "size": 2859
     },
     "manuscript/figures/ExtendedData/ED_Fig2_ShotNoiseRobustness.pdf": {
       "sha256": "0162b25db721719c230f823dcbb8129612db97ad10fba539bc3a2cf3f9e94733",
@@ -233,12 +241,48 @@
       "size": 7293
     },
     "manuscript/generate_portfolio_artifacts.py": {
-      "sha256": "e7c773f5a0004adaf772909d42880d08b0412f8780469a02c485127bfb6743ac",
-      "size": 66014
+      "sha256": "cbd27239da476fd184b06f44387a2cf6c7cfd259d4d537de3923a31a1587ce0b",
+      "size": 66286
+    },
+    "manuscript/main.aux": {
+      "sha256": "966ece7bb59600ff19d32e91dc1adfdeeb77e2913967c64265b8c92f5c15bb93",
+      "size": 29335
+    },
+    "manuscript/main.bbl": {
+      "sha256": "56ac5e52ad3f72fca8225754ec417cfd1125d3f330b9e93713f44f5309a346cd",
+      "size": 46841
+    },
+    "manuscript/main.blg": {
+      "sha256": "e91e5b13bf5c7edf1e47e1c95b7172d3212a31f9de9204c52258d6788534bc69",
+      "size": 541
+    },
+    "manuscript/main.log": {
+      "sha256": "499bff84a9e18e59caedc4c8f8c74e701e544b8cbcfb27659677da37e24e6a38",
+      "size": 23472
+    },
+    "manuscript/main.out": {
+      "sha256": "4c0a28c191847fe8de80518e1b31851868f9d3a741abd2b1ae19b8b158bc5d2d",
+      "size": 7234
+    },
+    "manuscript/main.pdf": {
+      "sha256": "685e566649205966bd1c58455d2914ce6a0a3db5a0b4f6b08cac2262b17aa293",
+      "size": 531921
+    },
+    "manuscript/main.tex": {
+      "sha256": "f99ba0e55f2340bdf425fb1c78b4d1ec431040f67778f4395fb51fe0671d528b",
+      "size": 49514
     },
     "manuscript/portfolio_artifacts_manifest.json": {
-      "sha256": "fc5cf1b7b8347989b74c4676b32f0bf50e40cb46dffbc015b10e7955f4bfb7ab",
-      "size": 5894
+      "sha256": "1fad4a823380ab7f45fb23efd9d4f83f3d36a4e58526e1923b65809500fef6e1",
+      "size": 5718
+    },
+    "manuscript/prx-popular-summary.tex": {
+      "sha256": "802257a74a4e44aa8258ca06729c3f8c702dd1803ea7014aacafbb4ffcc6ef0b",
+      "size": 966
+    },
+    "manuscript/refs.bib": {
+      "sha256": "d2fbef9a446b413a15b23fbc4573a0e2e05009b461316f5e29877e22c1966795",
+      "size": 21179
     },
     "manuscript/source_data/EDFig2_ShotNoise.csv": {
       "sha256": "896c80a9ff2ff3d9edf87d7abda3e75ef2b2e80fc092bba70d60ddf5fdb8f558",
@@ -301,20 +345,16 @@
       "size": 805
     },
     "manuscript/tables/table_confirmatory_gate.tex": {
-      "sha256": "807d5ee0fd00b37844b9e91dae984f8cf2f8120b004c8565f03d505c2caa79ec",
-      "size": 470
+      "sha256": "b19742f8d7a9840c661d6fdee351f561d605b65653bbea7bba4bba485708f053",
+      "size": 485
     },
     "manuscript/tables/table_confirmatory_results.tex": {
-      "sha256": "0d39ffc186d590e9370b55aeaffa65c55a4e5170284d648bc2e161688f5d1f39",
-      "size": 460
+      "sha256": "7e6e199bd0a5d113526cd8666f125a9a1db2a6abe2192d5ce8461bb0b793ebba",
+      "size": 1032
     },
     "manuscript/tables/table_efficiency.tex": {
       "sha256": "9d7bfc38d885fb25c968f9b43a5861b965e3b2714366fca62b70933e3114c587",
       "size": 771
-    },
-    "manuscript/tables/table_policy_comparison.tex": {
-      "sha256": "10a4427d4db6f65bbf49a4f8c868a50586b5638058213200f7c5009f6b07e968",
-      "size": 397
     },
     "manuscript/tables/table_portfolio_arms.tex": {
       "sha256": "639641f62cc227381be053a489a760a64872d4d46a81ee80464c7292717c682e",
@@ -327,6 +367,10 @@
     "manuscript/tables/table_resource_accounting.tex": {
       "sha256": "708bc4bf5080c4daff0a7e70d83233152d4ff3010ee090ad7057c6ce69ab895b",
       "size": 402
+    },
+    "manuscript/validate_manuscript.py": {
+      "sha256": "38aee41cc2e8935a276bb1c4669530385cdc4409143d69c188ea2dabeed559e2",
+      "size": 19602
     },
     "portfolio_results/development_v2_tqa_family_gate/angle_labels.json": {
       "sha256": "0ec9d35d20d54f17aa61f21a178505ae3ed63c1ab59fa8a8d84df1ea06714edb",
@@ -425,6 +469,6 @@
       "size": 1927498
     }
   },
-  "manifest_sha256": "8b5c8af07b282bfcc961758f5f70e4efbbaa92b4a95cd4eca72dde020cb7338f",
+  "manifest_sha256": "9c4047f76834b81aa8a6db71509659e1dcca9cefec486612db41954ebbdada0f",
   "schema_version": 1
 }

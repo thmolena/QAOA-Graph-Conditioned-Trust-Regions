@@ -1355,7 +1355,7 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
             f"{values['mean_delta_gated_minus_family_control']:+.5f} & "
             f"{values['accepted_count']} & {values['joint_harm_count']} \\\\"
         )
-    table_results.write_text(
+    family_results = (
         "\\begin{tabular}{@{}lrrrrrr@{}}\n"
         "\\toprule\n"
         "Stratum & $N$ & Fallback & Gated & $\\Delta$ & Accepted & Harms \\\\\n"
@@ -1371,7 +1371,6 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
         "\\end{tabular}\n"
     )
 
-    table_policy = TABLES / "table_policy_comparison.tex"
     family_mean = audit["family_label_control_mean_aurc"]
     policy_rows = [
         (
@@ -1399,7 +1398,7 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
             "retrospective only",
         ),
     ]
-    table_policy.write_text(
+    policy_results = (
         "\\begin{tabular}{@{}lrrl@{}}\n"
         "\\toprule\n"
         "Policy & Mean AURC & $\\Delta$ versus family & Interpretation \\\\\n"
@@ -1410,6 +1409,16 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
         )
         + "\n\\bottomrule\n"
         "\\end{tabular}\n"
+    )
+    table_results.write_text(
+        "\\begin{minipage}{\\textwidth}\n"
+        "\\textbf{(a) Family-stratified confirmatory audit.}"
+        "\\par\\smallskip\n"
+        + family_results
+        + "\\par\\medskip\n"
+        "\\textbf{(b) Locked policy comparison.}\\par\\smallskip\n"
+        + policy_results
+        + "\\end{minipage}\n"
     )
 
     gates = audit["go_no_go"]
@@ -1434,7 +1443,7 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
     ]
     table_gate = TABLES / "table_confirmatory_gate.tex"
     table_gate.write_text(
-        "\\begin{tabular}{@{}lrrc@{}}\n"
+        "\\begin{tabular}{@{}lr@{\\hspace{2em}}rc@{}}\n"
         "\\toprule\n"
         "Criterion & Required & Observed & Result \\\\\n"
         "\\midrule\n"
@@ -1537,7 +1546,6 @@ def make_tables_and_macros(evidence: dict) -> list[Path]:
         table_protocol,
         table_arms,
         table_results,
-        table_policy,
         table_gate,
         table_resources,
         macros,
@@ -1556,8 +1564,8 @@ def write_artifact_manifest(
     ]
     if len(figure_paths) != 2 * len(FIGURE_STEMS):
         raise ValueError("artifact set must contain PDF and PNG for 13 figures")
-    if len(table_paths) != 6:
-        raise ValueError("artifact set must contain exactly six study tables")
+    if len(table_paths) != 5:
+        raise ValueError("artifact set must contain exactly five study tables")
     body = {
         "schema_version": 2,
         "generator": "manuscript/generate_portfolio_artifacts.py",
@@ -1624,8 +1632,8 @@ def main() -> int:
         path for path in table_outputs
         if path.name.startswith("table_")
     ]
-    if len(table_paths) != 6:
-        raise ValueError("generator must expose exactly six manuscript tables")
+    if len(table_paths) != 5:
+        raise ValueError("generator must expose exactly five manuscript tables")
     outputs.extend(table_outputs)
     manifest = write_artifact_manifest(
         outputs, evidence, table_paths=table_paths)
